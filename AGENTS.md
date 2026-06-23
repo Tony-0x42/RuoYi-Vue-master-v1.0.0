@@ -22,19 +22,30 @@
 - 后端：`mvn -pl ruoyi-admin -am clean package -DskipTests` 后 `java -jar ruoyi-admin/target/ruoyi-admin.jar --spring.profiles.active=druid`
 - 前端：`cd ruoyi-ui && npm run dev`
 
-## 数据库变更规范
+## 本地数据库工具与连接方式
 
-- 所有数据库结构变更必须通过 SQL 脚本完成，脚本统一放在 `sql/` 目录。
-- 同时维护两类脚本：
-  - **初始化脚本**：如 `ry_init_*.sql`，用于新环境一次性创建所有表结构。
-  - **增量迁移脚本**：如 `bpm_*_migration.sql`，用于已运行数据库升级，命名需体现变更内容和日期。
-- 当需要修改数据库时，遵循以下流程：
-  1. **备份**：变更前必须先备份目标数据库。
-  2. **脚本化**：将变更写成可重复执行的 SQL 脚本，避免直接在生产环境手工操作。
-  3. **本地验证**：在本地或测试环境先执行并验证表结构、索引、数据一致性。
-  4. **自动执行**：只有在用户明确授权并提供连接信息后，才可在本地开发环境通过命令行工具（如 `mysql` 客户端）自动执行脚本；**生产环境禁止自动连接修改**。
-  5. **回滚准备**：复杂变更应提供回滚 SQL，或在事务中执行以便异常时回退。
-- 数据库连接优先使用 UTF-8 / utf8mb4 编码，命令行执行时显式指定 `--default-character-set=utf8mb4`。
+- MySQL 命令行客户端位置：`/d/tools/MySQL/MySQL Workbench 8.0/mysql.exe`
+- MySQL 逻辑备份工具位置：`/d/tools/MySQL/MySQL Workbench 8.0/mysqldump.exe`
+- 图形客户端：`/d/tools/dbeaver/`
+- 连接数据库示例（在 Bash 中执行）：
+  ```bash
+  MYSQL_BIN="/d/tools/MySQL/MySQL Workbench 8.0/mysql.exe"
+  "$MYSQL_BIN" -h <host> -P <port> -u <user> -p<password> --default-character-set=utf8mb4 <database>
+  ```
+- 执行 SQL 脚本示例：
+  ```bash
+  MYSQL_BIN="/d/tools/MySQL/MySQL Workbench 8.0/mysql.exe"
+  "$MYSQL_BIN" -h <host> -P <port> -u <user> -p<password> --default-character-set=utf8mb4 <database> < sql/bpm_variable_category_migration.sql
+  ```
+- 备份数据库示例：
+  ```bash
+  MYSQLDUMP_BIN="/d/tools/MySQL/MySQL Workbench 8.0/mysqldump.exe"
+  "$MYSQLDUMP_BIN" -h <host> -P <port> -u <user> -p<password> --default-character-set=utf8mb4 --single-transaction --routines --triggers <database> > backup_$(date +%Y%m%d%H%M%S).sql
+  ```
+- 数据库变更原则：
+  - 所有结构变更优先通过 `sql/` 目录下的脚本完成，并同时维护初始化脚本与增量迁移脚本。
+  - 变更前必须备份；生产环境禁止自动连接修改，需由用户确认后手动或通过审批流程执行。
+  - 命令行操作必须显式指定 `--default-character-set=utf8mb4`，避免中文乱码。
 
 ## 本地环境说明
 
