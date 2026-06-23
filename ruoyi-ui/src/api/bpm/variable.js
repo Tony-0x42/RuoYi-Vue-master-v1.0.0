@@ -9,6 +9,22 @@ export function listVariable(query) {
   })
 }
 
+// 根据分类ID查询变量定义列表
+export function listVariableByCategory(categoryId) {
+  return request({
+    url: '/bpm/variable/listByCategory/' + categoryId,
+    method: 'get'
+  })
+}
+
+// 根据流程定义ID查询有效变量定义列表（含继承）
+export function listVariableByDefinition(definitionId) {
+  return request({
+    url: '/bpm/variable/listByDefinition/' + definitionId,
+    method: 'get'
+  })
+}
+
 // 查询变量定义详细
 export function getVariable(variableId) {
   return request({

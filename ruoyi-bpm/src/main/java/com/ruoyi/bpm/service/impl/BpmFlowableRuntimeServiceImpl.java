@@ -23,11 +23,13 @@ import com.ruoyi.bpm.domain.BpmDefinition;
 import com.ruoyi.bpm.domain.BpmDefinitionVersion;
 import com.ruoyi.bpm.domain.BpmInstance;
 import com.ruoyi.bpm.domain.BpmTask;
+import com.ruoyi.bpm.domain.BpmVariable;
 import com.ruoyi.bpm.mapper.BpmDefinitionMapper;
 import com.ruoyi.bpm.mapper.BpmDefinitionVersionMapper;
 import com.ruoyi.bpm.mapper.BpmInstanceMapper;
 import com.ruoyi.bpm.mapper.BpmTaskMapper;
 import com.ruoyi.bpm.service.IBpmFlowableRuntimeService;
+import com.ruoyi.bpm.service.IBpmVariableService;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -68,6 +70,9 @@ public class BpmFlowableRuntimeServiceImpl implements IBpmFlowableRuntimeService
     @Autowired
     private ISysUserService sysUserService;
 
+    @Autowired
+    private IBpmVariableService bpmVariableService;
+
     @Override
     @Transactional
     public AjaxResult startProcess(Long definitionId, Map<String, Object> variables, String businessKey, String title)
@@ -83,6 +88,22 @@ public class BpmFlowableRuntimeServiceImpl implements IBpmFlowableRuntimeService
         }
 
         Map<String, Object> vars = variables == null ? new HashMap<>() : new HashMap<>(variables);
+
+        // 应用分类继承及流程定义级变量的默认值（用户传入值优先级更高）
+        List<BpmVariable> effectiveVariables = bpmVariableService.selectEffectiveVariablesByDefinitionId(definitionId);
+        for (BpmVariable variable : effectiveVariables)
+        {
+            if (StringUtils.isEmpty(variable.getVariableCode()) || vars.containsKey(variable.getVariableCode()))
+            {
+                continue;
+            }
+            Object defaultValue = convertDefaultValue(variable);
+            if (defaultValue != null)
+            {
+                vars.put(variable.getVariableCode(), defaultValue);
+            }
+        }
+
         String startUserId = String.valueOf(SecurityUtils.getUserId());
         vars.put("startUserId", startUserId);
         // 若流程中使用了 approvalAssignee 变量但未传入，默认指向发起人，避免 Unknown property 异常
@@ -517,6 +538,7 @@ public class BpmFlowableRuntimeServiceImpl implements IBpmFlowableRuntimeService
         if (instance != null)
         {
             bpmTask.setInstanceId(instance.getInstanceId());
+            bpmTask.setDefinitionId(instance.getDefinitionId());
             bpmTask.setInstanceTitle(instance.getTitle());
             bpmTask.setTitle(instance.getTitle());
             bpmTask.setDefinitionName(instance.getDefinitionName());
@@ -551,6 +573,7 @@ public class BpmFlowableRuntimeServiceImpl implements IBpmFlowableRuntimeService
         if (instance != null)
         {
             bpmTask.setInstanceId(instance.getInstanceId());
+            bpmTask.setDefinitionId(instance.getDefinitionId());
             bpmTask.setInstanceTitle(instance.getTitle());
             bpmTask.setTitle(instance.getTitle());
             bpmTask.setDefinitionName(instance.getDefinitionName());
@@ -612,6 +635,42 @@ public class BpmFlowableRuntimeServiceImpl implements IBpmFlowableRuntimeService
         catch (Exception e)
         {
             return null;
+        }
+    }
+
+    /**
+     * 按变量类型转换默认值
+     */
+    private Object convertDefaultValue(BpmVariable variable)
+    {
+        if (StringUtils.isEmpty(variable.getDefaultValue()))
+        {
+            return null;
+        }
+        String value = variable.getDefaultValue();
+        try
+        {
+            String type = variable.getVariableType();
+            if (type == null)
+            {
+                return value;
+            }
+            switch (type)
+            {
+                case "1":
+                    return Double.valueOf(value);
+                case "2":
+                    return Boolean.valueOf(value);
+                case "3":
+                    return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(value);
+                case "0":
+                default:
+                    return value;
+            }
+        }
+        catch (Exception e)
+        {
+            return value;
         }
     }
 }

@@ -64,6 +64,9 @@ public class BpmTask implements Serializable
     /** 流程名称 */
     private transient String definitionName;
 
+    /** 流程定义ID */
+    private transient Long definitionId;
+
     /** 实例标题 */
     private transient String instanceTitle;
 
@@ -191,6 +194,16 @@ public class BpmTask implements Serializable
         this.definitionName = definitionName;
     }
 
+    public Long getDefinitionId()
+    {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId)
+    {
+        this.definitionId = definitionId;
+    }
+
     public String getInstanceTitle()
     {
         return instanceTitle;
@@ -220,6 +233,7 @@ public class BpmTask implements Serializable
             .append("instanceId", getInstanceId())
             .append("flowableTaskId", getFlowableTaskId())
             .append("nodeName", getNodeName())
+            .append("definitionId", getDefinitionId())
             .append("assigneeUserId", getAssigneeUserId())
             .append("assigneeUserName", getAssigneeUserName())
             .append("status", getStatus())

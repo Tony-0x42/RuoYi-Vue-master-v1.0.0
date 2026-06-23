@@ -22,6 +22,10 @@ public class BpmVariable extends BaseEntity
     @Excel(name = "变量ID", cellType = ColumnType.NUMERIC)
     private Long variableId;
 
+    /** 分类ID */
+    @Excel(name = "分类ID", cellType = ColumnType.NUMERIC)
+    private Long categoryId;
+
     /** 定义ID */
     @Excel(name = "定义ID", cellType = ColumnType.NUMERIC)
     private Long definitionId;
@@ -52,7 +56,16 @@ public class BpmVariable extends BaseEntity
         this.variableId = variableId;
     }
 
-    @NotNull(message = "定义ID不能为空")
+    public Long getCategoryId()
+    {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId)
+    {
+        this.categoryId = categoryId;
+    }
+
     public Long getDefinitionId()
     {
         return definitionId;
@@ -111,6 +124,7 @@ public class BpmVariable extends BaseEntity
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
             .append("variableId", getVariableId())
+            .append("categoryId", getCategoryId())
             .append("definitionId", getDefinitionId())
             .append("variableName", getVariableName())
             .append("variableCode", getVariableCode())

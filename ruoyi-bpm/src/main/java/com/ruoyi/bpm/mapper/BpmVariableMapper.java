@@ -27,6 +27,22 @@ public interface BpmVariableMapper
     public List<BpmVariable> selectBpmVariableList(BpmVariable bpmVariable);
 
     /**
+     * 根据分类ID查询流程变量
+     * 
+     * @param categoryId 分类ID
+     * @return 流程变量集合
+     */
+    public List<BpmVariable> selectBpmVariableListByCategoryId(Long categoryId);
+
+    /**
+     * 根据流程定义ID查询流程变量
+     * 
+     * @param definitionId 流程定义ID
+     * @return 流程变量集合
+     */
+    public List<BpmVariable> selectBpmVariableListByDefinitionId(Long definitionId);
+
+    /**
      * 新增流程变量
      * 
      * @param bpmVariable 流程变量

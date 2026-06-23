@@ -30,6 +30,14 @@
                 <el-button
                   type="text"
                   size="mini"
+                  icon="el-icon-s-data"
+                  title="配置变量"
+                  @click.stop="handleConfigCategoryVariable(data)"
+                  v-hasPermi="['bpm:variable:list']"
+                />
+                <el-button
+                  type="text"
+                  size="mini"
                   icon="el-icon-plus"
                   @click.stop="handleCategoryAdd(data.id)"
                   v-hasPermi="['bpm:category:add']"
@@ -423,6 +431,9 @@ export default {
     },
     handleConfigVariable(row) {
       this.$router.push("/bpm/variable?definitionId=" + row.definitionId)
+    },
+    handleConfigCategoryVariable(data) {
+      this.$router.push("/bpm/variable?categoryId=" + data.id)
     },
     handleCategoryNodeClick(data) {
       if (data.id === 0) {

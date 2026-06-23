@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-alert
-      :title="'当前流程定义：' + (definitionName || '-')"
+      :title="ownerTitle"
       type="info"
       :closable="false"
       style="margin-bottom: 15px;"
@@ -146,8 +146,9 @@
 </template>
 
 <script>
-import { listVariable, getVariable, delVariable, addVariable, updateVariable } from "@/api/bpm/variable"
+import { listVariable, listVariableByCategory, listVariableByDefinition, getVariable, delVariable, addVariable, updateVariable } from "@/api/bpm/variable"
 import { getDefinition } from "@/api/bpm/definition"
+import { getCategory } from "@/api/bpm/category"
 
 export default {
   name: "BpmVariable",
@@ -160,6 +161,8 @@ export default {
       showSearch: true,
       total: 0,
       variableList: [],
+      categoryId: undefined,
+      categoryName: "",
       definitionId: undefined,
       definitionName: "",
       title: "",
@@ -173,6 +176,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        categoryId: undefined,
         definitionId: undefined,
         variableName: undefined,
         variableCode: undefined
@@ -191,10 +195,27 @@ export default {
       }
     }
   },
+  computed: {
+    ownerTitle() {
+      if (this.categoryId) {
+        return '当前流程分类：' + (this.categoryName || '-')
+      }
+      if (this.definitionId) {
+        return '当前流程定义：' + (this.definitionName || '-')
+      }
+      return '未指定变量所属对象'
+    }
+  },
   created() {
-    this.definitionId = this.$route.query.definitionId
+    this.categoryId = this.$route.query.categoryId ? Number(this.$route.query.categoryId) : undefined
+    this.definitionId = this.$route.query.definitionId ? Number(this.$route.query.definitionId) : undefined
+    this.queryParams.categoryId = this.categoryId
     this.queryParams.definitionId = this.definitionId
-    if (this.definitionId) {
+    if (this.categoryId) {
+      getCategory(this.categoryId).then(response => {
+        this.categoryName = response.data.categoryName
+      })
+    } else if (this.definitionId) {
       getDefinition(this.definitionId).then(response => {
         this.definitionName = response.data.definitionName
       })
@@ -208,11 +229,25 @@ export default {
     },
     getList() {
       this.loading = true
-      listVariable(this.queryParams).then(response => {
-        this.variableList = response.rows
-        this.total = response.total
-        this.loading = false
-      })
+      if (this.categoryId) {
+        listVariableByCategory(this.categoryId).then(response => {
+          this.variableList = response.data
+          this.total = response.data.length
+          this.loading = false
+        })
+      } else if (this.definitionId) {
+        listVariable(this.queryParams).then(response => {
+          this.variableList = response.rows
+          this.total = response.total
+          this.loading = false
+        })
+      } else {
+        listVariable(this.queryParams).then(response => {
+          this.variableList = response.rows
+          this.total = response.total
+          this.loading = false
+        })
+      }
     },
     cancel() {
       this.open = false
@@ -221,6 +256,7 @@ export default {
     reset() {
       this.form = {
         variableId: undefined,
+        categoryId: this.categoryId,
         definitionId: this.definitionId,
         variableName: undefined,
         variableCode: undefined,

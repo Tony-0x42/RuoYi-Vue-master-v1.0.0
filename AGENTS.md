@@ -12,6 +12,11 @@
 - 流程发布后会生成新的 Flowable `ProcessDefinition` 版本，并同步写入 `bpm_definition_version`。
 - 启动流程时如需指定办理人，请通过流程变量 `approvalAssignee` 传入用户 ID（如 `1`）。
 
+## Git 提交规范
+
+- 所有 Git commit message 必须使用英文撰写，保持简洁、清晰，遵循常规提交格式（如 `feat:`, `fix:`, `docs:`, `refactor:` 等前缀）。
+- 禁止使用中文或无意义的提交信息。
+
 ## 构建与启动
 
 - 后端：`mvn -pl ruoyi-admin -am clean package -DskipTests` 后 `java -jar ruoyi-admin/target/ruoyi-admin.jar --spring.profiles.active=druid`

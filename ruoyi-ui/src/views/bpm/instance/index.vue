@@ -96,7 +96,7 @@
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="选择流程" prop="definitionId">
-          <el-select v-model="form.definitionId" placeholder="请选择已发布的流程" style="width: 100%">
+          <el-select v-model="form.definitionId" placeholder="请选择已发布的流程" style="width: 100%" @change="handleDefinitionChange">
             <el-option
               v-for="item in definitionOptions"
               :key="item.definitionId"
@@ -108,8 +108,26 @@
         <el-form-item label="流程标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入流程标题" />
         </el-form-item>
-        <el-form-item label="流程变量">
-          <div v-for="(item, index) in form.variables" :key="index" style="margin-bottom: 10px;">
+        <el-form-item label="流程变量" v-if="form.variableDefinitions && form.variableDefinitions.length > 0">
+          <div v-for="(item, index) in form.variableDefinitions" :key="index" style="margin-bottom: 10px;">
+            <el-row :gutter="10">
+              <el-col :span="8">
+                <el-input v-model="item.variableCode" placeholder="变量编码" disabled />
+              </el-col>
+              <el-col :span="16">
+                <el-input v-if="item.variableType == 0" v-model="item.variableValue" :placeholder="'默认值: ' + (item.defaultValue || '-')" />
+                <el-input v-else-if="item.variableType == 1" v-model="item.variableValue" type="number" :placeholder="'默认值: ' + (item.defaultValue || '-')" />
+                <el-select v-else-if="item.variableType == 2" v-model="item.variableValue" placeholder="请选择" style="width: 100%">
+                  <el-option label="是" value="true" />
+                  <el-option label="否" value="false" />
+                </el-select>
+                <el-date-picker v-else-if="item.variableType == 3" v-model="item.variableValue" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" style="width: 100%" />
+              </el-col>
+            </el-row>
+          </div>
+        </el-form-item>
+        <el-form-item label="扩展变量">
+          <div v-for="(item, index) in form.variables" :key="'ext-' + index" style="margin-bottom: 10px;">
             <el-row :gutter="10">
               <el-col :span="10">
                 <el-input v-model="item.variableCode" placeholder="变量编码" />
@@ -136,6 +154,7 @@
 <script>
 import { listInstance, delInstance } from "@/api/bpm/instance"
 import { listDefinition } from "@/api/bpm/definition"
+import { listVariableByDefinition } from "@/api/bpm/variable"
 import { startProcess } from "@/api/bpm/runtime"
 
 export default {
@@ -160,6 +179,7 @@ export default {
       form: {
         definitionId: undefined,
         title: undefined,
+        variableDefinitions: [],
         variables: []
       },
       rules: {
@@ -198,6 +218,7 @@ export default {
       this.form = {
         definitionId: undefined,
         title: undefined,
+        variableDefinitions: [],
         variables: []
       }
       this.resetForm("form")
@@ -215,6 +236,23 @@ export default {
       this.open = true
       this.title = "发起流程"
     },
+    handleDefinitionChange(definitionId) {
+      this.form.variableDefinitions = []
+      this.form.variables = []
+      if (!definitionId) {
+        return
+      }
+      listVariableByDefinition(definitionId).then(response => {
+        this.form.variableDefinitions = (response.data || []).map(item => ({
+          variableId: item.variableId,
+          variableCode: item.variableCode,
+          variableName: item.variableName,
+          variableType: item.variableType,
+          defaultValue: item.defaultValue,
+          variableValue: item.defaultValue
+        }))
+      })
+    },
     addVariable() {
       this.form.variables.push({ variableCode: "", variableValue: "" })
     },
@@ -225,6 +263,13 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           const variables = {}
+          // 1. 放入有效变量定义的值
+          this.form.variableDefinitions.forEach(item => {
+            if (item.variableCode) {
+              variables[item.variableCode] = item.variableValue
+            }
+          })
+          // 2. 扩展变量可覆盖或补充
           this.form.variables.forEach(item => {
             if (item.variableCode) {
               variables[item.variableCode] = item.variableValue

@@ -60,6 +60,22 @@ public class BpmVariableController extends BaseController
         return success(bpmVariableService.selectBpmVariableById(variableId));
     }
 
+    @PreAuthorize("@ss.hasPermi('bpm:variable:list')")
+    @GetMapping("/listByCategory/{categoryId}")
+    public AjaxResult listByCategory(@PathVariable Long categoryId)
+    {
+        List<BpmVariable> list = bpmVariableService.selectBpmVariableListByCategoryId(categoryId);
+        return success(list);
+    }
+
+    @PreAuthorize("@ss.hasPermi('bpm:variable:list')")
+    @GetMapping("/listByDefinition/{definitionId}")
+    public AjaxResult listByDefinition(@PathVariable Long definitionId)
+    {
+        List<BpmVariable> list = bpmVariableService.selectEffectiveVariablesByDefinitionId(definitionId);
+        return success(list);
+    }
+
     @PreAuthorize("@ss.hasPermi('bpm:variable:add')")
     @Log(title = "流程变量", businessType = BusinessType.INSERT)
     @PostMapping

@@ -6,6 +6,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <resultMap type="BpmVariable" id="BpmVariableResult">
         <id     property="variableId"   column="variable_id"      />
+        <result property="categoryId"   column="category_id"      />
         <result property="definitionId" column="definition_id"    />
         <result property="variableName" column="variable_name"    />
         <result property="variableCode" column="variable_code"    />
@@ -19,7 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectBpmVariableVo">
-        select variable_id, definition_id, variable_name, variable_code, variable_type, default_value, create_by, create_time, update_by, update_time, remark from bpm_variable
+        select variable_id, category_id, definition_id, variable_name, variable_code, variable_type, default_value, create_by, create_time, update_by, update_time, remark from bpm_variable
     </sql>
 
     <select id="selectBpmVariableById" parameterType="Long" resultMap="BpmVariableResult">
@@ -30,6 +31,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectBpmVariableList" parameterType="BpmVariable" resultMap="BpmVariableResult">
         <include refid="selectBpmVariableVo"/>
         <where>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
             <if test="definitionId != null">
                 AND definition_id = #{definitionId}
             </if>
@@ -45,8 +49,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
+    <select id="selectBpmVariableListByCategoryId" parameterType="Long" resultMap="BpmVariableResult">
+        <include refid="selectBpmVariableVo"/>
+        where category_id = #{categoryId}
+    </select>
+
+    <select id="selectBpmVariableListByDefinitionId" parameterType="Long" resultMap="BpmVariableResult">
+        <include refid="selectBpmVariableVo"/>
+        where definition_id = #{definitionId}
+    </select>
+
     <insert id="insertBpmVariable" parameterType="BpmVariable">
         insert into bpm_variable (
+            <if test="categoryId != null">category_id,</if>
             <if test="definitionId != null">definition_id,</if>
             <if test="variableName != null and variableName != ''">variable_name,</if>
             <if test="variableCode != null and variableCode != ''">variable_code,</if>
@@ -56,6 +71,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="remark != null and remark != ''">remark,</if>
             create_time
         )values(
+            <if test="categoryId != null">#{categoryId},</if>
             <if test="definitionId != null">#{definitionId},</if>
             <if test="variableName != null and variableName != ''">#{variableName},</if>
             <if test="variableCode != null and variableCode != ''">#{variableCode},</if>
@@ -70,6 +86,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateBpmVariable" parameterType="BpmVariable">
         update bpm_variable
         <set>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
             <if test="definitionId != null">definition_id = #{definitionId},</if>
             <if test="variableName != null and variableName != ''">variable_name = #{variableName},</if>
             <if test="variableCode != null and variableCode != ''">variable_code = #{variableCode},</if>

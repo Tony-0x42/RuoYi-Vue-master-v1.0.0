@@ -1214,7 +1214,8 @@ DROP TABLE IF EXISTS `bpm_variable`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bpm_variable` (
   `variable_id` bigint NOT NULL AUTO_INCREMENT COMMENT '变量ID',
-  `definition_id` bigint NOT NULL COMMENT '定义ID',
+  `category_id` bigint DEFAULT NULL COMMENT '分类ID',
+  `definition_id` bigint DEFAULT NULL COMMENT '定义ID',
   `variable_name` varchar(64) NOT NULL COMMENT '变量名称',
   `variable_code` varchar(64) NOT NULL COMMENT '变量编码',
   `variable_type` char(1) DEFAULT '0' COMMENT '变量类型（0字符串 1数字 2布尔 3日期）',
@@ -1224,7 +1225,9 @@ CREATE TABLE `bpm_variable` (
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`variable_id`)
+  PRIMARY KEY (`variable_id`),
+  UNIQUE KEY `uk_category_variable_code` (`category_id`,`variable_code`),
+  UNIQUE KEY `uk_definition_variable_code` (`definition_id`,`variable_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='变量定义表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 

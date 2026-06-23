@@ -96,8 +96,26 @@
         <el-form-item label="审批意见" prop="comment">
           <el-input v-model="form.comment" type="textarea" placeholder="请输入审批意见" />
         </el-form-item>
-        <el-form-item label="流程变量">
-          <div v-for="(item, index) in form.variables" :key="index" style="margin-bottom: 10px;">
+        <el-form-item label="流程变量" v-if="form.variableDefinitions && form.variableDefinitions.length > 0">
+          <div v-for="(item, index) in form.variableDefinitions" :key="index" style="margin-bottom: 10px;">
+            <el-row :gutter="10">
+              <el-col :span="8">
+                <el-input v-model="item.variableCode" placeholder="变量编码" disabled />
+              </el-col>
+              <el-col :span="16">
+                <el-input v-if="item.variableType == 0" v-model="item.variableValue" :placeholder="'默认值: ' + (item.defaultValue || '-')" />
+                <el-input v-else-if="item.variableType == 1" v-model="item.variableValue" type="number" :placeholder="'默认值: ' + (item.defaultValue || '-')" />
+                <el-select v-else-if="item.variableType == 2" v-model="item.variableValue" placeholder="请选择" style="width: 100%">
+                  <el-option label="是" value="true" />
+                  <el-option label="否" value="false" />
+                </el-select>
+                <el-date-picker v-else-if="item.variableType == 3" v-model="item.variableValue" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" style="width: 100%" />
+              </el-col>
+            </el-row>
+          </div>
+        </el-form-item>
+        <el-form-item label="扩展变量">
+          <div v-for="(item, index) in form.variables" :key="'ext-' + index" style="margin-bottom: 10px;">
             <el-row :gutter="10">
               <el-col :span="10">
                 <el-input v-model="item.variableCode" placeholder="变量编码" />
@@ -136,6 +154,7 @@
 
 <script>
 import { todoList } from "@/api/bpm/task"
+import { listVariableByDefinition } from "@/api/bpm/variable"
 import { submitTask, returnTask, rejectTask, claimTask, assignTask, delegateTask } from "@/api/bpm/runtime"
 
 export default {
@@ -151,6 +170,7 @@ export default {
       actionTitle: "",
       actionOpen: false,
       currentTaskId: undefined,
+      currentDefinitionId: undefined,
       actionType: undefined,
       queryParams: {
         pageNum: 1,
@@ -160,6 +180,7 @@ export default {
       },
       form: {
         comment: undefined,
+        variableDefinitions: [],
         variables: []
       },
       rules: {
@@ -196,8 +217,10 @@ export default {
     reset() {
       this.form = {
         comment: undefined,
+        variableDefinitions: [],
         variables: []
       }
+      this.currentDefinitionId = undefined
       this.resetForm("form")
     },
     handleQuery() {
@@ -217,13 +240,31 @@ export default {
     handleSubmit(row) {
       this.reset()
       this.currentTaskId = row.flowableTaskId
+      this.currentDefinitionId = row.definitionId
       this.open = true
       this.title = "办理任务"
+      if (row.definitionId) {
+        listVariableByDefinition(row.definitionId).then(response => {
+          this.form.variableDefinitions = (response.data || []).map(item => ({
+            variableId: item.variableId,
+            variableCode: item.variableCode,
+            variableName: item.variableName,
+            variableType: item.variableType,
+            defaultValue: item.defaultValue,
+            variableValue: item.defaultValue
+          }))
+        })
+      }
     },
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
           const variables = {}
+          this.form.variableDefinitions.forEach(item => {
+            if (item.variableCode) {
+              variables[item.variableCode] = item.variableValue
+            }
+          })
           this.form.variables.forEach(item => {
             if (item.variableCode) {
               variables[item.variableCode] = item.variableValue
