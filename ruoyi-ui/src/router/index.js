@@ -167,6 +167,34 @@ export const dynamicRoutes = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
       }
     ]
+  },
+  {
+    path: '/bpm/designer',
+    component: Layout,
+    hidden: true,
+    permissions: ['bpm:definition:design'],
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/bpm/designer'),
+        name: 'BpmDesigner',
+        meta: { title: '流程设计', activeMenu: '/bpm/definition' }
+      }
+    ]
+  },
+  {
+    path: '/bpm/trace',
+    component: Layout,
+    hidden: true,
+    permissions: ['bpm:instance:query'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/bpm/trace'),
+        name: 'BpmTrace',
+        meta: { title: '流程跟踪', activeMenu: '/bpm/instance' }
+      }
+    ]
   }
 ]
 

@@ -27,12 +27,12 @@ module.exports = {
   assetsDir: 'static',
   // 如果你不需要生产环境的 source map，可以将其设置为 false 以加速生产环境构建。
   productionSourceMap: false,
-  transpileDependencies: ['quill'],
+  transpileDependencies: ['quill', /bpmn-js/, /bpmn-moddle/, /moddle/, /moddle-xml/, /min-dash/, /min-dom/, /tiny-svg/, /ids/, /diagram-js/, /domify/],
   // webpack-dev-server 相关配置
   devServer: {
     host: '0.0.0.0',
     port: port,
-    open: true,
+    open: false,
     proxy: {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       [process.env.VUE_APP_BASE_API]: {
@@ -61,7 +61,14 @@ module.exports = {
     name: name,
     resolve: {
       alias: {
-        '@': resolve('src')
+        '@': resolve('src'),
+        'bpmn-moddle': resolve('node_modules/bpmn-moddle/dist/index.js'),
+        'moddle': resolve('node_modules/moddle/dist/index.js'),
+        'moddle-xml': resolve('node_modules/moddle-xml/dist/index.js'),
+        'min-dash': resolve('node_modules/min-dash/dist/index.js'),
+        'min-dom': resolve('node_modules/min-dom/dist/index.js'),
+        'tiny-svg': resolve('node_modules/tiny-svg/dist/index.js'),
+        'ids': resolve('node_modules/ids/dist/index.js')
       }
     },
     plugins: [

@@ -145,3 +145,17 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+# Flowable 流程引擎配置
+flowable:
+  # 自动创建/更新 Flowable 表结构
+  database-schema-update: true
+  # 是否使用历史表
+  db-history-used: true
+  # 历史记录级别：none/activity/audit/full
+  history-level: full
+  # 异步执行器（默认关闭，需要时再开启）
+  async-executor-activate: false
+  # 关闭 Flowable 自带的 IDM，使用若依用户体系
+  idm:
+    enabled: false

@@ -1,0 +1,302 @@
+<template>
+  <div class="app-container">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="80px">
+      <el-form-item label="流程标题" prop="instanceTitle">
+        <el-input
+          v-model="queryParams.instanceTitle"
+          placeholder="请输入流程标题"
+          clearable
+          style="width: 240px"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="节点名称" prop="nodeName">
+        <el-input
+          v-model="queryParams.nodeName"
+          placeholder="请输入节点名称"
+          clearable
+          style="width: 240px"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-row :gutter="10" class="mb8">
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+    </el-row>
+
+    <el-table v-loading="loading" :data="taskList">
+      <el-table-column label="Flowable任务ID" align="center" prop="flowableTaskId" :show-overflow-tooltip="true" />
+      <el-table-column label="流程标题" align="center" prop="instanceTitle" :show-overflow-tooltip="true" />
+      <el-table-column label="节点名称" align="center" prop="nodeName" />
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="280">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-check"
+            @click="handleSubmit(scope.row)"
+          >办理</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-back"
+            @click="handleReturn(scope.row)"
+          >退回</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-close"
+            @click="handleReject(scope.row)"
+          >拒绝</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-s-check"
+            @click="handleClaim(scope.row)"
+          >签收</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-user"
+            @click="handleAssign(scope.row)"
+            v-hasPermi="['bpm:task:assign']"
+          >指派</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-s-promotion"
+            @click="handleDelegate(scope.row)"
+            v-hasPermi="['bpm:task:delegate']"
+          >特送</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="queryParams.pageNum"
+      :limit.sync="queryParams.pageSize"
+      @pagination="getList"
+    />
+
+    <!-- 办理任务对话框 -->
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="审批意见" prop="comment">
+          <el-input v-model="form.comment" type="textarea" placeholder="请输入审批意见" />
+        </el-form-item>
+        <el-form-item label="流程变量">
+          <div v-for="(item, index) in form.variables" :key="index" style="margin-bottom: 10px;">
+            <el-row :gutter="10">
+              <el-col :span="10">
+                <el-input v-model="item.variableCode" placeholder="变量编码" />
+              </el-col>
+              <el-col :span="10">
+                <el-input v-model="item.variableValue" placeholder="变量值" />
+              </el-col>
+              <el-col :span="4">
+                <el-button type="danger" icon="el-icon-delete" circle size="mini" @click="removeVariable(index)"></el-button>
+              </el-col>
+            </el-row>
+          </div>
+          <el-button type="primary" plain size="mini" icon="el-icon-plus" @click="addVariable">添加变量</el-button>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 退回/拒绝对话框 -->
+    <el-dialog :title="actionTitle" :visible.sync="actionOpen" width="500px" append-to-body>
+      <el-form ref="actionForm" :model="actionForm" :rules="actionRules" label-width="80px">
+        <el-form-item label="审批意见" prop="comment">
+          <el-input v-model="actionForm.comment" type="textarea" placeholder="请输入审批意见" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitAction">确 定</el-button>
+        <el-button @click="actionOpen = false">取 消</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { todoList } from "@/api/bpm/task"
+import { submitTask, returnTask, rejectTask, claimTask, assignTask, delegateTask } from "@/api/bpm/runtime"
+
+export default {
+  name: "BpmTaskTodo",
+  data() {
+    return {
+      loading: true,
+      showSearch: true,
+      total: 0,
+      taskList: [],
+      title: "",
+      open: false,
+      actionTitle: "",
+      actionOpen: false,
+      currentTaskId: undefined,
+      actionType: undefined,
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+        instanceTitle: undefined,
+        nodeName: undefined
+      },
+      form: {
+        comment: undefined,
+        variables: []
+      },
+      rules: {
+        comment: [
+          { required: true, message: "审批意见不能为空", trigger: "blur" }
+        ]
+      },
+      actionForm: {
+        comment: undefined
+      },
+      actionRules: {
+        comment: [
+          { required: true, message: "审批意见不能为空", trigger: "blur" }
+        ]
+      }
+    }
+  },
+  created() {
+    this.getList()
+  },
+  methods: {
+    getList() {
+      this.loading = true
+      todoList(this.queryParams).then(response => {
+        this.taskList = response.rows
+        this.total = response.total
+        this.loading = false
+      })
+    },
+    cancel() {
+      this.open = false
+      this.reset()
+    },
+    reset() {
+      this.form = {
+        comment: undefined,
+        variables: []
+      }
+      this.resetForm("form")
+    },
+    handleQuery() {
+      this.queryParams.pageNum = 1
+      this.getList()
+    },
+    resetQuery() {
+      this.resetForm("queryForm")
+      this.handleQuery()
+    },
+    addVariable() {
+      this.form.variables.push({ variableCode: "", variableValue: "" })
+    },
+    removeVariable(index) {
+      this.form.variables.splice(index, 1)
+    },
+    handleSubmit(row) {
+      this.reset()
+      this.currentTaskId = row.flowableTaskId
+      this.open = true
+      this.title = "办理任务"
+    },
+    submitForm() {
+      this.$refs["form"].validate(valid => {
+        if (valid) {
+          const variables = {}
+          this.form.variables.forEach(item => {
+            if (item.variableCode) {
+              variables[item.variableCode] = item.variableValue
+            }
+          })
+          submitTask(this.currentTaskId, { comment: this.form.comment, variables: variables }).then(() => {
+            this.$modal.msgSuccess("提交成功")
+            this.open = false
+            this.getList()
+          })
+        }
+      })
+    },
+    handleReturn(row) {
+      this.actionType = "return"
+      this.currentTaskId = row.flowableTaskId
+      this.actionTitle = "退回任务"
+      this.actionForm = { comment: undefined }
+      this.actionOpen = true
+    },
+    handleReject(row) {
+      this.actionType = "reject"
+      this.currentTaskId = row.flowableTaskId
+      this.actionTitle = "拒绝任务"
+      this.actionForm = { comment: undefined }
+      this.actionOpen = true
+    },
+    submitAction() {
+      this.$refs["actionForm"].validate(valid => {
+        if (valid) {
+          const request = this.actionType === "return" ? returnTask : rejectTask
+          request(this.currentTaskId, this.actionForm.comment).then(() => {
+            this.$modal.msgSuccess(this.actionType === "return" ? "退回成功" : "拒绝成功")
+            this.actionOpen = false
+            this.getList()
+          })
+        }
+      })
+    },
+    handleClaim(row) {
+      this.$modal.confirm('是否确认签收任务"' + row.flowableTaskId + '"？').then(function() {
+        return claimTask(row.flowableTaskId)
+      }).then(() => {
+        this.getList()
+        this.$modal.msgSuccess("签收成功")
+      }).catch(() => {})
+    },
+    handleAssign(row) {
+      this.$prompt('请输入指派用户ID', '任务指派', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /^\d+$/,
+        inputErrorMessage: '用户ID必须为数字'
+      }).then(({ value }) => {
+        assignTask(row.flowableTaskId, value).then(() => {
+          this.$modal.msgSuccess("指派成功")
+          this.getList()
+        })
+      }).catch(() => {})
+    },
+    handleDelegate(row) {
+      this.$prompt('请输入特送用户ID', '任务特送', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /^\d+$/,
+        inputErrorMessage: '用户ID必须为数字'
+      }).then(({ value }) => {
+        delegateTask(row.flowableTaskId, value).then(() => {
+          this.$modal.msgSuccess("特送成功")
+          this.getList()
+        })
+      }).catch(() => {})
+    }
+  }
+}
+</script>
