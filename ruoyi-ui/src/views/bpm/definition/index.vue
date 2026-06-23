@@ -96,31 +96,10 @@
               plain
               icon="el-icon-plus"
               size="mini"
+              :disabled="selectedCategoryId === undefined"
               @click="handleAdd"
               v-hasPermi="['bpm:definition:add']"
             >新增</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button
-              type="success"
-              plain
-              icon="el-icon-edit"
-              size="mini"
-              :disabled="single"
-              @click="handleUpdate"
-              v-hasPermi="['bpm:definition:edit']"
-            >修改</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button
-              type="danger"
-              plain
-              icon="el-icon-delete"
-              size="mini"
-              :disabled="multiple"
-              @click="handleDelete"
-              v-hasPermi="['bpm:definition:remove']"
-            >删除</el-button>
           </el-col>
           <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -137,7 +116,7 @@
               <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="280">
+          <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="280" fixed="right">
             <template slot-scope="scope">
               <el-button
                 size="mini"
@@ -191,7 +170,13 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="流程分类" prop="categoryId">
-          <treeselect v-model="form.categoryId" :options="categoryTreeOptions" :normalizer="normalizer" placeholder="请选择流程分类" />
+          <treeselect
+            v-model="form.categoryId"
+            :options="categoryTreeOptions"
+            :normalizer="normalizer"
+            :disabled="form.definitionId === undefined"
+            placeholder="请选择流程分类"
+          />
         </el-form-item>
         <el-form-item label="流程名称" prop="definitionName">
           <el-input v-model="form.definitionName" placeholder="请输入流程名称" />
@@ -266,6 +251,7 @@ export default {
       definitionList: [],
       categoryTree: [],
       categoryTreeOptions: [],
+      selectedCategoryId: undefined,
       treeProps: {
         children: 'children',
         label: 'label'
@@ -326,7 +312,7 @@ export default {
       treeCategory({}).then(response => {
         this.categoryTreeOptions = [{
           id: 0,
-          label: '顶级分类',
+          label: '全部流程',
           children: response.data
         }]
       })
@@ -373,6 +359,7 @@ export default {
     },
     handleAdd() {
       this.reset()
+      this.form.categoryId = this.selectedCategoryId
       this.open = true
       this.title = "添加流程定义"
     },
@@ -438,8 +425,10 @@ export default {
     handleCategoryNodeClick(data) {
       if (data.id === 0) {
         this.queryParams.categoryId = undefined
+        this.selectedCategoryId = undefined
       } else {
         this.queryParams.categoryId = data.id
+        this.selectedCategoryId = data.id
       }
       this.handleQuery()
     },

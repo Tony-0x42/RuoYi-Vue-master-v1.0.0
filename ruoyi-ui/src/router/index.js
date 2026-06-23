@@ -195,6 +195,20 @@ export const dynamicRoutes = [
         meta: { title: '流程跟踪', activeMenu: '/bpm/instance' }
       }
     ]
+  },
+  {
+    path: '/bpm/variable',
+    component: Layout,
+    hidden: true,
+    permissions: ['bpm:variable:list'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/bpm/variable'),
+        name: 'BpmVariable',
+        meta: { title: '变量定义', activeMenu: '/bpm/definition' }
+      }
+    ]
   }
 ]
 
