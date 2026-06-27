@@ -53,6 +53,14 @@ public interface SysUserMapper
     public SysUser selectUserById(Long userId);
 
     /**
+     * 通过用户ID列表查询用户
+     *
+     * @param userIds 用户ID列表
+     * @return 用户信息集合信息
+     */
+    public List<SysUser> selectUserListByIds(List<Long> userIds);
+
+    /**
      * 新增用户信息
      * 
      * @param user 用户信息

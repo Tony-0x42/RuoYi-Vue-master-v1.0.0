@@ -91,8 +91,24 @@ public class BpmProcessApiController {
     public BpmApiResult<Map<String, Object>> complete(@PathVariable String taskId,
                                                       @RequestBody CompleteTaskDTO dto) {
         BpmTask task = taskService.complete(taskId, dto.getOperator(), dto.getAction(),
-                dto.getOpinion(), dto.getFormData(), dto.getVariables());
+                dto.getOpinion(), dto.getFormData(), dto.getVariables(), dto.getNextAssignees());
         BpmProcessInstance instance = instanceService.selectById(task.getInstanceId());
+        List<BpmTask> nextTasks = taskService.selectTodoList(null, null).stream()
+                .filter(t -> t.getInstanceId().equals(task.getInstanceId()))
+                .collect(Collectors.toList());
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("taskId", taskId);
+        result.put("instanceId", task.getInstanceId());
+        result.put("nextNode", nextTasks.isEmpty() ? "" : nextTasks.get(0).getNodeName());
+        result.put("nextTasks", nextTasks.stream().map(this::toTaskVO).collect(Collectors.toList()));
+        return BpmApiResult.ok(result);
+    }
+
+    @PostMapping("/tasks/{taskId}/returnToPrevious")
+    public BpmApiResult<Map<String, Object>> returnToPrevious(@PathVariable String taskId,
+                                                              @RequestBody CompleteTaskDTO dto) {
+        BpmTask task = taskService.returnToPrevious(taskId, dto.getOperator(), dto.getOpinion());
         List<BpmTask> nextTasks = taskService.selectTodoList(null, null).stream()
                 .filter(t -> t.getInstanceId().equals(task.getInstanceId()))
                 .collect(Collectors.toList());

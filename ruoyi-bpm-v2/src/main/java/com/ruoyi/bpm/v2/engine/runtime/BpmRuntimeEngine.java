@@ -69,6 +69,29 @@ public class BpmRuntimeEngine {
     private final SpelExpressionParser spelParser = new SpelExpressionParser();
 
     /**
+     * 预览从指定节点出发的下一环节
+     */
+    public List<BpmNode> previewNextNodes(String processKey, String fromNodeId, Map<String, Object> vars) {
+        BpmProcessDefinition definition = definitionMapper.selectByKeyAndTenant(processKey, getCurrentTenantId());
+        if (definition == null) {
+            throw new ServiceException("流程定义不存在");
+        }
+        BpmProcessModel model = modelParser.parse(definition.getExtJson());
+        BpmNode node = findNodeById(model, fromNodeId);
+        if (node == null) {
+            throw new ServiceException("节点不存在");
+        }
+        return getNextNodes(model, node, vars);
+    }
+
+    /**
+     * 预览节点的候选人
+     */
+    public List<Long> previewAssignees(BpmNode node, Long starter, Map<String, Object> vars) {
+        return getAssignees(node, starter, vars);
+    }
+
+    /**
      * 启动流程实例
      */
     @Transactional(rollbackFor = Exception.class)
