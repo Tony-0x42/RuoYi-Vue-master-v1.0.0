@@ -45,7 +45,7 @@ public class BpmProcessApiController {
     private IBpmProcessDefinitionService definitionService;
 
     @PostMapping("/instances/start")
-    public BpmApiResult<Map<String, Object>> start(@RequestBody StartProcessDTO dto) {
+    public BpmApiResult<Map<String, Object>> start(@Valid @RequestBody StartProcessDTO dto) {
         BpmProcessInstance instance = instanceService.start(
                 dto.getProcessDefinitionKey(),
                 dto.getBusinessKey(),
@@ -93,7 +93,7 @@ public class BpmProcessApiController {
 
     @PostMapping("/tasks/{taskId}/complete")
     public BpmApiResult<Map<String, Object>> complete(@PathVariable String taskId,
-                                                      @RequestBody CompleteTaskDTO dto) {
+                                                      @Valid @RequestBody CompleteTaskDTO dto) {
         BpmTask task = taskService.complete(taskId, dto.getOperator(), dto.getAction(),
                 dto.getOpinion(), dto.getFormData(), dto.getVariables(), dto.getNextAssignees());
         BpmProcessInstance instance = instanceService.selectById(task.getInstanceId());
