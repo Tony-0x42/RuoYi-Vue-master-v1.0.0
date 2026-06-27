@@ -1,4 +1,4 @@
-# 流程定义使用说明
+# 流程定义使用手册
 
 > 适用范围：RuoYi-Vue BPM v2（`ruoyi-bpm-v2`）流程管理模块  
 > 文档版本：v1.0  
@@ -713,8 +713,8 @@ POST /api/v1/process/instances/start
 
 ### 13.3 相关文档
 
-- [BPM v2 API 接口指南](../bpm-v2-api-guide.md)
-- [BPM v2 实现计划](../bpm-v2-implementation-plan.md)
-- [M1 流程设计器核心](../../spec/modules/M1-流程设计器核心.md)
-- [M3 审批节点配置](../../spec/modules/M3-审批节点配置.md)
-- [M8 流程版本管理](../../spec/modules/M8-流程版本管理.md)
+- [BPM v2 API 接口指南](../../docs/bpm-v2-api-guide.md)
+- [BPM v2 实现计划](../../docs/bpm-v2-implementation-plan.md)
+- [M1 流程设计器核心](./M1-流程设计器核心.md)
+- [M3 审批节点配置](./M3-审批节点配置.md)
+- [M8 流程版本管理](./M8-流程版本管理.md)
