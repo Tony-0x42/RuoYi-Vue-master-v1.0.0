@@ -35,7 +35,9 @@ export default {
     profile: 'Profile',
     home: 'Home',
     dashboard: 'Dashboard',
-    layoutSettings: 'Layout Settings'
+    layoutSettings: 'Layout Settings',
+    layoutSize: 'Layout Size',
+    notifications: 'Notifications'
   },
   tagsView: {
     close: 'Close',

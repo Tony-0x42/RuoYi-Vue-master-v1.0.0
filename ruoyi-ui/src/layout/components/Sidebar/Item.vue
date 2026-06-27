@@ -1,4 +1,6 @@
 <script>
+import i18n from '@/i18n'
+
 export default {
   name: 'MenuItem',
   functional: true,
@@ -27,6 +29,11 @@ export default {
       if (parent.$te(key)) {
         displayTitle = parent.$t(key)
       }
+    }
+
+    // Translate title key or fallback string
+    if (displayTitle) {
+      displayTitle = (parent && parent.$t) ? parent.$t(displayTitle) : i18n.t(displayTitle)
     }
 
     if (icon) {

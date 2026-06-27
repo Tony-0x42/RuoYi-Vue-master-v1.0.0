@@ -35,7 +35,9 @@ export default {
     profile: '个人中心',
     home: '首页',
     dashboard: '首页',
-    layoutSettings: '布局设置'
+    layoutSettings: '布局设置',
+    layoutSize: '布局大小',
+    notifications: '消息通知'
   },
   tagsView: {
     close: '关闭',

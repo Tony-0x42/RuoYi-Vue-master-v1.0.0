@@ -1,5 +1,10 @@
 import store from '@/store'
 import cache from '@/plugins/cache'
+import i18n from '@/i18n'
+
+function translateTitle(title) {
+  return i18n.t(title || 'no-name')
+}
 
 const PERSIST_KEY = 'tags-view-visited'
 
@@ -32,7 +37,7 @@ const mutations = {
     if (state.iframeViews.some(v => v.path === view.path)) return
     state.iframeViews.push(
       Object.assign({}, view, {
-        title: view.meta.title || 'no-name'
+        title: translateTitle(view.meta.title)
       })
     )
   },
@@ -40,7 +45,7 @@ const mutations = {
     if (state.visitedViews.some(v => v.path === view.path)) return
     state.visitedViews.push(
       Object.assign({}, view, {
-        title: view.meta.title || 'no-name'
+        title: translateTitle(view.meta.title)
       })
     )
     saveVisitedViews(state.visitedViews)
@@ -49,7 +54,7 @@ const mutations = {
     if (state.visitedViews.some(v => v.path === view.path)) return
     state.visitedViews.unshift(
       Object.assign({}, view, {
-        title: view.meta.title || 'no-name'
+        title: translateTitle(view.meta.title)
       })
     )
   },
