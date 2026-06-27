@@ -33,16 +33,16 @@
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/user/profile">
-            <el-dropdown-item>个人中心</el-dropdown-item>
+            <el-dropdown-item>{{ $t('layout.profile') }}</el-dropdown-item>
           </router-link>
           <el-dropdown-item @click.native="setLayout" v-if="setting">
-            <span>布局设置</span>
+            <span>{{ $t('layout.layoutSettings') }}</span>
           </el-dropdown-item>
           <el-dropdown-item @click.native="lockScreen">
-            <span>锁定屏幕</span>
+            <span>{{ $t('route.lockScreen') }}</span>
           </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
-            <span>退出登录</span>
+            <span>{{ $t('layout.logout') }}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>

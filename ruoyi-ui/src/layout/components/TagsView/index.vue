@@ -36,31 +36,31 @@
         <i class="el-icon-arrow-down" />
       </span>
       <el-dropdown-menu slot="dropdown" class="tags-dropdown-menu">
-        <el-dropdown-item v-if="!isAffix(selectedDropdownTag)" command="close" icon="el-icon-close">关闭当前</el-dropdown-item>
-        <el-dropdown-item command="closeOthers" icon="el-icon-circle-close">关闭其他</el-dropdown-item>
-        <el-dropdown-item command="closeLeft" :disabled="isFirstView()" icon="el-icon-back">关闭左侧</el-dropdown-item>
-        <el-dropdown-item command="closeRight" :disabled="isLastView()" icon="el-icon-right">关闭右侧</el-dropdown-item>
-        <el-dropdown-item command="closeAll" icon="el-icon-circle-close">全部关闭</el-dropdown-item>
+        <el-dropdown-item v-if="!isAffix(selectedDropdownTag)" command="close" icon="el-icon-close">{{ $t('tagsView.closeCurrent') }}</el-dropdown-item>
+        <el-dropdown-item command="closeOthers" icon="el-icon-circle-close">{{ $t('tagsView.closeOthers') }}</el-dropdown-item>
+        <el-dropdown-item command="closeLeft" :disabled="isFirstView()" icon="el-icon-back">{{ $t('tagsView.closeLeft') }}</el-dropdown-item>
+        <el-dropdown-item command="closeRight" :disabled="isLastView()" icon="el-icon-right">{{ $t('tagsView.closeRight') }}</el-dropdown-item>
+        <el-dropdown-item command="closeAll" icon="el-icon-circle-close">{{ $t('tagsView.closeAll') }}</el-dropdown-item>
         <el-dropdown-item command="fullscreen" divided>
-          <template v-if="!isFullscreen"><i class="el-icon-full-screen"></i>全屏显示</template>
-          <template v-else><i class="el-icon-close"></i>退出全屏</template>
+          <template v-if="!isFullscreen"><i class="el-icon-full-screen"></i>{{ $t('tagsView.fullscreen') }}</template>
+          <template v-else><i class="el-icon-close"></i>{{ $t('tagsView.exitFullscreen') }}</template>
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
 
     <!-- 刷新按钮 -->
-    <span class="tags-action-btn tags-refresh-btn" title="刷新页面" @click="refreshSelectedTag(selectedDropdownTag)">
-      <i class="el-icon-refresh-right" /> 刷新
+    <span class="tags-action-btn tags-refresh-btn" :title="$t('tagsView.refreshPage')" @click="refreshSelectedTag(selectedDropdownTag)">
+      <i class="el-icon-refresh-right" /> {{ $t('tagsView.refresh') }}
     </span>
 
     <!-- 右键上下文菜单 -->
     <ul v-show="visible" :style="{ left: left + 'px', top: top + 'px' }" class="contextmenu">
-      <li @click="refreshSelectedTag(selectedTag)"><i class="el-icon-refresh-right"></i> 刷新页面</li>
-      <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)"><i class="el-icon-close"></i> 关闭当前</li>
-      <li @click="closeOthersTags"><i class="el-icon-circle-close"></i> 关闭其他</li>
-      <li v-if="!isFirstView()" @click="closeLeftTags"><i class="el-icon-back"></i> 关闭左侧</li>
-      <li v-if="!isLastView()" @click="closeRightTags"><i class="el-icon-right"></i> 关闭右侧</li>
-      <li @click="closeAllTags(selectedTag)"><i class="el-icon-circle-close"></i> 全部关闭</li>
+      <li @click="refreshSelectedTag(selectedTag)"><i class="el-icon-refresh-right"></i> {{ $t('tagsView.refreshPage') }}</li>
+      <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)"><i class="el-icon-close"></i> {{ $t('tagsView.closeCurrent') }}</li>
+      <li @click="closeOthersTags"><i class="el-icon-circle-close"></i> {{ $t('tagsView.closeOthers') }}</li>
+      <li v-if="!isFirstView()" @click="closeLeftTags"><i class="el-icon-back"></i> {{ $t('tagsView.closeLeft') }}</li>
+      <li v-if="!isLastView()" @click="closeRightTags"><i class="el-icon-right"></i> {{ $t('tagsView.closeRight') }}</li>
+      <li @click="closeAllTags(selectedTag)"><i class="el-icon-circle-close"></i> {{ $t('tagsView.closeAll') }}</li>
     </ul>
   </div>
 </template>
