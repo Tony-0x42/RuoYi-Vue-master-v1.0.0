@@ -1,13 +1,13 @@
 <template>
   <div class="top-right-btn" :style="style">
     <el-row>
-      <el-tooltip class="item" effect="dark" :content="showSearch ? '隐藏搜索' : '显示搜索'" placement="top" v-if="search">
+      <el-tooltip class="item" effect="dark" :content="showSearch ? $t('toolbar.hideSearch') : $t('toolbar.showSearch')" placement="top" v-if="search">
         <el-button size="mini" circle icon="el-icon-search" @click="toggleSearch()" />
       </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="刷新" placement="top">
+      <el-tooltip class="item" effect="dark" :content="$t('toolbar.refresh')" placement="top">
         <el-button size="mini" circle icon="el-icon-refresh" @click="refresh()" />
       </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="显隐列" placement="top" v-if="Object.keys(columns).length > 0">
+      <el-tooltip class="item" effect="dark" :content="$t('toolbar.column')" placement="top" v-if="Object.keys(columns).length > 0">
         <el-button size="mini" circle icon="el-icon-menu" @click="showColumn()" v-if="showColumnsType == 'transfer'"/>
         <el-dropdown trigger="click" :hide-on-click="false" style="padding-left: 12px" v-if="showColumnsType == 'checkbox'">
           <el-button size="mini" circle icon="el-icon-menu" />
@@ -28,7 +28,7 @@
     </el-row>
     <el-dialog :title="title" :visible.sync="open" append-to-body>
       <el-transfer
-        :titles="['显示', '隐藏']"
+        :titles="[$t('toolbar.show'), $t('toolbar.hide')]"
         v-model="value"
         :data="transferData"
         @change="dataChange"

@@ -43,7 +43,13 @@ export default {
     unknown: '系统未知错误',
     unauthorized: '登录状态已过期，您可以继续留在该页面，或者重新登录',
     unauthorizedConfirm: '重新登录',
-    downloadError: '下载文件出现错误，请联系管理员！'
+    downloadError: '下载文件出现错误，请联系管理员！',
+    code: {
+      '401': '认证失败，无法访问系统资源',
+      '403': '当前操作没有权限',
+      '404': '访问资源不存在',
+      'default': '系统未知错误，请反馈给管理员'
+    }
   },
   modal: {
     title: '系统提示',
@@ -57,6 +63,9 @@ export default {
     column: '显隐列',
     show: '显示',
     hide: '隐藏'
+  },
+  date: {
+    weekdays: ['日', '一', '二', '三', '四', '五', '六']
   },
   pagination: {
     total: '共 {total} 条'

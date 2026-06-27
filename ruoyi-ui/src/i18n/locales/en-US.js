@@ -43,7 +43,13 @@ export default {
     unknown: 'System unknown error',
     unauthorized: 'Login status has expired, you can stay on this page or log in again',
     unauthorizedConfirm: 'Log in again',
-    downloadError: 'An error occurred while downloading the file, please contact the administrator!'
+    downloadError: 'An error occurred while downloading the file, please contact the administrator!',
+    code: {
+      '401': 'Authentication failed, unable to access system resources',
+      '403': 'Current operation has no permission',
+      '404': 'Access resource does not exist',
+      'default': 'System unknown error, please report to administrator'
+    }
   },
   modal: {
     title: 'System Prompt',
@@ -57,6 +63,9 @@ export default {
     column: 'Column Display',
     show: 'Show',
     hide: 'Hide'
+  },
+  date: {
+    weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   },
   pagination: {
     total: 'Total {total} items'

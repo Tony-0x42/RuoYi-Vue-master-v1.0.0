@@ -3,6 +3,7 @@ import { Notification, MessageBox, Message, Loading } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
+import i18n from '@/i18n'
 import { tansParams, blobValidate } from "@/utils/ruoyi"
 import cache from '@/plugins/cache'
 import { saveAs } from 'file-saver'
@@ -77,7 +78,7 @@ service.interceptors.response.use(res => {
   // 未设置状态码则默认成功状态
   const code = res.data.code || 200
   // 获取错误信息
-  const msg = errorCode[code] || res.data.msg || errorCode['default']
+  const msg = errorCode(code) || res.data.msg || errorCode()
   // 二进制数据则直接返回
   if (res.request.responseType === 'blob' || res.request.responseType === 'arraybuffer') {
     return res.data
@@ -85,7 +86,11 @@ service.interceptors.response.use(res => {
   if (code === 401) {
     if (!isRelogin.show) {
       isRelogin.show = true
-      MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', { confirmButtonText: '重新登录', cancelButtonText: '取消', type: 'warning' }).then(() => {
+      MessageBox.confirm(i18n.t('error.unauthorized'), i18n.t('modal.title'), {
+        confirmButtonText: i18n.t('error.unauthorizedConfirm'),
+        cancelButtonText: i18n.t('modal.cancel'),
+        type: 'warning'
+      }).then(() => {
         isRelogin.show = false
         store.dispatch('LogOut').then(() => {
           location.href = '/index'
@@ -112,11 +117,11 @@ error => {
   console.log('err' + error)
   let { message } = error
   if (message == "Network Error") {
-    message = "后端接口连接异常"
+    message = i18n.t('error.network')
   } else if (message.includes("timeout")) {
-    message = "系统接口请求超时"
+    message = i18n.t('error.timeout')
   } else if (message.includes("Request failed with status code")) {
-    message = "系统接口" + message.slice(-3) + "异常"
+    message = i18n.t('error.unknown')
   }
   Message({ message: message, type: 'error', duration: 5 * 1000 })
   return Promise.reject(error)
@@ -139,13 +144,13 @@ export function download(url, params, filename, config) {
     } else {
       const resText = await data.text()
       const rspObj = JSON.parse(resText)
-      const errMsg = errorCode[rspObj.code] || rspObj.msg || errorCode['default']
+      const errMsg = errorCode(rspObj.code) || rspObj.msg || errorCode()
       Message.error(errMsg)
     }
     downloadLoadingInstance.close()
   }).catch((r) => {
     console.error(r)
-    Message.error('下载文件出现错误，请联系管理员！')
+    Message.error(i18n.t('error.downloadError'))
     downloadLoadingInstance.close()
   })
 }

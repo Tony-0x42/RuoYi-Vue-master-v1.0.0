@@ -1,6 +1,11 @@
 import { Message, MessageBox, Notification, Loading } from 'element-ui'
+import i18n from '@/i18n'
 
 let loadingInstance
+
+const defaultTitle = i18n.t('modal.title')
+const confirmText = i18n.t('modal.confirm')
+const cancelText = i18n.t('modal.cancel')
 
 export default {
   // 消息提示
@@ -21,19 +26,19 @@ export default {
   },
   // 弹出提示
   alert(content) {
-    MessageBox.alert(content, "系统提示")
+    MessageBox.alert(content, defaultTitle)
   },
   // 错误提示
   alertError(content) {
-    MessageBox.alert(content, "系统提示", { type: 'error' })
+    MessageBox.alert(content, defaultTitle, { type: 'error' })
   },
   // 成功提示
   alertSuccess(content) {
-    MessageBox.alert(content, "系统提示", { type: 'success' })
+    MessageBox.alert(content, defaultTitle, { type: 'success' })
   },
   // 警告提示
   alertWarning(content) {
-    MessageBox.alert(content, "系统提示", { type: 'warning' })
+    MessageBox.alert(content, defaultTitle, { type: 'warning' })
   },
   // 通知提示
   notify(content) {
@@ -53,17 +58,17 @@ export default {
   },
   // 确认窗体
   confirm(content) {
-    return MessageBox.confirm(content, "系统提示", {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    return MessageBox.confirm(content, defaultTitle, {
+      confirmButtonText: confirmText,
+      cancelButtonText: cancelText,
       type: "warning",
     })
   },
   // 提交内容
   prompt(content) {
-    return MessageBox.prompt(content, "系统提示", {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    return MessageBox.prompt(content, defaultTitle, {
+      confirmButtonText: confirmText,
+      cancelButtonText: cancelText,
       type: "warning",
     })
   },
