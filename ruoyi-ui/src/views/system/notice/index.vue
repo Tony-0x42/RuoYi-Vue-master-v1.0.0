@@ -70,8 +70,8 @@
     </el-row>
 
     <el-table v-loading="loading" :data="noticeList" @selection-change="handleSelectionChange">
+      <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="序号" align="center" prop="noticeId" width="100" />
       <el-table-column label="公告标题" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <a class="link-type" style="cursor:pointer" @click="handleViewData(scope.row)">{{ scope.row.noticeTitle }}</a>
