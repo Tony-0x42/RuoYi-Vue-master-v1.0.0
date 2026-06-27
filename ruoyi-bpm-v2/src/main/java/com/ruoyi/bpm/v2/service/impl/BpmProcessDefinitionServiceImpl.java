@@ -105,7 +105,7 @@ public class BpmProcessDefinitionServiceImpl implements IBpmProcessDefinitionSer
         }
 
         // 从 BPMN XML 重新生成 extJson，保证运行时模型与图形一致
-        BpmProcessModel existingModel = processModelParser.parse(StringUtils.isEmpty(definition.getExtJson()) ? "" : definition.getExtJson());
+        BpmProcessModel existingModel = processModelParser.parse(StringUtils.isEmpty(extJson) ? "" : extJson);
         BpmProcessModel newModel = bpmnXmlParser.parse(xml, existingModel);
         extJson = processModelParser.serialize(newModel);
 
