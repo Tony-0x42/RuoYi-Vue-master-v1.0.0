@@ -33,8 +33,21 @@ public class OaBpmHelper {
      * @return 流程实例
      */
     public BpmProcessInstance startApproval(String processKey, String businessKey, Long starter) {
+        return startApproval(processKey, businessKey, starter, DEFAULT_APPROVER_ID);
+    }
+
+    /**
+     * 启动审批流程实例，指定办理人。
+     *
+     * @param processKey 流程定义 Key
+     * @param businessKey 业务标识
+     * @param starter 发起人用户 ID
+     * @param approverId 办理人用户 ID
+     * @return 流程实例
+     */
+    public BpmProcessInstance startApproval(String processKey, String businessKey, Long starter, Long approverId) {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("approvalAssignee", DEFAULT_APPROVER_ID);
+        variables.put("approvalAssignee", approverId);
         return instanceService.start(processKey, businessKey, starter, null, variables);
     }
 
@@ -59,5 +72,16 @@ public class OaBpmHelper {
      */
     public BpmProcessInstance getInstance(String instanceId) {
         return instanceService.selectById(instanceId);
+    }
+
+    /**
+     * 根据实例 ID 查询流程实例状态。
+     *
+     * @param instanceId 流程实例 ID
+     * @return 流程实例状态字符串；未找到时返回 null
+     */
+    public String getInstanceStatus(String instanceId) {
+        BpmProcessInstance instance = instanceService.selectById(instanceId);
+        return instance != null ? instance.getStatus() : null;
     }
 }
