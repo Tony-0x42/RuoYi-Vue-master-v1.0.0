@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,11 @@ import com.ruoyi.bpm.v2.mapper.BpmProcessDefinitionMapper;
 import com.ruoyi.bpm.v2.mapper.BpmProcessInstanceMapper;
 import com.ruoyi.bpm.v2.mapper.BpmTaskHistoryMapper;
 import com.ruoyi.bpm.v2.mapper.BpmTaskMapper;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.system.mapper.SysUserMapper;
 
 /**
  * 自研轻量级流程运行时引擎
@@ -59,6 +62,9 @@ public class BpmRuntimeEngine {
 
     @Autowired
     private ProcessModelParser modelParser;
+
+    @Autowired
+    private SysUserMapper sysUserMapper;
 
     private final SpelExpressionParser spelParser = new SpelExpressionParser();
 
@@ -471,6 +477,10 @@ public class BpmRuntimeEngine {
         }
         if ("starter".equals(assigneeType)) {
             result = List.of(starter);
+        } else if ("role".equals(assigneeType)) {
+            result = resolveUsersByRole(result);
+        } else if ("dept".equals(assigneeType)) {
+            result = resolveUsersByDept(result);
         } else if ("expression".equals(assigneeType)) {
             String expression = getStringProperty(node, "expression", "");
             try {
@@ -495,6 +505,38 @@ public class BpmRuntimeEngine {
             }
         }
         return result.stream().distinct().collect(Collectors.toList());
+    }
+
+    private List<Long> resolveUsersByRole(List<Long> roleIds) {
+        List<Long> userIds = new ArrayList<>();
+        for (Long roleId : roleIds) {
+            if (roleId == null) {
+                continue;
+            }
+            SysUser query = new SysUser();
+            query.setRoleId(roleId);
+            sysUserMapper.selectAllocatedList(query).stream()
+                    .map(SysUser::getUserId)
+                    .filter(Objects::nonNull)
+                    .forEach(userIds::add);
+        }
+        return userIds;
+    }
+
+    private List<Long> resolveUsersByDept(List<Long> deptIds) {
+        List<Long> userIds = new ArrayList<>();
+        for (Long deptId : deptIds) {
+            if (deptId == null) {
+                continue;
+            }
+            SysUser query = new SysUser();
+            query.setDeptId(deptId);
+            sysUserMapper.selectUserList(query).stream()
+                    .map(SysUser::getUserId)
+                    .filter(Objects::nonNull)
+                    .forEach(userIds::add);
+        }
+        return userIds;
     }
 
     private String getStringProperty(BpmNode node, String key, String defaultValue) {
