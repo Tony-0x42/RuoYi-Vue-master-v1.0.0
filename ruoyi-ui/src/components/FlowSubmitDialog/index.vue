@@ -186,7 +186,6 @@ export default {
         }
       }).catch(error => {
         this.$message.error('流程预览失败')
-        console.error('流程预览失败', error)
       }).finally(() => {
         this.loading = false
       })
@@ -223,7 +222,6 @@ export default {
           this.handleClose()
         }).catch(error => {
           this.$message.error('提交失败')
-          console.error('提交失败', error)
         }).finally(() => {
           this.submitLoading = false
         })
@@ -252,7 +250,6 @@ export default {
         this.handleClose()
       }).catch(error => {
         this.$message.error('退回失败')
-        console.error('退回失败', error)
       }).finally(() => {
         this.returnLoading = false
       })
