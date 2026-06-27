@@ -355,7 +355,7 @@ export default {
         this.$modal.msgSuccess(this.assignAction === "assign" ? "指派成功" : "特送成功")
         this.assignDialogVisible = false
         this.getList()
-      })
+      }).catch(() => {})
     }
   }
 }
