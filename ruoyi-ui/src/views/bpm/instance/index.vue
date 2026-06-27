@@ -46,7 +46,7 @@
     </el-row>
 
     <el-table v-loading="loading" :data="instanceList">
-      <el-table-column label="实例编号" align="center" prop="instanceId" />
+      <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
       <el-table-column label="流程标题" align="center" prop="title" :show-overflow-tooltip="true" />
       <el-table-column label="流程定义" align="center" prop="definitionName" />
       <el-table-column label="状态" align="center" prop="status">

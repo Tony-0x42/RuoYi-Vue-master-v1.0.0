@@ -1,6 +1,11 @@
 <template>
   <div class="app-container" style="padding: 0; background: transparent;">
     <el-table v-loading="loading" :data="taskList" size="small" stripe>
+      <el-table-column label="序号" width="50" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.$index + 1 }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="流程标题" prop="instanceTitle" :show-overflow-tooltip="true" min-width="140" />
       <el-table-column label="节点" prop="nodeName" width="100" align="center" />
       <el-table-column label="创建时间" width="150" align="center">

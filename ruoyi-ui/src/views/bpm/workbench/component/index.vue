@@ -33,8 +33,8 @@
     </el-row>
 
     <el-table v-loading="loading" :data="componentList" @selection-change="handleSelectionChange">
+      <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="组件ID" align="center" prop="componentId" width="80" />
       <el-table-column label="英文名" align="center" prop="componentName" :show-overflow-tooltip="true" />
       <el-table-column label="显示名称" align="center" prop="componentLabel" />
       <el-table-column label="组件路径" align="center" prop="componentPath" :show-overflow-tooltip="true" />

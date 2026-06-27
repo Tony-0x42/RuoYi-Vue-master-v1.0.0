@@ -105,8 +105,8 @@
         </el-row>
 
         <el-table v-loading="loading" :data="definitionList" @selection-change="handleSelectionChange">
+          <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
           <el-table-column type="selection" width="55" align="center" />
-          <el-table-column label="流程编号" align="center" prop="definitionId" />
           <el-table-column label="流程名称" align="center" prop="definitionName" :show-overflow-tooltip="true" />
           <el-table-column label="流程编码" align="center" prop="definitionCode" :show-overflow-tooltip="true" />
           <el-table-column label="流程分类" align="center" prop="categoryName" />
