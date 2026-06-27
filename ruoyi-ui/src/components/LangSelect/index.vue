@@ -23,10 +23,17 @@ export default {
   },
   methods: {
     handleSetLanguage(lang) {
-      this.$i18n.locale = lang
-      this.$store.dispatch('app/setLocale', lang).then(() => {
-        location.reload()
-      })
+      const isLoggedIn = !!this.$store.getters.token
+      if (isLoggedIn) {
+        this.$store.dispatch('user/UpdateLang', lang).then(() => {
+          location.reload()
+        })
+      } else {
+        this.$i18n.locale = lang
+        this.$store.dispatch('app/setLocale', lang).then(() => {
+          location.reload()
+        })
+      }
     }
   }
 }

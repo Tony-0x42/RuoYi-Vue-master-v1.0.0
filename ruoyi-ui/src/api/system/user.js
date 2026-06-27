@@ -87,6 +87,11 @@ export function updateUserProfile(data) {
   })
 }
 
+// 修改用户个人信息（别名）
+export function updateProfile(data) {
+  return updateUserProfile(data)
+}
+
 // 用户密码重置
 export function updateUserPwd(oldPassword, newPassword) {
   const data = {
