@@ -1,5 +1,7 @@
 import zhCNBase from './zh-CN'
 import enUSBase from './en-US'
+import elementZhCN from 'element-ui/lib/locale/lang/zh-CN'
+import elementEn from 'element-ui/lib/locale/lang/en'
 
 function deepMerge(target, source) {
   if (!source) return target
@@ -17,8 +19,8 @@ function deepMerge(target, source) {
 }
 
 const messages = {
-  'zh-CN': { ...zhCNBase },
-  'en-US': { ...enUSBase }
+  'zh-CN': deepMerge({ ...zhCNBase }, elementZhCN),
+  'en-US': deepMerge({ ...enUSBase }, elementEn)
 }
 
 const oaLocaleFiles = require.context('./oa', true, /\/(zh-CN|en-US)\.js$/)
