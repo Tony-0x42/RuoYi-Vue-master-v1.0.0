@@ -57,6 +57,8 @@
         ref="userTable"
         v-loading="loading"
         :data="userList"
+        row-key="userId"
+        :reserve-selection="true"
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center" />
@@ -216,12 +218,11 @@ export default {
       const table = this.$refs.userTable
       if (!table || !this.userList.length) return
       this.isSyncingSelection = true
-      table.clearSelection()
       const selectedIds = new Set(this.selectedUsers.map(u => this.stringId(u.userId)))
       for (const row of this.userList) {
-        if (selectedIds.has(this.stringId(row.userId))) {
-          table.toggleRowSelection(row, true)
-        }
+        const id = this.stringId(row.userId)
+        const shouldBeSelected = selectedIds.has(id)
+        table.toggleRowSelection(row, shouldBeSelected)
       }
       this.isSyncingSelection = false
     },
@@ -230,12 +231,11 @@ export default {
       const currentPageIds = new Set(this.userList.map(row => this.stringId(row.userId)))
       const selectedMap = new Map(this.selectedUsers.map(u => [this.stringId(u.userId), u]))
 
-      for (const row of this.userList) {
-        const id = this.stringId(row.userId)
-        const isSelected = selection.some(item => this.stringId(item.userId) === id)
-        if (isSelected) {
-          selectedMap.set(id, row)
-        } else if (currentPageIds.has(id)) {
+      for (const row of selection) {
+        selectedMap.set(this.stringId(row.userId), row)
+      }
+      for (const id of currentPageIds) {
+        if (!selection.some(item => this.stringId(item.userId) === id)) {
           selectedMap.delete(id)
         }
       }
