@@ -156,7 +156,12 @@ export default {
       post: '岗位',
       postPlaceholder: '请选择岗位',
       remark: '备注',
-      remarkPlaceholder: '请输入内容'
+      remarkPlaceholder: '请输入内容',
+      userNameRequired: '用户名称不能为空',
+      userNameLength: '用户名称长度必须介于 2 和 20 之间',
+      nickNameRequired: '用户昵称不能为空',
+      emailInvalid: '请输入正确的邮箱地址',
+      phonenumberInvalid: '请输入正确的手机号码'
     },
     table: {
       userName: '用户名称',

@@ -1,28 +1,28 @@
 <template>
   <div class="app-container">
-    <h4 class="form-header h4">基本信息</h4>
+    <h4 class="form-header h4">{{ $t('user.basicInfo') }}</h4>
     <el-form ref="form" :model="form" label-width="80px">
       <el-row>
         <el-col :span="8" :offset="2">
-          <el-form-item label="用户昵称" prop="nickName">
+          <el-form-item :label="$t('user.form.nickName')" prop="nickName">
             <el-input v-model="form.nickName" disabled />
           </el-form-item>
         </el-col>
         <el-col :span="8" :offset="2">
-          <el-form-item label="登录账号" prop="userName">
+          <el-form-item :label="$t('user.loginAccount')" prop="userName">
             <el-input v-model="form.userName" disabled />
           </el-form-item>
         </el-col>
       </el-row>
     </el-form>
 
-    <h4 class="form-header h4">角色信息</h4>
+    <h4 class="form-header h4">{{ $t('user.roleInfo') }}</h4>
     <el-table v-loading="loading" :row-key="getRowKey" @row-click="clickRow" ref="table" @selection-change="handleSelectionChange" :data="roles.slice((pageNum-1)*pageSize,pageNum*pageSize)">
       <el-table-column type="selection" :reserve-selection="true" :selectable="checkSelectable" width="55" />
       <index-column :page="pageNum" :size="pageSize" />
-      <el-table-column label="角色名称" align="center" prop="roleName" />
-      <el-table-column label="权限字符" align="center" prop="roleKey" />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column :label="$t('user.roleName')" align="center" prop="roleName" />
+      <el-table-column :label="$t('user.roleKey')" align="center" prop="roleKey" />
+      <el-table-column :label="$t('common.createTime')" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
@@ -33,8 +33,8 @@
 
     <el-form label-width="100px">
       <el-form-item style="text-align: center;margin-left:-120px;margin-top:30px;">
-        <el-button type="primary" @click="submitForm()">提交</el-button>
-        <el-button @click="close()">返回</el-button>
+        <el-button type="primary" @click="submitForm()">{{ $t('common.submit') }}</el-button>
+        <el-button @click="close()">{{ $t('common.return') }}</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -104,7 +104,7 @@ export default {
       const userId = this.form.userId
       const roleIds = this.roleIds.join(",")
       updateAuthRole({ userId: userId, roleIds: roleIds }).then(() => {
-        this.$modal.msgSuccess("授权成功")
+        this.$modal.msgSuccess(this.$t('user.authSuccess'))
         this.close()
       })
     },

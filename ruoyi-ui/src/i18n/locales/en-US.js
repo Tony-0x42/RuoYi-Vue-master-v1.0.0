@@ -156,7 +156,12 @@ export default {
       post: 'Post',
       postPlaceholder: 'Please select post',
       remark: 'Remark',
-      remarkPlaceholder: 'Please enter content'
+      remarkPlaceholder: 'Please enter content',
+      userNameRequired: 'User name cannot be empty',
+      userNameLength: 'User name length must be between 2 and 20',
+      nickNameRequired: 'Nickname cannot be empty',
+      emailInvalid: 'Please enter a valid email address',
+      phonenumberInvalid: 'Please enter a valid phone number'
     },
     table: {
       userName: 'User Name',
