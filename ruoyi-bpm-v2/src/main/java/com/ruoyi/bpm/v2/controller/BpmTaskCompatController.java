@@ -65,6 +65,7 @@ public class BpmTaskCompatController extends BaseController {
                 title = "流程实例-" + task.getInstanceId();
             }
             vo.put("instanceTitle", title);
+            vo.put("businessKey", instance == null ? null : instance.getBusinessKey());
             vo.put("definitionId", instance == null ? null : instance.getDefinitionId());
             result.add(vo);
         }

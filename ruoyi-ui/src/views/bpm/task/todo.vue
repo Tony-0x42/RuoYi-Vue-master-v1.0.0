@@ -254,6 +254,38 @@ export default {
       this.form.variables.splice(index, 1)
     },
     handleSubmit(row) {
+      const businessKey = row.businessKey
+      if (businessKey) {
+        const separatorIndex = businessKey.indexOf(':')
+        if (separatorIndex > 0) {
+          const prefix = businessKey.substring(0, separatorIndex)
+          const id = businessKey.substring(separatorIndex + 1)
+          if (prefix === 'expense_report') {
+            this.$router.push({ path: '/oa/expense', query: { id } })
+            return
+          } else if (prefix === 'expense_loan') {
+            this.$router.push({ path: '/oa/expense/loan', query: { id } })
+            return
+          } else if (['asset_receive', 'asset_transfer', 'asset_repair', 'asset_scrap'].includes(prefix)) {
+            this.$router.push({ path: '/oa/asset/detail/' + id })
+            return
+          } else if (prefix === 'attendance_leave') {
+            this.$router.push({ path: '/oa/attendance/leave', query: { id } })
+            return
+          } else if (prefix === 'attendance_overtime') {
+            this.$router.push({ path: '/oa/attendance/overtime', query: { id } })
+            return
+          } else if (prefix === 'attendance_trip') {
+            this.$router.push({ path: '/oa/attendance/trip', query: { id } })
+            return
+          } else if (prefix === 'attendance_makeup') {
+            this.$router.push({ path: '/oa/attendance/makeup', query: { id } })
+            return
+          }
+        }
+        this.$modal.msgInfo('请在业务页面处理')
+        return
+      }
       this.reset()
       this.currentTaskId = row.flowableTaskId
       this.currentDefinitionId = row.definitionId
