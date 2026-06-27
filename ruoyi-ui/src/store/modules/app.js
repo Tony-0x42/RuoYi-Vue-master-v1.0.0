@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie'
+import { setLocale as i18nSetLocale, DEFAULT_LOCALE } from '@/i18n'
 
 const state = {
   sidebar: {
@@ -7,7 +8,8 @@ const state = {
     hide: false
   },
   device: 'desktop',
-  size: Cookies.get('size') || 'medium'
+  size: Cookies.get('size') || 'medium',
+  locale: localStorage.getItem('ruoyi-locale') || DEFAULT_LOCALE
 }
 
 const mutations = {
@@ -37,6 +39,9 @@ const mutations = {
   },
   SET_SIDEBAR_HIDE: (state, status) => {
     state.sidebar.hide = status
+  },
+  SET_LOCALE: (state, locale) => {
+    state.locale = locale
   }
 }
 
@@ -55,6 +60,10 @@ const actions = {
   },
   toggleSideBarHide({ commit }, status) {
     commit('SET_SIDEBAR_HIDE', status)
+  },
+  setLocale({ commit }, locale) {
+    i18nSetLocale(locale)
+    commit('SET_LOCALE', locale)
   }
 }
 

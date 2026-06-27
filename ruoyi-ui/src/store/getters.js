@@ -2,6 +2,7 @@ const getters = {
   sidebar: state => state.app.sidebar,
   size: state => state.app.size,
   device: state => state.app.device,
+  locale: state => state.app.locale,
   dict: state => state.dict.dict,
   isLock: state => state.lock.isLock,
   lockPath: state => state.lock.lockPath,
