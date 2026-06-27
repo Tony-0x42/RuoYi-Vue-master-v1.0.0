@@ -62,6 +62,9 @@ public class SysUser extends BaseEntity
     @Excel(name = "账号状态", readConverterExp = "0=正常,1=停用")
     private String status;
 
+    /** 语言偏好（zh-CN 简体中文 en 英文） */
+    private String lang;
+
     /** 删除标志（0代表存在 2代表删除） */
     private String delFlag;
 
@@ -220,6 +223,16 @@ public class SysUser extends BaseEntity
         this.status = status;
     }
 
+    public String getLang()
+    {
+        return lang;
+    }
+
+    public void setLang(String lang)
+    {
+        this.lang = lang;
+    }
+
     public String getDelFlag()
     {
         return delFlag;
@@ -323,6 +336,7 @@ public class SysUser extends BaseEntity
             .append("avatar", getAvatar())
             .append("password", getPassword())
             .append("status", getStatus())
+            .append("lang", getLang())
             .append("delFlag", getDelFlag())
             .append("loginIp", getLoginIp())
             .append("loginDate", getLoginDate())

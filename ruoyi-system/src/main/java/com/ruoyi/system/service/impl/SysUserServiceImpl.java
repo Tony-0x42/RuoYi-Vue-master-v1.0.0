@@ -261,6 +261,11 @@ public class SysUserServiceImpl implements ISysUserService
     @Transactional
     public int insertUser(SysUser user)
     {
+        // 默认语言偏好为简体中文
+        if (StringUtils.isEmpty(user.getLang()))
+        {
+            user.setLang("zh-CN");
+        }
         // 新增用户信息
         int rows = userMapper.insertUser(user);
         // 新增用户岗位关联

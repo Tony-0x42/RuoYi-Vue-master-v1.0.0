@@ -1,5 +1,7 @@
 package com.ruoyi.framework.web.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -60,7 +62,7 @@ public class SysLoginService
      * @param uuid 唯一标识
      * @return 结果
      */
-    public String login(String username, String password, String code, String uuid)
+    public Map<String, Object> login(String username, String password, String code, String uuid)
     {
         // 验证码校验
         validateCaptcha(username, code, uuid);
@@ -96,7 +98,11 @@ public class SysLoginService
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         recordLoginInfo(loginUser.getUserId());
         // 生成token
-        return tokenService.createToken(loginUser);
+        String token = tokenService.createToken(loginUser);
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.TOKEN, token);
+        result.put("lang", loginUser.getUser().getLang());
+        return result;
     }
 
     /**
