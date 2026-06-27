@@ -44,6 +44,10 @@ export default {
     unauthorized: '登录状态已过期，您可以继续留在该页面，或者重新登录',
     unauthorizedConfirm: '重新登录',
     downloadError: '下载文件出现错误，请联系管理员！',
+    duplicateSubmit: '数据正在处理，请勿重复提交',
+    invalidSession: '无效的会话，或者会话已过期，请重新登录。',
+    downloading: '正在下载数据，请稍候',
+    requestSizeLimit: '请求数据大小超出允许的5M限制，请检查数据是否包含大文本或过多条目。',
     code: {
       '401': '认证失败，无法访问系统资源',
       '403': '当前操作没有权限',
@@ -61,8 +65,10 @@ export default {
     showSearch: '显示搜索',
     refresh: '刷新',
     column: '显隐列',
+    columnDisplay: '列展示',
     show: '显示',
-    hide: '隐藏'
+    hide: '隐藏',
+    showHideTitle: '显示/隐藏'
   },
   date: {
     weekdays: ['日', '一', '二', '三', '四', '五', '六']

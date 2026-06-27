@@ -48,7 +48,7 @@ service.interceptors.request.use(config => {
     const requestSize = Object.keys(JSON.stringify(requestObj)).length // 请求数据大小
     const limitSize = 5 * 1024 * 1024 // 限制存放数据5M
     if (requestSize >= limitSize) {
-      console.warn(`[${config.url}]: ` + '请求数据大小超出允许的5M限制，无法进行防重复提交验证。')
+      console.warn(`[${config.url}]: ` + i18n.t('error.requestSizeLimit'))
       return config
     }
     const sessionObj = cache.session.getJSON('sessionObj')
@@ -59,7 +59,7 @@ service.interceptors.request.use(config => {
       const s_data = sessionObj.data                // 请求数据
       const s_time = sessionObj.time                // 请求时间
       if (s_data === requestObj.data && requestObj.time - s_time < interval && s_url === requestObj.url) {
-        const message = '数据正在处理，请勿重复提交'
+        const message = i18n.t('error.duplicateSubmit')
         console.warn(`[${s_url}]: ` + message)
         return Promise.reject(new Error(message))
       } else {
@@ -99,7 +99,7 @@ service.interceptors.response.use(res => {
         isRelogin.show = false
       })
     }
-    return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
+    return Promise.reject(i18n.t('error.invalidSession'))
   } else if (code === 500) {
     Message({ message: msg, type: 'error' })
     return Promise.reject(new Error(msg))
@@ -130,7 +130,7 @@ error => {
 
 // 通用下载方法
 export function download(url, params, filename, config) {
-  downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
+  downloadLoadingInstance = Loading.service({ text: i18n.t('error.downloading'), spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
   return service.post(url, params, {
     transformRequest: [(params) => { return tansParams(params) }],
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

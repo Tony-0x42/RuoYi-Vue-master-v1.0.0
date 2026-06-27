@@ -3,10 +3,6 @@ import i18n from '@/i18n'
 
 let loadingInstance
 
-const defaultTitle = i18n.t('modal.title')
-const confirmText = i18n.t('modal.confirm')
-const cancelText = i18n.t('modal.cancel')
-
 export default {
   // 消息提示
   msg(content) {
@@ -26,19 +22,19 @@ export default {
   },
   // 弹出提示
   alert(content) {
-    MessageBox.alert(content, defaultTitle)
+    MessageBox.alert(content, i18n.t('modal.title'))
   },
   // 错误提示
   alertError(content) {
-    MessageBox.alert(content, defaultTitle, { type: 'error' })
+    MessageBox.alert(content, i18n.t('modal.title'), { type: 'error' })
   },
   // 成功提示
   alertSuccess(content) {
-    MessageBox.alert(content, defaultTitle, { type: 'success' })
+    MessageBox.alert(content, i18n.t('modal.title'), { type: 'success' })
   },
   // 警告提示
   alertWarning(content) {
-    MessageBox.alert(content, defaultTitle, { type: 'warning' })
+    MessageBox.alert(content, i18n.t('modal.title'), { type: 'warning' })
   },
   // 通知提示
   notify(content) {
@@ -58,17 +54,17 @@ export default {
   },
   // 确认窗体
   confirm(content) {
-    return MessageBox.confirm(content, defaultTitle, {
-      confirmButtonText: confirmText,
-      cancelButtonText: cancelText,
+    return MessageBox.confirm(content, i18n.t('modal.title'), {
+      confirmButtonText: i18n.t('modal.confirm'),
+      cancelButtonText: i18n.t('modal.cancel'),
       type: "warning",
     })
   },
   // 提交内容
   prompt(content) {
-    return MessageBox.prompt(content, defaultTitle, {
-      confirmButtonText: confirmText,
-      cancelButtonText: cancelText,
+    return MessageBox.prompt(content, i18n.t('modal.title'), {
+      confirmButtonText: i18n.t('modal.confirm'),
+      cancelButtonText: i18n.t('modal.cancel'),
       type: "warning",
     })
   },

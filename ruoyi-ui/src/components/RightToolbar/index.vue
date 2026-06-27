@@ -14,7 +14,7 @@
           <el-dropdown-menu slot="dropdown">
             <!-- 全选/反选 按钮 -->
             <el-dropdown-item>
-              <el-checkbox :indeterminate="isIndeterminate" v-model="isChecked" @change="toggleCheckAll"> 列展示 </el-checkbox>
+              <el-checkbox :indeterminate="isIndeterminate" v-model="isChecked" @change="toggleCheckAll"> {{ $t('toolbar.columnDisplay') }} </el-checkbox>
             </el-dropdown-item>
             <div class="check-line"></div>
             <template v-for="(item, key) in columns">
@@ -46,8 +46,6 @@ export default {
     return {
       // 显隐数据
       value: [],
-      // 弹出层标题
-      title: "显示/隐藏",
       // 是否显示弹出层
       open: false
     }
@@ -91,6 +89,9 @@ export default {
         ret.marginRight = `${this.gutter / 2}px`
       }
       return ret
+    },
+    title() {
+      return this.$t('toolbar.showHideTitle')
     },
     isChecked: {
       get() {

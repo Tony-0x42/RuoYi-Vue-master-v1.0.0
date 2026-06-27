@@ -44,6 +44,10 @@ export default {
     unauthorized: 'Login status has expired, you can stay on this page or log in again',
     unauthorizedConfirm: 'Log in again',
     downloadError: 'An error occurred while downloading the file, please contact the administrator!',
+    duplicateSubmit: 'Data is being processed, please do not submit repeatedly.',
+    invalidSession: 'Invalid session or session expired, please log in again.',
+    downloading: 'Downloading data, please wait...',
+    requestSizeLimit: 'Request data size exceeds the allowed 5MB limit. Please check if the data contains large text or too many entries.',
     code: {
       '401': 'Authentication failed, unable to access system resources',
       '403': 'Current operation has no permission',
@@ -61,8 +65,10 @@ export default {
     showSearch: 'Show Search',
     refresh: 'Refresh',
     column: 'Column Display',
+    columnDisplay: 'Column Display',
     show: 'Show',
-    hide: 'Hide'
+    hide: 'Hide',
+    showHideTitle: 'Show/Hide'
   },
   date: {
     weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
