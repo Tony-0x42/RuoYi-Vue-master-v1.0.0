@@ -281,7 +281,7 @@ export default {
       let values = extensionElements.get('values') || []
       values = values.filter(v => v.$type !== 'flowable:' + name)
       if (value) {
-        const newElem = moddle.create('flowable:' + name, { value })
+        const newElem = moddle.createAny('flowable:' + name, 'http://flowable.org/bpmn', { value })
         values.push(newElem)
       }
       extensionElements.set('values', values)
