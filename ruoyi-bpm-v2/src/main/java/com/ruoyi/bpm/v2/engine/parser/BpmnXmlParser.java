@@ -260,6 +260,17 @@ public class BpmnXmlParser {
         for (BpmNode node : parsed.getNodes()) {
             BpmNode old = existingNodes.get(node.getId());
             if (old != null) {
+                // 当 BPMN XML 中未配置办理人时，保留 runtime-only 的 expression/starter 配置
+                boolean parsedHasAssignee = StringUtils.isNotEmpty(node.getAssigneeType())
+                        || (node.getAssignees() != null && !node.getAssignees().isEmpty());
+                if (!parsedHasAssignee) {
+                    String oldAssigneeType = old.getAssigneeType();
+                    if ("expression".equals(oldAssigneeType) || "starter".equals(oldAssigneeType)) {
+                        node.setAssigneeType(old.getAssigneeType());
+                        node.setAssignees(old.getAssignees());
+                    }
+                }
+
                 if (old.getApproveType() != null) {
                     node.setApproveType(old.getApproveType());
                 }

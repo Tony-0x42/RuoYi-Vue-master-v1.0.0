@@ -131,4 +131,68 @@ class BpmnXmlParserTest {
         BpmProcessModel model = parser.parse(null, existing);
         assertEquals(existing, model);
     }
+
+    @Test
+    void shouldPreserveExpressionAssigneeWhenParsedNodeHasNoAssignee() {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<bpmn:definitions xmlns:bpmn=\"http://www.omg.org/spec/BPMN/20100524/MODEL\" " +
+                "xmlns:flowable=\"http://flowable.org/bpmn\" id=\"Definitions_1\" targetNamespace=\"http://bpmn.io/schema/bpmn\">\n" +
+                "  <bpmn:process id=\"Process_1\" isExecutable=\"true\">\n" +
+                "    <bpmn:startEvent id=\"StartEvent_1\" name=\"Start\" />\n" +
+                "    <bpmn:userTask id=\"UserTask_1\" name=\"Task\" />\n" +
+                "    <bpmn:endEvent id=\"EndEvent_1\" name=\"End\" />\n" +
+                "    <bpmn:sequenceFlow id=\"Flow_1\" sourceRef=\"StartEvent_1\" targetRef=\"UserTask_1\" />\n" +
+                "    <bpmn:sequenceFlow id=\"Flow_2\" sourceRef=\"UserTask_1\" targetRef=\"EndEvent_1\" />\n" +
+                "  </bpmn:process>\n" +
+                "</bpmn:definitions>";
+
+        BpmProcessModel existing = new BpmProcessModel();
+        BpmNode existingNode = new BpmNode();
+        existingNode.setId("UserTask_1");
+        existingNode.setType("approve");
+        existingNode.setAssigneeType("expression");
+        existingNode.setAssignees(List.of(100L));
+        existing.setNodes(List.of(existingNode));
+
+        BpmProcessModel model = parser.parse(xml, existing);
+        BpmNode node = model.getNodes().stream()
+                .filter(n -> "UserTask_1".equals(n.getId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(node);
+        assertEquals("expression", node.getAssigneeType());
+        assertEquals(List.of(100L), node.getAssignees());
+    }
+
+    @Test
+    void shouldPreserveStarterAssigneeWhenParsedNodeHasNoAssignee() {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<bpmn:definitions xmlns:bpmn=\"http://www.omg.org/spec/BPMN/20100524/MODEL\" " +
+                "xmlns:flowable=\"http://flowable.org/bpmn\" id=\"Definitions_1\" targetNamespace=\"http://bpmn.io/schema/bpmn\">\n" +
+                "  <bpmn:process id=\"Process_1\" isExecutable=\"true\">\n" +
+                "    <bpmn:startEvent id=\"StartEvent_1\" name=\"Start\" />\n" +
+                "    <bpmn:userTask id=\"UserTask_1\" name=\"Task\" />\n" +
+                "    <bpmn:endEvent id=\"EndEvent_1\" name=\"End\" />\n" +
+                "    <bpmn:sequenceFlow id=\"Flow_1\" sourceRef=\"StartEvent_1\" targetRef=\"UserTask_1\" />\n" +
+                "    <bpmn:sequenceFlow id=\"Flow_2\" sourceRef=\"UserTask_1\" targetRef=\"EndEvent_1\" />\n" +
+                "  </bpmn:process>\n" +
+                "</bpmn:definitions>";
+
+        BpmProcessModel existing = new BpmProcessModel();
+        BpmNode existingNode = new BpmNode();
+        existingNode.setId("UserTask_1");
+        existingNode.setType("approve");
+        existingNode.setAssigneeType("starter");
+        existingNode.setAssignees(List.of(1L));
+        existing.setNodes(List.of(existingNode));
+
+        BpmProcessModel model = parser.parse(xml, existing);
+        BpmNode node = model.getNodes().stream()
+                .filter(n -> "UserTask_1".equals(n.getId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(node);
+        assertEquals("starter", node.getAssigneeType());
+        assertEquals(List.of(1L), node.getAssignees());
+    }
 }
