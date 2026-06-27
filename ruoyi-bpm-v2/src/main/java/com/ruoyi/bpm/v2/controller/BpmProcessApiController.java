@@ -1,10 +1,12 @@
 package com.ruoyi.bpm.v2.controller;
 
+import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +32,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
  */
 @RestController
 @RequestMapping("/api/v1/process")
+@Validated
 public class BpmProcessApiController {
 
     @Autowired
@@ -108,7 +111,7 @@ public class BpmProcessApiController {
 
     @PostMapping("/tasks/{taskId}/returnToPrevious")
     public BpmApiResult<Map<String, Object>> returnToPrevious(@PathVariable String taskId,
-                                                              @RequestBody ReturnTaskDTO dto) {
+                                                              @RequestBody @Valid ReturnTaskDTO dto) {
         BpmTask task = taskService.returnToPrevious(taskId, dto.getOperator(), dto.getTargetNodeId(),
                 dto.getReturnAssignee(), dto.getOpinion());
         List<BpmTask> nextTasks = taskService.selectTodoList(null, null).stream()

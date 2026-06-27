@@ -19,7 +19,6 @@ import com.alibaba.fastjson2.JSON;
 import com.ruoyi.bpm.v2.domain.BpmDefinitionVersion;
 import com.ruoyi.bpm.v2.domain.BpmProcessDefinition;
 import com.ruoyi.bpm.v2.domain.BpmProcessInstance;
-import com.ruoyi.bpm.v2.domain.BpmDefinitionVersion;
 import com.ruoyi.bpm.v2.domain.BpmTask;
 import com.ruoyi.bpm.v2.domain.BpmTaskHistory;
 import com.ruoyi.bpm.v2.engine.model.BpmEdge;

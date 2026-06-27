@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson2.JSON;
 import com.ruoyi.bpm.v2.domain.BpmTask;
 import com.ruoyi.bpm.v2.engine.runtime.BpmRuntimeEngine;
+import com.ruoyi.bpm.v2.enums.BpmTaskStatus;
 import com.ruoyi.bpm.v2.mapper.BpmTaskMapper;
 import com.ruoyi.bpm.v2.service.IBpmTaskService;
 import com.ruoyi.common.exception.ServiceException;
@@ -72,6 +73,9 @@ public class BpmTaskServiceImpl implements IBpmTaskService {
         }
         if (!hasTaskPermission(task, operator)) {
             throw new ServiceException("无权限处理该任务");
+        }
+        if (!BpmTaskStatus.PENDING.name().equals(task.getStatus()) && !BpmTaskStatus.CLAIMED.name().equals(task.getStatus())) {
+            throw new ServiceException("任务状态不允许退回");
         }
 
         Map<String, Object> vars = new HashMap<>();
