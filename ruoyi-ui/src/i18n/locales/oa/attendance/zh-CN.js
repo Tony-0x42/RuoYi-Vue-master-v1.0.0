@@ -99,7 +99,7 @@ export default {
       checkType: '补卡类型',
       checkIn: '上班卡',
       checkOut: '下班卡',
-      submitApproval: '提交审批',
+      submitApproval: '提交成功',
       submitLeave: '提交请假',
       submitOvertime: '提交加班',
       submitTrip: '提交出差',

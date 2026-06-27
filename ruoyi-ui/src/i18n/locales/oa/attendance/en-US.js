@@ -99,7 +99,7 @@ export default {
       checkType: 'Check-in Type',
       checkIn: 'Check-in',
       checkOut: 'Check-out',
-      submitApproval: 'Submit for Approval',
+      submitApproval: 'Submitted successfully',
       submitLeave: 'Submit Leave',
       submitOvertime: 'Submit Overtime',
       submitTrip: 'Submit Trip',
