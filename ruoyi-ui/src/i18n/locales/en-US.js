@@ -15,12 +15,47 @@ export default {
     createTime: 'Create Time',
     yes: 'Yes',
     no: 'No',
-    tip: 'Tip'
+    tip: 'Tip',
+    startDate: 'Start Date',
+    endDate: 'End Date',
+    more: 'More',
+    return: 'Return',
+    success: 'Success',
+    addSuccess: 'Added successfully',
+    editSuccess: 'Updated successfully',
+    deleteSuccess: 'Deleted successfully'
   },
   route: {
     dashboard: 'Dashboard',
     profile: 'Profile',
     lockScreen: 'Lock Screen'
+  },
+  layout: {
+    logout: 'Log Out',
+    profile: 'Profile',
+    home: 'Home',
+    dashboard: 'Dashboard',
+    layoutSettings: 'Layout Settings'
+  },
+  tagsView: {
+    close: 'Close',
+    closeCurrent: 'Close Current',
+    closeOthers: 'Close Others',
+    closeAll: 'Close All',
+    closeLeft: 'Close Left',
+    closeRight: 'Close Right',
+    refresh: 'Refresh',
+    refreshPage: 'Refresh Page',
+    fullscreen: 'Fullscreen',
+    exitFullscreen: 'Exit Fullscreen'
+  },
+  menu: {
+    system: 'System Management',
+    'system-user': 'User Management',
+    'system-role': 'Role Management',
+    monitor: 'System Monitoring',
+    tool: 'System Tools',
+    bpm: 'Process Management'
   },
   login: {
     title: 'xxx Management System',
@@ -30,6 +65,7 @@ export default {
     passwordPlaceholder: 'Please enter your password',
     remember: 'Remember me',
     submit: 'Sign in',
+    register: 'Register Now',
     loading: 'Signing in...',
     usernameRequired: 'Please enter your username',
     passwordRequired: 'Please enter your password',
@@ -75,5 +111,60 @@ export default {
   },
   pagination: {
     total: 'Total {total} items'
+  },
+  user: {
+    title: 'User Management',
+    add: 'Add User',
+    edit: 'Edit User',
+    deleteConfirm: 'Are you sure to delete user(s) with ID "{userIds}"?',
+    importTitle: 'User Import',
+    importUpdateSupport: 'Whether to update existing user data',
+    orgTitle: 'Organization',
+    deptSearchPlaceholder: 'Please enter department name',
+    enable: 'Enable',
+    disable: 'Disable',
+    statusChangeConfirm: 'Are you sure to {text} user "{userName}"?',
+    statusChangeSuccess: '{text} successfully',
+    resetPwd: 'Reset Password',
+    resetPwdPrompt: 'Please enter new password for 「{userName}」',
+    resetPwdSuccess: 'Modified successfully, new password is: {password}',
+    assignRole: 'Assign Role',
+    basicInfo: 'Basic Information',
+    roleInfo: 'Role Information',
+    loginAccount: 'Login Account',
+    roleName: 'Role Name',
+    roleKey: 'Permission Key',
+    authSuccess: 'Authorization successful',
+    form: {
+      userName: 'User Name',
+      userNamePlaceholder: 'Please enter user name',
+      nickName: 'Nickname',
+      nickNamePlaceholder: 'Please enter nickname',
+      phonenumber: 'Phone Number',
+      phonenumberPlaceholder: 'Please enter phone number',
+      status: 'Status',
+      deptId: 'Department',
+      deptIdPlaceholder: 'Please select department',
+      roleIds: 'Roles',
+      roleIdsPlaceholder: 'Please select roles',
+      email: 'Email',
+      emailPlaceholder: 'Please enter email',
+      password: 'Password',
+      passwordPlaceholder: 'Please enter password',
+      sex: 'Gender',
+      sexPlaceholder: 'Please select gender',
+      post: 'Post',
+      postPlaceholder: 'Please select post',
+      remark: 'Remark',
+      remarkPlaceholder: 'Please enter content'
+    },
+    table: {
+      userName: 'User Name',
+      nickName: 'Nickname',
+      deptName: 'Department',
+      phonenumber: 'Phone Number',
+      status: 'Status',
+      createTime: 'Create Time'
+    }
   }
 }

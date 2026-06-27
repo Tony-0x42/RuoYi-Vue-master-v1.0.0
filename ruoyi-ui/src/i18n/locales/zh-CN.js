@@ -15,12 +15,47 @@ export default {
     createTime: '创建时间',
     yes: '是',
     no: '否',
-    tip: '提示'
+    tip: '提示',
+    startDate: '开始日期',
+    endDate: '结束日期',
+    more: '更多',
+    return: '返回',
+    success: '成功',
+    addSuccess: '新增成功',
+    editSuccess: '修改成功',
+    deleteSuccess: '删除成功'
   },
   route: {
     dashboard: '首页',
     profile: '个人中心',
     lockScreen: '锁定屏幕'
+  },
+  layout: {
+    logout: '退出登录',
+    profile: '个人中心',
+    home: '首页',
+    dashboard: '首页',
+    layoutSettings: '布局设置'
+  },
+  tagsView: {
+    close: '关闭',
+    closeCurrent: '关闭当前',
+    closeOthers: '关闭其它',
+    closeAll: '关闭全部',
+    closeLeft: '关闭左侧',
+    closeRight: '关闭右侧',
+    refresh: '刷新',
+    refreshPage: '刷新页面',
+    fullscreen: '全屏显示',
+    exitFullscreen: '退出全屏'
+  },
+  menu: {
+    system: '系统管理',
+    'system-user': '用户管理',
+    'system-role': '角色管理',
+    monitor: '系统监控',
+    tool: '系统工具',
+    bpm: '流程管理'
   },
   login: {
     title: 'xxx管理系统',
@@ -30,6 +65,7 @@ export default {
     passwordPlaceholder: '请输入您的密码',
     remember: '记住密码',
     submit: '登 录',
+    register: '立即注册',
     loading: '登 录 中...',
     usernameRequired: '请输入您的账号',
     passwordRequired: '请输入您的密码',
@@ -75,5 +111,60 @@ export default {
   },
   pagination: {
     total: '共 {total} 条'
+  },
+  user: {
+    title: '用户管理',
+    add: '新增用户',
+    edit: '修改用户',
+    deleteConfirm: '是否确认删除用户编号为"{userIds}"的数据项？',
+    importTitle: '用户导入',
+    importUpdateSupport: '是否更新已经存在的用户数据',
+    orgTitle: '组织机构',
+    deptSearchPlaceholder: '请输入部门名称',
+    enable: '启用',
+    disable: '停用',
+    statusChangeConfirm: '确认要"{text}""{userName}"用户吗？',
+    statusChangeSuccess: '{text}成功',
+    resetPwd: '重置密码',
+    resetPwdPrompt: '请输入「{userName}」的新密码',
+    resetPwdSuccess: '修改成功，新密码是：{password}',
+    assignRole: '分配角色',
+    basicInfo: '基本信息',
+    roleInfo: '角色信息',
+    loginAccount: '登录账号',
+    roleName: '角色名称',
+    roleKey: '权限字符',
+    authSuccess: '授权成功',
+    form: {
+      userName: '用户名称',
+      userNamePlaceholder: '请输入用户名称',
+      nickName: '用户昵称',
+      nickNamePlaceholder: '请输入用户昵称',
+      phonenumber: '手机号码',
+      phonenumberPlaceholder: '请输入手机号码',
+      status: '用户状态',
+      deptId: '归属部门',
+      deptIdPlaceholder: '请选择归属部门',
+      roleIds: '角色',
+      roleIdsPlaceholder: '请选择角色',
+      email: '邮箱',
+      emailPlaceholder: '请输入邮箱',
+      password: '用户密码',
+      passwordPlaceholder: '请输入用户密码',
+      sex: '用户性别',
+      sexPlaceholder: '请选择性别',
+      post: '岗位',
+      postPlaceholder: '请选择岗位',
+      remark: '备注',
+      remarkPlaceholder: '请输入内容'
+    },
+    table: {
+      userName: '用户名称',
+      nickName: '用户昵称',
+      deptName: '部门',
+      phonenumber: '手机号码',
+      status: '状态',
+      createTime: '创建时间'
+    }
   }
 }
