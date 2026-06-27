@@ -25,7 +25,7 @@ export default {
     handleSetLanguage(lang) {
       const isLoggedIn = !!this.$store.getters.token
       if (isLoggedIn) {
-        this.$store.dispatch('user/UpdateLang', lang).then(() => {
+        this.$store.dispatch('UpdateLang', lang).then(() => {
           location.reload()
         })
       } else {

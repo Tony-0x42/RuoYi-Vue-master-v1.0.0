@@ -1,6 +1,7 @@
 <template>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
+      <div class="login-lang"><lang-select /></div>
       <h3 class="title">{{title}}</h3>
       <el-form-item prop="username">
         <el-input
@@ -66,9 +67,11 @@ import { getCodeImg } from "@/api/login"
 import Cookies from "js-cookie"
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 import defaultSettings from '@/settings'
+import LangSelect from '@/components/LangSelect'
 
 export default {
   name: "Login",
+  components: { LangSelect },
   data() {
     return {
       title: process.env.VUE_APP_TITLE,
@@ -174,6 +177,7 @@ export default {
 }
 
 .login-form {
+  position: relative;
   border-radius: 6px;
   background: #ffffff;
   width: 400px;
@@ -219,5 +223,13 @@ export default {
 }
 .login-code-img {
   height: 38px;
+}
+.login-lang {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 18px;
+  color: #5a5e66;
+  cursor: pointer;
 }
 </style>
