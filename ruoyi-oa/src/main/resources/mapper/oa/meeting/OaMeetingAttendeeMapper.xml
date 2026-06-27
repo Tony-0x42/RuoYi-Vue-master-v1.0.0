@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.meeting.mapper.OaMeetingAttendeeMapper">
+
+    <resultMap type="com.ruoyi.oa.meeting.domain.OaMeetingAttendee" id="OaMeetingAttendeeResult">
+        <id property="id" column="id"/>
+        <result property="meetingId" column="meeting_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="email" column="email"/>
+        <result property="status" column="status"/>
+        <result property="signInTime" column="sign_in_time"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectOaMeetingAttendeeVo">
+        select a.id, a.meeting_id, a.user_id, u.user_name, a.email, a.status, a.sign_in_time, a.tenant_id, a.create_time
+        from oa_meeting_attendee a
+        left join sys_user u on u.user_id = a.user_id
+    </sql>
+
+    <select id="selectByMeetingId" parameterType="Long" resultMap="OaMeetingAttendeeResult">
+        <include refid="selectOaMeetingAttendeeVo"/>
+        where a.meeting_id = #{meetingId}
+        order by a.create_time asc
+    </select>
+
+    <select id="selectByMeetingAndUser" parameterType="java.util.Map" resultMap="OaMeetingAttendeeResult">
+        <include refid="selectOaMeetingAttendeeVo"/>
+        where a.meeting_id = #{meetingId} and a.user_id = #{userId}
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.meeting.domain.OaMeetingAttendee" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_meeting_attendee (meeting_id, user_id, email, status, sign_in_time, tenant_id, create_time)
+        values (#{meetingId}, #{userId}, #{email}, #{status}, #{signInTime}, #{tenantId}, sysdate())
+    </insert>
+
+    <insert id="batchInsert">
+        insert into oa_meeting_attendee (meeting_id, user_id, email, status, create_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.meetingId}, #{item.userId}, #{item.email}, #{item.status}, sysdate())
+        </foreach>
+    </insert>
+
+    <update id="signIn" parameterType="com.ruoyi.oa.meeting.domain.OaMeetingAttendee">
+        update oa_meeting_attendee
+        set status = 1, sign_in_time = #{signInTime}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteByMeetingId" parameterType="Long">
+        delete from oa_meeting_attendee where meeting_id = #{meetingId}
+    </delete>
+
+</mapper>

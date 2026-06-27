@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.meeting.mapper.OaMeetingMapper">
+
+    <resultMap type="com.ruoyi.oa.meeting.domain.OaMeeting" id="OaMeetingResult">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="roomId" column="room_id"/>
+        <result property="roomName" column="room_name"/>
+        <result property="organizer" column="organizer"/>
+        <result property="organizerName" column="organizer_name"/>
+        <result property="content" column="content"/>
+        <result property="status" column="status"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaMeetingVo">
+        select m.id, m.title, m.start_time, m.end_time, m.room_id, r.name as room_name,
+               m.organizer, u.user_name as organizer_name, m.content, m.status, m.tenant_id,
+               m.create_by, m.create_time, m.update_by, m.update_time, m.remark
+        from oa_meeting m
+        left join oa_meeting_room r on r.id = m.room_id
+        left join sys_user u on u.user_id = m.organizer
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaMeetingResult">
+        <include refid="selectOaMeetingVo"/>
+        where m.id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.meeting.domain.OaMeeting" resultMap="OaMeetingResult">
+        <include refid="selectOaMeetingVo"/>
+        <where>
+            <if test="title != null and title != ''">and m.title like concat('%', #{title}, '%')</if>
+            <if test="roomId != null">and m.room_id = #{roomId}</if>
+            <if test="organizer != null">and m.organizer = #{organizer}</if>
+            <if test="status != null">and m.status = #{status}</if>
+            <if test="params.beginTime != null and params.beginTime != ''">and m.start_time &gt;= #{params.beginTime}</if>
+            <if test="params.endTime != null and params.endTime != ''">and m.end_time &lt;= #{params.endTime}</if>
+        </where>
+        order by m.start_time desc
+    </select>
+
+    <select id="selectOccupancyList" parameterType="java.util.Map" resultMap="OaMeetingResult">
+        <include refid="selectOaMeetingVo"/>
+        <where>
+            and m.status != 3
+            <if test="roomId != null">and m.room_id = #{roomId}</if>
+            <if test="startTime != null and startTime != ''">and m.end_time &gt;= #{startTime}</if>
+            <if test="endTime != null and endTime != ''">and m.start_time &lt;= #{endTime}</if>
+        </where>
+        order by m.start_time asc
+    </select>
+
+    <select id="selectConflictMeetings" parameterType="java.util.Map" resultMap="OaMeetingResult">
+        <include refid="selectOaMeetingVo"/>
+        <where>
+            and m.status != 3
+            and m.room_id = #{roomId}
+            and m.end_time &gt; #{startTime}
+            and m.start_time &lt; #{endTime}
+            <if test="excludeId != null">and m.id != #{excludeId}</if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.meeting.domain.OaMeeting" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_meeting
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="roomId != null">room_id,</if>
+            <if test="organizer != null">organizer,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="status != null">status,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="roomId != null">#{roomId},</if>
+            <if test="organizer != null">#{organizer},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="status != null">#{status},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.meeting.domain.OaMeeting">
+        update oa_meeting
+        <set>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="roomId != null">room_id = #{roomId},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="cancelById" parameterType="Long">
+        update oa_meeting set status = 3, update_time = sysdate() where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_meeting where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_meeting where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

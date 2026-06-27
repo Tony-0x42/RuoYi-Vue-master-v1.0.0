@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.knowledgebase.mapper.OaKbFavoriteMapper">
+
+    <resultMap type="com.ruoyi.oa.knowledgebase.domain.OaKbFavorite" id="OaKbFavoriteResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="articleId" column="article_id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectOaKbFavoriteVo">
+        select id, user_id, article_id, tenant_id, create_time
+        from oa_kb_favorite
+    </sql>
+
+    <select id="selectByUserAndArticle" parameterType="com.ruoyi.oa.knowledgebase.domain.OaKbFavorite" resultMap="OaKbFavoriteResult">
+        <include refid="selectOaKbFavoriteVo"/>
+        where user_id = #{userId} and article_id = #{articleId} limit 1
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.knowledgebase.domain.OaKbFavorite" resultMap="OaKbFavoriteResult">
+        <include refid="selectOaKbFavoriteVo"/>
+        <where>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="articleId != null">and article_id = #{articleId}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.knowledgebase.domain.OaKbFavorite" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_kb_favorite (user_id, article_id, tenant_id, create_time)
+        values (#{userId}, #{articleId}, #{tenantId}, sysdate())
+    </insert>
+
+    <delete id="deleteByUserAndArticle" parameterType="com.ruoyi.oa.knowledgebase.domain.OaKbFavorite">
+        delete from oa_kb_favorite where user_id = #{userId} and article_id = #{articleId}
+    </delete>
+
+    <delete id="deleteByArticleId" parameterType="Long">
+        delete from oa_kb_favorite where article_id = #{articleId}
+    </delete>
+
+    <delete id="deleteByArticleIds">
+        delete from oa_kb_favorite where article_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="countByArticleId" parameterType="Long" resultType="long">
+        select count(*) from oa_kb_favorite where article_id = #{articleId}
+    </select>
+
+</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.task.mapper.OaTaskSubtaskMapper">
+
+    <resultMap type="com.ruoyi.oa.task.domain.OaTaskSubtask" id="OaTaskSubtaskResult">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="title" column="title"/>
+        <result property="status" column="status"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="selectByParentId" parameterType="Long" resultMap="OaTaskSubtaskResult">
+        select id, parent_id, title, status, tenant_id, create_time
+        from oa_task_subtask
+        where parent_id = #{parentId}
+        order by create_time asc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.task.domain.OaTaskSubtask" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_task_subtask
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">parent_id,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="status != null">status,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">#{parentId},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="status != null">#{status},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <insert id="insertBatch">
+        insert into oa_task_subtask (parent_id, title, status, tenant_id, create_time) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.parentId}, #{item.title}, #{item.status}, #{item.tenantId}, sysdate())
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.task.domain.OaTaskSubtask">
+        update oa_task_subtask
+        <set>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteByParentId" parameterType="Long">
+        delete from oa_task_subtask where parent_id = #{parentId}
+    </delete>
+
+    <delete id="deleteByParentIds">
+        delete from oa_task_subtask where parent_id in
+        <foreach item="parentId" collection="array" open="(" separator="," close=")">
+            #{parentId}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.knowledgebase.mapper.OaKbReadLogMapper">
+
+    <resultMap type="com.ruoyi.oa.knowledgebase.domain.OaKbReadLog" id="OaKbReadLogResult">
+        <id property="id" column="id"/>
+        <result property="articleId" column="article_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="readTime" column="read_time"/>
+        <result property="tenantId" column="tenant_id"/>
+    </resultMap>
+
+    <sql id="selectOaKbReadLogVo">
+        select id, article_id, user_id, read_time, tenant_id
+        from oa_kb_read_log
+    </sql>
+
+    <select id="selectRecentLog" parameterType="com.ruoyi.oa.knowledgebase.domain.OaKbReadLog" resultMap="OaKbReadLogResult">
+        <include refid="selectOaKbReadLogVo"/>
+        where article_id = #{articleId}
+          and user_id = #{userId}
+          and read_time &gt; date_sub(now(), interval 1 day)
+        order by read_time desc
+        limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.knowledgebase.domain.OaKbReadLog" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_kb_read_log (article_id, user_id, read_time, tenant_id)
+        values (#{articleId}, #{userId}, sysdate(), #{tenantId})
+    </insert>
+
+    <delete id="deleteByArticleId" parameterType="Long">
+        delete from oa_kb_read_log where article_id = #{articleId}
+    </delete>
+
+    <delete id="deleteByArticleIds">
+        delete from oa_kb_read_log where article_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="countByArticleId" parameterType="Long" resultType="long">
+        select count(distinct user_id) from oa_kb_read_log where article_id = #{articleId}
+    </select>
+
+</mapper>

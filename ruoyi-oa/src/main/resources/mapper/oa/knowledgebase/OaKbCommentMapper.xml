@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.knowledgebase.mapper.OaKbCommentMapper">
+
+    <resultMap type="com.ruoyi.oa.knowledgebase.domain.OaKbComment" id="OaKbCommentResult">
+        <id property="id" column="id"/>
+        <result property="articleId" column="article_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="content" column="content"/>
+        <result property="status" column="status"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaKbCommentVo">
+        select id, article_id, user_id, content, status, tenant_id, create_by, create_time, update_by, update_time, remark
+        from oa_kb_comment
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaKbCommentResult">
+        <include refid="selectOaKbCommentVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.knowledgebase.domain.OaKbComment" resultMap="OaKbCommentResult">
+        <include refid="selectOaKbCommentVo"/>
+        <where>
+            <if test="articleId != null">and article_id = #{articleId}</if>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.knowledgebase.domain.OaKbComment" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_kb_comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="articleId != null">article_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="status != null">status,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="articleId != null">#{articleId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="status != null">#{status},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.knowledgebase.domain.OaKbComment">
+        update oa_kb_comment
+        <set>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_kb_comment where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_kb_comment where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByArticleId" parameterType="Long">
+        delete from oa_kb_comment where article_id = #{articleId}
+    </delete>
+
+    <delete id="deleteByArticleIds">
+        delete from oa_kb_comment where article_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="countByArticleId" parameterType="Long" resultType="long">
+        select count(*) from oa_kb_comment where article_id = #{articleId}
+    </select>
+
+</mapper>
