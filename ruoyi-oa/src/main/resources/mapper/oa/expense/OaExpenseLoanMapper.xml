@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.expense.mapper.OaExpenseLoanMapper">
+
+    <resultMap type="com.ruoyi.oa.expense.domain.OaExpenseLoan" id="OaExpenseLoanResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="amount" column="amount"/>
+        <result property="repaidAmount" column="repaid_amount"/>
+        <result property="reason" column="reason"/>
+        <result property="processInstanceId" column="process_instance_id"/>
+        <result property="status" column="status"/>
+        <result property="dueDate" column="due_date"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaExpenseLoanVo">
+        select id, user_id, user_name, amount, repaid_amount, reason, process_instance_id, status, due_date, tenant_id,
+               create_by, create_time, update_by, update_time, remark
+        from oa_expense_loan
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaExpenseLoanResult">
+        <include refid="selectOaExpenseLoanVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.expense.domain.OaExpenseLoan" resultMap="OaExpenseLoanResult">
+        <include refid="selectOaExpenseLoanVo"/>
+        <where>
+            <if test="userName != null and userName != ''">and user_name like concat('%', #{userName}, '%')</if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="createBy != null and createBy != ''">and create_by = #{createBy}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectAvailableLoans" parameterType="Long" resultMap="OaExpenseLoanResult">
+        <include refid="selectOaExpenseLoanVo"/>
+        where user_id = #{userId} and status = 2 and (repaid_amount is null or repaid_amount &lt; amount)
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.expense.domain.OaExpenseLoan" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_expense_loan
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="userName != null and userName != ''">user_name,</if>
+            <if test="amount != null">amount,</if>
+            <if test="repaidAmount != null">repaid_amount,</if>
+            <if test="reason != null and reason != ''">reason,</if>
+            <if test="processInstanceId != null and processInstanceId != ''">process_instance_id,</if>
+            <if test="status != null">status,</if>
+            <if test="dueDate != null">due_date,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="userName != null and userName != ''">#{userName},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="repaidAmount != null">#{repaidAmount},</if>
+            <if test="reason != null and reason != ''">#{reason},</if>
+            <if test="processInstanceId != null and processInstanceId != ''">#{processInstanceId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="dueDate != null">#{dueDate},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.expense.domain.OaExpenseLoan">
+        update oa_expense_loan
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="repaidAmount != null">repaid_amount = #{repaidAmount},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="dueDate != null">due_date = #{dueDate},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateRepaidAmount" parameterType="com.ruoyi.oa.expense.domain.OaExpenseLoan">
+        update oa_expense_loan
+        set repaid_amount = #{repaidAmount},
+            status = #{status},
+            update_time = sysdate()
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_expense_loan where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_expense_loan where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.asset.mapper.OaAssetCategoryMapper">
+
+    <resultMap type="com.ruoyi.oa.asset.domain.OaAssetCategory" id="OaAssetCategoryResult">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="name" column="name"/>
+        <result property="code" column="code"/>
+        <result property="depreciationYears" column="depreciation_years"/>
+        <result property="sort" column="sort"/>
+        <result property="status" column="status"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaAssetCategoryVo">
+        select id, parent_id, name, code, depreciation_years, sort, status, tenant_id, create_by, create_time, update_by, update_time, remark
+        from oa_asset_category
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaAssetCategoryResult">
+        <include refid="selectOaAssetCategoryVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.asset.domain.OaAssetCategory" resultMap="OaAssetCategoryResult">
+        <include refid="selectOaAssetCategoryVo"/>
+        <where>
+            <if test="name != null and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="code != null and code != ''">and code = #{code}</if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="parentId != null">and parent_id = #{parentId}</if>
+        </where>
+        order by sort asc, id asc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.asset.domain.OaAssetCategory" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_asset_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">parent_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="depreciationYears != null">depreciation_years,</if>
+            <if test="sort != null">sort,</if>
+            <if test="status != null">status,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">#{parentId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="depreciationYears != null">#{depreciationYears},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="status != null">#{status},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.asset.domain.OaAssetCategory">
+        update oa_asset_category
+        <set>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="code != null and code != ''">code = #{code},</if>
+            <if test="depreciationYears != null">depreciation_years = #{depreciationYears},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_asset_category where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_asset_category where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="checkCodeUnique" parameterType="String" resultMap="OaAssetCategoryResult">
+        <include refid="selectOaAssetCategoryVo"/>
+        where code = #{code} limit 1
+    </select>
+
+    <select id="countChildren" parameterType="Long" resultType="long">
+        select count(*) from oa_asset_category where parent_id = #{parentId}
+    </select>
+
+    <select id="countAssets" parameterType="Long" resultType="long">
+        select count(*) from oa_asset where category_id = #{categoryId}
+    </select>
+
+</mapper>

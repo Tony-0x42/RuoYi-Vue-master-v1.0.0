@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.message.mapper.OaMessageTemplateMapper">
+
+    <resultMap type="com.ruoyi.oa.message.domain.OaMessageTemplate" id="OaMessageTemplateResult">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="channelsJson" column="channels_json"/>
+        <result property="contentJson" column="content_json"/>
+        <result property="variables" column="variables"/>
+        <result property="status" column="status"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaMessageTemplateVo">
+        select id, code, name, type, channels_json, content_json, variables, status, tenant_id,
+               create_by, create_time, update_by, update_time, remark
+        from oa_message_template
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaMessageTemplateResult">
+        <include refid="selectOaMessageTemplateVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByCode" parameterType="String" resultMap="OaMessageTemplateResult">
+        <include refid="selectOaMessageTemplateVo"/>
+        where code = #{code}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.message.domain.OaMessageTemplate" resultMap="OaMessageTemplateResult">
+        <include refid="selectOaMessageTemplateVo"/>
+        <where>
+            <if test="code != null and code != ''">and code like concat('%', #{code}, '%')</if>
+            <if test="name != null and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="type != null and type != ''">and type = #{type}</if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.message.domain.OaMessageTemplate" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_message_template
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="code != null and code != ''">code,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="type != null and type != ''">type,</if>
+            <if test="channelsJson != null and channelsJson != ''">channels_json,</if>
+            <if test="contentJson != null and contentJson != ''">content_json,</if>
+            <if test="variables != null and variables != ''">variables,</if>
+            <if test="status != null">status,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="type != null and type != ''">#{type},</if>
+            <if test="channelsJson != null and channelsJson != ''">#{channelsJson},</if>
+            <if test="contentJson != null and contentJson != ''">#{contentJson},</if>
+            <if test="variables != null and variables != ''">#{variables},</if>
+            <if test="status != null">#{status},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.message.domain.OaMessageTemplate">
+        update oa_message_template
+        <set>
+            <if test="code != null and code != ''">code = #{code},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="type != null and type != ''">type = #{type},</if>
+            <if test="channelsJson != null">channels_json = #{channelsJson},</if>
+            <if test="contentJson != null">content_json = #{contentJson},</if>
+            <if test="variables != null">variables = #{variables},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_message_template where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_message_template where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

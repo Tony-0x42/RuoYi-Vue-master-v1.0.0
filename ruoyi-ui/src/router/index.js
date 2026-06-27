@@ -5,6 +5,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
+import oaAssetRoutes from './oa/asset'
 
 /**
  * Note: 路由配置项
@@ -209,7 +210,8 @@ export const dynamicRoutes = [
         meta: { title: '变量定义', activeMenu: '/bpm/definition' }
       }
     ]
-  }
+  },
+  ...oaAssetRoutes
 ]
 
 // 防止连续点击多次路由报错

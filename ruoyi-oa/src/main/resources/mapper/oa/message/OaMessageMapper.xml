@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.message.mapper.OaMessageMapper">
+
+    <resultMap type="com.ruoyi.oa.message.domain.OaMessage" id="OaMessageResult">
+        <id property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="sender" column="sender"/>
+        <result property="priority" column="priority"/>
+        <result property="status" column="status"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="recipientId" column="recipient_id"/>
+        <result property="recipientStatus" column="recipient_status"/>
+        <result property="readTime" column="read_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaMessageVo">
+        select id, type, title, content, sender, priority, status, tenant_id,
+               create_by, create_time, update_by, update_time, remark
+        from oa_message
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaMessageResult">
+        <include refid="selectOaMessageVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.message.domain.OaMessage" resultMap="OaMessageResult">
+        <include refid="selectOaMessageVo"/>
+        <where>
+            <if test="title != null and title != ''">and title like concat('%', #{title}, '%')</if>
+            <if test="type != null and type != ''">and type = #{type}</if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="sender != null and sender != ''">and sender = #{sender}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectInboxList" resultMap="OaMessageResult">
+        select m.id, m.type, m.title, m.content, m.sender, m.priority, m.status, m.tenant_id,
+               m.create_by, m.create_time, m.update_by, m.update_time, m.remark,
+               r.id as recipient_id, r.status as recipient_status, r.read_time
+        from oa_message m
+        inner join oa_message_recipient r on r.message_id = m.id
+        where r.user_id = #{userId}
+        <if test="query.title != null and query.title != ''">and m.title like concat('%', #{query.title}, '%')</if>
+        <if test="query.type != null and query.type != ''">and m.type = #{query.type}</if>
+        <if test="query.recipientStatus != null">and r.status = #{query.recipientStatus}</if>
+        order by m.create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.message.domain.OaMessage" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_message
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="type != null and type != ''">type,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="sender != null and sender != ''">sender,</if>
+            <if test="priority != null and priority != ''">priority,</if>
+            <if test="status != null">status,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="type != null and type != ''">#{type},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="sender != null and sender != ''">#{sender},</if>
+            <if test="priority != null and priority != ''">#{priority},</if>
+            <if test="status != null">#{status},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.message.domain.OaMessage">
+        update oa_message
+        <set>
+            <if test="type != null and type != ''">type = #{type},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="sender != null and sender != ''">sender = #{sender},</if>
+            <if test="priority != null and priority != ''">priority = #{priority},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_message where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_message where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

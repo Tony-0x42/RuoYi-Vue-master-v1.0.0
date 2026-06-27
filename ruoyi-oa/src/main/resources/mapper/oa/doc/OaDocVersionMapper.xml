@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.doc.mapper.OaDocVersionMapper">
+
+    <resultMap type="com.ruoyi.oa.doc.domain.OaDocVersion" id="OaDocVersionResult">
+        <id property="id" column="id"/>
+        <result property="fileId" column="file_id"/>
+        <result property="versionNo" column="version_no"/>
+        <result property="storagePath" column="storage_path"/>
+        <result property="size" column="size"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectOaDocVersionVo">
+        select id, file_id, version_no, storage_path, size, remark, create_by, create_time
+        from oa_doc_version
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaDocVersionResult">
+        <include refid="selectOaDocVersionVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByFileId" parameterType="Long" resultMap="OaDocVersionResult">
+        <include refid="selectOaDocVersionVo"/>
+        where file_id = #{fileId}
+        order by version_no desc
+    </select>
+
+    <select id="selectMaxVersionNo" parameterType="Long" resultType="Integer">
+        select max(version_no) from oa_doc_version where file_id = #{fileId}
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.doc.domain.OaDocVersion" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_doc_version
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fileId != null">file_id,</if>
+            <if test="versionNo != null">version_no,</if>
+            <if test="storagePath != null and storagePath != ''">storage_path,</if>
+            <if test="size != null">size,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fileId != null">#{fileId},</if>
+            <if test="versionNo != null">#{versionNo},</if>
+            <if test="storagePath != null and storagePath != ''">#{storagePath},</if>
+            <if test="size != null">#{size},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_doc_version where id = #{id}
+    </delete>
+
+    <delete id="deleteByFileId" parameterType="Long">
+        delete from oa_doc_version where file_id = #{fileId}
+    </delete>
+
+</mapper>

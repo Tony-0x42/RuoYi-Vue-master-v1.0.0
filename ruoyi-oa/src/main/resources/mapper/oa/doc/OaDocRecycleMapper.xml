@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.doc.mapper.OaDocRecycleMapper">
+
+    <resultMap type="com.ruoyi.oa.doc.domain.OaDocRecycle" id="OaDocRecycleResult">
+        <id property="id" column="id"/>
+        <result property="objectType" column="object_type"/>
+        <result property="objectId" column="object_id"/>
+        <result property="name" column="name"/>
+        <result property="deleteBy" column="delete_by"/>
+        <result property="deleteTime" column="delete_time"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaDocRecycleVo">
+        select id, object_type, object_id, name, delete_by, delete_time, tenant_id, create_time, remark
+        from oa_doc_recycle
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaDocRecycleResult">
+        <include refid="selectOaDocRecycleVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.doc.domain.OaDocRecycle" resultMap="OaDocRecycleResult">
+        <include refid="selectOaDocRecycleVo"/>
+        <where>
+            <if test="objectType != null and objectType != ''">and object_type = #{objectType}</if>
+            <if test="name != null and name != ''">and name like concat('%', #{name}, '%')</if>
+        </where>
+        order by delete_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.doc.domain.OaDocRecycle" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_doc_recycle
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="objectType != null and objectType != ''">object_type,</if>
+            <if test="objectId != null">object_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="deleteBy != null and deleteBy != ''">delete_by,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            delete_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="objectType != null and objectType != ''">#{objectType},</if>
+            <if test="objectId != null">#{objectId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="deleteBy != null and deleteBy != ''">#{deleteBy},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_doc_recycle where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_doc_recycle where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByObject" parameterType="com.ruoyi.oa.doc.domain.OaDocRecycle">
+        delete from oa_doc_recycle
+        where object_type = #{objectType} and object_id = #{objectId}
+    </delete>
+
+</mapper>

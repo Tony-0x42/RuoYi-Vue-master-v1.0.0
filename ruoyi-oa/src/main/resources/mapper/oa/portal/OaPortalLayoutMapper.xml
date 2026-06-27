@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.portal.mapper.OaPortalLayoutMapper">
+
+    <resultMap type="com.ruoyi.oa.portal.domain.OaPortalLayout" id="OaPortalLayoutResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="roleId" column="role_id"/>
+        <result property="layoutJson" column="layout_json"/>
+        <result property="isDefault" column="is_default"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaPortalLayoutVo">
+        select id, user_id, role_id, layout_json, is_default, tenant_id, create_by, create_time,
+               update_by, update_time, remark
+        from oa_portal_layout
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaPortalLayoutResult">
+        <include refid="selectOaPortalLayoutVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.portal.domain.OaPortalLayout" resultMap="OaPortalLayoutResult">
+        <include refid="selectOaPortalLayoutVo"/>
+        <where>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="roleId != null">and role_id = #{roleId}</if>
+            <if test="isDefault != null">and is_default = #{isDefault}</if>
+        </where>
+        order by is_default desc, create_time desc
+    </select>
+
+    <select id="selectByUserId" parameterType="Long" resultMap="OaPortalLayoutResult">
+        <include refid="selectOaPortalLayoutVo"/>
+        where user_id = #{userId}
+        order by is_default desc
+        limit 1
+    </select>
+
+    <select id="selectDefaultByRoleId" parameterType="Long" resultMap="OaPortalLayoutResult">
+        <include refid="selectOaPortalLayoutVo"/>
+        where role_id = #{roleId} and is_default = 1
+        order by create_time desc
+        limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.portal.domain.OaPortalLayout" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_portal_layout
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="roleId != null">role_id,</if>
+            <if test="layoutJson != null and layoutJson != ''">layout_json,</if>
+            <if test="isDefault != null">is_default,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="roleId != null">#{roleId},</if>
+            <if test="layoutJson != null and layoutJson != ''">#{layoutJson},</if>
+            <if test="isDefault != null">#{isDefault},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.portal.domain.OaPortalLayout">
+        update oa_portal_layout
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="roleId != null">role_id = #{roleId},</if>
+            <if test="layoutJson != null">layout_json = #{layoutJson},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_portal_layout where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_portal_layout where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

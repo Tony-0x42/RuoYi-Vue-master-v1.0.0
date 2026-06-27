@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.asset.mapper.OaAssetTransferMapper">
+
+    <resultMap type="com.ruoyi.oa.asset.domain.OaAssetTransfer" id="OaAssetTransferResult">
+        <id property="id" column="id"/>
+        <result property="assetId" column="asset_id"/>
+        <result property="fromUserId" column="from_user_id"/>
+        <result property="fromUserName" column="from_user_name"/>
+        <result property="toUserId" column="to_user_id"/>
+        <result property="toUserName" column="to_user_name"/>
+        <result property="processInstanceId" column="process_instance_id"/>
+        <result property="transferTime" column="transfer_time"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaAssetTransferVo">
+        select id, asset_id, from_user_id, from_user_name, to_user_id, to_user_name, process_instance_id, transfer_time, tenant_id,
+               create_by, create_time, update_by, update_time, remark
+        from oa_asset_transfer
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaAssetTransferResult">
+        <include refid="selectOaAssetTransferVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.asset.domain.OaAssetTransfer" resultMap="OaAssetTransferResult">
+        <include refid="selectOaAssetTransferVo"/>
+        <where>
+            <if test="assetId != null">and asset_id = #{assetId}</if>
+            <if test="fromUserId != null">and from_user_id = #{fromUserId}</if>
+            <if test="toUserId != null">and to_user_id = #{toUserId}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectListByAssetId" parameterType="Long" resultMap="OaAssetTransferResult">
+        <include refid="selectOaAssetTransferVo"/>
+        where asset_id = #{assetId}
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.asset.domain.OaAssetTransfer" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_asset_transfer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="assetId != null">asset_id,</if>
+            <if test="fromUserId != null">from_user_id,</if>
+            <if test="fromUserName != null and fromUserName != ''">from_user_name,</if>
+            <if test="toUserId != null">to_user_id,</if>
+            <if test="toUserName != null and toUserName != ''">to_user_name,</if>
+            <if test="processInstanceId != null and processInstanceId != ''">process_instance_id,</if>
+            <if test="transferTime != null">transfer_time,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="assetId != null">#{assetId},</if>
+            <if test="fromUserId != null">#{fromUserId},</if>
+            <if test="fromUserName != null and fromUserName != ''">#{fromUserName},</if>
+            <if test="toUserId != null">#{toUserId},</if>
+            <if test="toUserName != null and toUserName != ''">#{toUserName},</if>
+            <if test="processInstanceId != null and processInstanceId != ''">#{processInstanceId},</if>
+            <if test="transferTime != null">#{transferTime},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.asset.domain.OaAssetTransfer">
+        update oa_asset_transfer
+        <set>
+            <if test="assetId != null">asset_id = #{assetId},</if>
+            <if test="fromUserId != null">from_user_id = #{fromUserId},</if>
+            <if test="fromUserName != null">from_user_name = #{fromUserName},</if>
+            <if test="toUserId != null">to_user_id = #{toUserId},</if>
+            <if test="toUserName != null">to_user_name = #{toUserName},</if>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="transferTime != null">transfer_time = #{transferTime},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_asset_transfer where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_asset_transfer where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.attendance.mapper.OaLeaveBalanceMapper">
+
+    <resultMap type="com.ruoyi.oa.attendance.domain.OaLeaveBalance" id="OaLeaveBalanceResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="leaveType" column="leave_type"/>
+        <result property="totalDays" column="total_days"/>
+        <result property="usedDays" column="used_days"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectOaLeaveBalanceVo">
+        select b.id, b.user_id, u.nick_name as user_name, b.leave_type, b.total_days, b.used_days,
+               b.tenant_id, b.create_by, b.create_time
+        from oa_leave_balance b
+        left join sys_user u on u.user_id = b.user_id
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaLeaveBalanceResult">
+        <include refid="selectOaLeaveBalanceVo"/>
+        where b.id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.attendance.domain.OaLeaveBalance" resultMap="OaLeaveBalanceResult">
+        <include refid="selectOaLeaveBalanceVo"/>
+        <where>
+            <if test="userId != null">and b.user_id = #{userId}</if>
+            <if test="leaveType != null and leaveType != ''">and b.leave_type = #{leaveType}</if>
+        </where>
+        order by b.create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.attendance.domain.OaLeaveBalance" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_leave_balance
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="leaveType != null and leaveType != ''">leave_type,</if>
+            <if test="totalDays != null">total_days,</if>
+            <if test="usedDays != null">used_days,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="leaveType != null and leaveType != ''">#{leaveType},</if>
+            <if test="totalDays != null">#{totalDays},</if>
+            <if test="usedDays != null">#{usedDays},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.attendance.domain.OaLeaveBalance">
+        update oa_leave_balance
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="leaveType != null and leaveType != ''">leave_type = #{leaveType},</if>
+            <if test="totalDays != null">total_days = #{totalDays},</if>
+            <if test="usedDays != null">used_days = #{usedDays},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_leave_balance where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_leave_balance where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

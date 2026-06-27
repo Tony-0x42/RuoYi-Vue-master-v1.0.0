@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.attendance.mapper.OaAttendanceMonthlyMapper">
+
+    <resultMap type="com.ruoyi.oa.attendance.domain.OaAttendanceMonthly" id="OaAttendanceMonthlyResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="yearMonth" column="year_month"/>
+        <result property="normalDays" column="normal_days"/>
+        <result property="lateCount" column="late_count"/>
+        <result property="earlyCount" column="early_count"/>
+        <result property="absentDays" column="absent_days"/>
+        <result property="leaveDays" column="leave_days"/>
+        <result property="overtimeHours" column="overtime_hours"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectOaAttendanceMonthlyVo">
+        select m.id, m.user_id, u.nick_name as user_name, m.year_month, m.normal_days, m.late_count,
+               m.early_count, m.absent_days, m.leave_days, m.overtime_hours, m.tenant_id,
+               m.create_by, m.create_time
+        from oa_attendance_monthly m
+        left join sys_user u on u.user_id = m.user_id
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaAttendanceMonthlyResult">
+        <include refid="selectOaAttendanceMonthlyVo"/>
+        where m.id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceMonthly" resultMap="OaAttendanceMonthlyResult">
+        <include refid="selectOaAttendanceMonthlyVo"/>
+        <where>
+            <if test="userId != null">and m.user_id = #{userId}</if>
+            <if test="yearMonth != null and yearMonth != ''">and m.year_month = #{yearMonth}</if>
+        </where>
+        order by m.year_month desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceMonthly" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_attendance_monthly
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="yearMonth != null and yearMonth != ''">year_month,</if>
+            <if test="normalDays != null">normal_days,</if>
+            <if test="lateCount != null">late_count,</if>
+            <if test="earlyCount != null">early_count,</if>
+            <if test="absentDays != null">absent_days,</if>
+            <if test="leaveDays != null">leave_days,</if>
+            <if test="overtimeHours != null">overtime_hours,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="yearMonth != null and yearMonth != ''">#{yearMonth},</if>
+            <if test="normalDays != null">#{normalDays},</if>
+            <if test="lateCount != null">#{lateCount},</if>
+            <if test="earlyCount != null">#{earlyCount},</if>
+            <if test="absentDays != null">#{absentDays},</if>
+            <if test="leaveDays != null">#{leaveDays},</if>
+            <if test="overtimeHours != null">#{overtimeHours},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceMonthly">
+        update oa_attendance_monthly
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="yearMonth != null and yearMonth != ''">year_month = #{yearMonth},</if>
+            <if test="normalDays != null">normal_days = #{normalDays},</if>
+            <if test="lateCount != null">late_count = #{lateCount},</if>
+            <if test="earlyCount != null">early_count = #{earlyCount},</if>
+            <if test="absentDays != null">absent_days = #{absentDays},</if>
+            <if test="leaveDays != null">leave_days = #{leaveDays},</if>
+            <if test="overtimeHours != null">overtime_hours = #{overtimeHours},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_attendance_monthly where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_attendance_monthly where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

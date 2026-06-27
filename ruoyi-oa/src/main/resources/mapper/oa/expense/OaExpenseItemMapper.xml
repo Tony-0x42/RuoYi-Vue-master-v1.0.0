@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.expense.mapper.OaExpenseItemMapper">
+
+    <resultMap type="com.ruoyi.oa.expense.domain.OaExpenseItem" id="OaExpenseItemResult">
+        <id property="id" column="id"/>
+        <result property="reportId" column="report_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="amount" column="amount"/>
+        <result property="invoiceId" column="invoice_id"/>
+        <result property="description" column="description"/>
+        <result property="expenseDate" column="expense_date"/>
+    </resultMap>
+
+    <sql id="selectOaExpenseItemVo">
+        select i.id, i.report_id, i.category_id, c.name as category_name, i.amount, i.invoice_id, i.description, i.expense_date
+        from oa_expense_item i
+        left join oa_expense_category c on c.id = i.category_id
+    </sql>
+
+    <select id="selectByReportId" parameterType="Long" resultMap="OaExpenseItemResult">
+        <include refid="selectOaExpenseItemVo"/>
+        where i.report_id = #{reportId}
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.expense.domain.OaExpenseItem" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_expense_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="reportId != null">report_id,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="amount != null">amount,</if>
+            <if test="invoiceId != null">invoice_id,</if>
+            <if test="description != null and description != ''">description,</if>
+            <if test="expenseDate != null">expense_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="reportId != null">#{reportId},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="invoiceId != null">#{invoiceId},</if>
+            <if test="description != null and description != ''">#{description},</if>
+            <if test="expenseDate != null">#{expenseDate},</if>
+        </trim>
+    </insert>
+
+    <insert id="batchInsert">
+        insert into oa_expense_item (report_id, category_id, amount, invoice_id, description, expense_date)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.reportId}, #{item.categoryId}, #{item.amount}, #{item.invoiceId}, #{item.description}, #{item.expenseDate})
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.expense.domain.OaExpenseItem">
+        update oa_expense_item
+        <set>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="invoiceId != null">invoice_id = #{invoiceId},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="expenseDate != null">expense_date = #{expenseDate},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteByReportId" parameterType="Long">
+        delete from oa_expense_item where report_id = #{reportId}
+    </delete>
+
+    <delete id="deleteByReportIds">
+        delete from oa_expense_item where report_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

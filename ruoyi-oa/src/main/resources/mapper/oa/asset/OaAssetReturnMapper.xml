@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.asset.mapper.OaAssetReturnMapper">
+
+    <resultMap type="com.ruoyi.oa.asset.domain.OaAssetReturn" id="OaAssetReturnResult">
+        <id property="id" column="id"/>
+        <result property="assetId" column="asset_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="returnTime" column="return_time"/>
+        <result property="status" column="status"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaAssetReturnVo">
+        select id, asset_id, user_id, user_name, return_time, status, tenant_id,
+               create_by, create_time, update_by, update_time, remark
+        from oa_asset_return
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaAssetReturnResult">
+        <include refid="selectOaAssetReturnVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.asset.domain.OaAssetReturn" resultMap="OaAssetReturnResult">
+        <include refid="selectOaAssetReturnVo"/>
+        <where>
+            <if test="assetId != null">and asset_id = #{assetId}</if>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectListByAssetId" parameterType="Long" resultMap="OaAssetReturnResult">
+        <include refid="selectOaAssetReturnVo"/>
+        where asset_id = #{assetId}
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.asset.domain.OaAssetReturn" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_asset_return
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="assetId != null">asset_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="userName != null and userName != ''">user_name,</if>
+            <if test="returnTime != null">return_time,</if>
+            <if test="status != null">status,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="assetId != null">#{assetId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="userName != null and userName != ''">#{userName},</if>
+            <if test="returnTime != null">#{returnTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.asset.domain.OaAssetReturn">
+        update oa_asset_return
+        <set>
+            <if test="assetId != null">asset_id = #{assetId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="returnTime != null">return_time = #{returnTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_asset_return where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_asset_return where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

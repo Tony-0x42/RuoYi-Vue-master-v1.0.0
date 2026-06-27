@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.asset.mapper.OaAssetInventoryMapper">
+
+    <resultMap type="com.ruoyi.oa.asset.domain.OaAssetInventory" id="OaAssetInventoryResult">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="scopeType" column="scope_type"/>
+        <result property="scopeIds" column="scope_ids"/>
+        <result property="status" column="status"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaAssetInventoryVo">
+        select id, name, scope_type, scope_ids, status, start_time, end_time, tenant_id,
+               create_by, create_time, update_by, update_time, remark
+        from oa_asset_inventory
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaAssetInventoryResult">
+        <include refid="selectOaAssetInventoryVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.asset.domain.OaAssetInventory" resultMap="OaAssetInventoryResult">
+        <include refid="selectOaAssetInventoryVo"/>
+        <where>
+            <if test="name != null and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="scopeType != null">and scope_type = #{scopeType}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.asset.domain.OaAssetInventory" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_asset_inventory
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="scopeType != null">scope_type,</if>
+            <if test="scopeIds != null and scopeIds != ''">scope_ids,</if>
+            <if test="status != null">status,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="scopeType != null">#{scopeType},</if>
+            <if test="scopeIds != null and scopeIds != ''">#{scopeIds},</if>
+            <if test="status != null">#{status},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.asset.domain.OaAssetInventory">
+        update oa_asset_inventory
+        <set>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="scopeType != null">scope_type = #{scopeType},</if>
+            <if test="scopeIds != null">scope_ids = #{scopeIds},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_asset_inventory where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_asset_inventory where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

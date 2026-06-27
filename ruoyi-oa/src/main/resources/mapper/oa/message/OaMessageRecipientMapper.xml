@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.message.mapper.OaMessageRecipientMapper">
+
+    <resultMap type="com.ruoyi.oa.message.domain.OaMessageRecipient" id="OaMessageRecipientResult">
+        <id property="id" column="id"/>
+        <result property="messageId" column="message_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="channel" column="channel"/>
+        <result property="status" column="status"/>
+        <result property="readTime" column="read_time"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="batchInsert">
+        insert into oa_message_recipient (message_id, user_id, channel, status, create_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.messageId}, #{item.userId}, #{item.channel}, #{item.status}, #{item.createTime})
+        </foreach>
+    </insert>
+
+    <update id="updateReadStatus">
+        update oa_message_recipient
+        set status = 1, read_time = sysdate()
+        where id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and user_id = #{userId}
+        and status = 0
+    </update>
+
+    <delete id="deleteByMessageIds">
+        delete from oa_message_recipient where message_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectByMessageId" parameterType="Long" resultMap="OaMessageRecipientResult">
+        select id, message_id, user_id, channel, status, read_time, tenant_id, create_time
+        from oa_message_recipient
+        where message_id = #{messageId}
+    </select>
+
+</mapper>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.expense.mapper.OaExpenseRepaymentMapper">
+
+    <resultMap type="com.ruoyi.oa.expense.domain.OaExpenseRepayment" id="OaExpenseRepaymentResult">
+        <id property="id" column="id"/>
+        <result property="loanId" column="loan_id"/>
+        <result property="amount" column="amount"/>
+        <result property="reportId" column="report_id"/>
+        <result property="repaymentTime" column="repayment_time"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaExpenseRepaymentVo">
+        select id, loan_id, amount, report_id, repayment_time, tenant_id, create_by, create_time, remark
+        from oa_expense_repayment
+    </sql>
+
+    <select id="selectByLoanId" parameterType="Long" resultMap="OaExpenseRepaymentResult">
+        <include refid="selectOaExpenseRepaymentVo"/>
+        where loan_id = #{loanId}
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.expense.domain.OaExpenseRepayment" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_expense_repayment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="loanId != null">loan_id,</if>
+            <if test="amount != null">amount,</if>
+            <if test="reportId != null">report_id,</if>
+            <if test="repaymentTime != null">repayment_time,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="loanId != null">#{loanId},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="reportId != null">#{reportId},</if>
+            <if test="repaymentTime != null">#{repaymentTime},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_expense_repayment where id = #{id}
+    </delete>
+
+</mapper>

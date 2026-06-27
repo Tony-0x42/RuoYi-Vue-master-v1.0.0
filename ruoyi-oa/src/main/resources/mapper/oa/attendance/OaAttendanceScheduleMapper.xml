@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.attendance.mapper.OaAttendanceScheduleMapper">
+
+    <resultMap type="com.ruoyi.oa.attendance.domain.OaAttendanceSchedule" id="OaAttendanceScheduleResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="scheduleDate" column="schedule_date"/>
+        <result property="shiftId" column="shift_id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="shiftName" column="shift_name"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaAttendanceScheduleVo">
+        select s.id, s.user_id, u.nick_name as user_name, s.schedule_date, s.shift_id, sh.name as shift_name,
+               s.tenant_id, s.create_by, s.create_time, s.remark
+        from oa_attendance_schedule s
+        left join sys_user u on u.user_id = s.user_id
+        left join oa_attendance_shift sh on sh.id = s.shift_id
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaAttendanceScheduleResult">
+        <include refid="selectOaAttendanceScheduleVo"/>
+        where s.id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceSchedule" resultMap="OaAttendanceScheduleResult">
+        <include refid="selectOaAttendanceScheduleVo"/>
+        <where>
+            <if test="userId != null">and s.user_id = #{userId}</if>
+            <if test="shiftId != null">and s.shift_id = #{shiftId}</if>
+            <if test="scheduleDate != null">and s.schedule_date = #{scheduleDate}</if>
+        </where>
+        order by s.schedule_date desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceSchedule" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_attendance_schedule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="scheduleDate != null">schedule_date,</if>
+            <if test="shiftId != null">shift_id,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="scheduleDate != null">#{scheduleDate},</if>
+            <if test="shiftId != null">#{shiftId},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceSchedule">
+        update oa_attendance_schedule
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="scheduleDate != null">schedule_date = #{scheduleDate},</if>
+            <if test="shiftId != null">shift_id = #{shiftId},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_attendance_schedule where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_attendance_schedule where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.asset.mapper.OaAssetInventoryItemMapper">
+
+    <resultMap type="com.ruoyi.oa.asset.domain.OaAssetInventoryItem" id="OaAssetInventoryItemResult">
+        <id property="id" column="id"/>
+        <result property="inventoryId" column="inventory_id"/>
+        <result property="assetId" column="asset_id"/>
+        <result property="assetCode" column="asset_code"/>
+        <result property="assetName" column="asset_name"/>
+        <result property="bookStatus" column="book_status"/>
+        <result property="actualStatus" column="actual_status"/>
+        <result property="result" column="result"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaAssetInventoryItemVo">
+        select id, inventory_id, asset_id, asset_code, asset_name, book_status, actual_status, result, tenant_id,
+               create_by, create_time, update_by, update_time, remark
+        from oa_asset_inventory_item
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaAssetInventoryItemResult">
+        <include refid="selectOaAssetInventoryItemVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.asset.domain.OaAssetInventoryItem" resultMap="OaAssetInventoryItemResult">
+        <include refid="selectOaAssetInventoryItemVo"/>
+        <where>
+            <if test="inventoryId != null">and inventory_id = #{inventoryId}</if>
+            <if test="assetId != null">and asset_id = #{assetId}</if>
+            <if test="result != null">and result = #{result}</if>
+        </where>
+        order by id asc
+    </select>
+
+    <select id="selectListByInventoryId" parameterType="Long" resultMap="OaAssetInventoryItemResult">
+        <include refid="selectOaAssetInventoryItemVo"/>
+        where inventory_id = #{inventoryId}
+        order by id asc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.asset.domain.OaAssetInventoryItem" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_asset_inventory_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="inventoryId != null">inventory_id,</if>
+            <if test="assetId != null">asset_id,</if>
+            <if test="assetCode != null and assetCode != ''">asset_code,</if>
+            <if test="assetName != null and assetName != ''">asset_name,</if>
+            <if test="bookStatus != null">book_status,</if>
+            <if test="actualStatus != null">actual_status,</if>
+            <if test="result != null">result,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="inventoryId != null">#{inventoryId},</if>
+            <if test="assetId != null">#{assetId},</if>
+            <if test="assetCode != null and assetCode != ''">#{assetCode},</if>
+            <if test="assetName != null and assetName != ''">#{assetName},</if>
+            <if test="bookStatus != null">#{bookStatus},</if>
+            <if test="actualStatus != null">#{actualStatus},</if>
+            <if test="result != null">#{result},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.asset.domain.OaAssetInventoryItem">
+        update oa_asset_inventory_item
+        <set>
+            <if test="inventoryId != null">inventory_id = #{inventoryId},</if>
+            <if test="assetId != null">asset_id = #{assetId},</if>
+            <if test="assetCode != null">asset_code = #{assetCode},</if>
+            <if test="assetName != null">asset_name = #{assetName},</if>
+            <if test="bookStatus != null">book_status = #{bookStatus},</if>
+            <if test="actualStatus != null">actual_status = #{actualStatus},</if>
+            <if test="result != null">result = #{result},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_asset_inventory_item where id = #{id}
+    </delete>
+
+    <delete id="deleteByInventoryId" parameterType="Long">
+        delete from oa_asset_inventory_item where inventory_id = #{inventoryId}
+    </delete>
+
+</mapper>

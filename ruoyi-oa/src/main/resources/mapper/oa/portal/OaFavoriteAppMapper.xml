@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.portal.mapper.OaFavoriteAppMapper">
+
+    <resultMap type="com.ruoyi.oa.portal.domain.OaFavoriteApp" id="OaFavoriteAppResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="appCode" column="app_code"/>
+        <result property="sort" column="sort"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectOaFavoriteAppVo">
+        select id, user_id, app_code, sort, tenant_id, create_time
+        from oa_favorite_app
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaFavoriteAppResult">
+        <include refid="selectOaFavoriteAppVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.portal.domain.OaFavoriteApp" resultMap="OaFavoriteAppResult">
+        <include refid="selectOaFavoriteAppVo"/>
+        <where>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="appCode != null and appCode != ''">and app_code = #{appCode}</if>
+        </where>
+        order by sort asc, create_time desc
+    </select>
+
+    <select id="selectByUserId" parameterType="Long" resultMap="OaFavoriteAppResult">
+        <include refid="selectOaFavoriteAppVo"/>
+        where user_id = #{userId}
+        order by sort asc, create_time desc
+    </select>
+
+    <select id="selectByUserAndApp" parameterType="com.ruoyi.oa.portal.domain.OaFavoriteApp" resultMap="OaFavoriteAppResult">
+        <include refid="selectOaFavoriteAppVo"/>
+        where user_id = #{userId} and app_code = #{appCode}
+        limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.portal.domain.OaFavoriteApp" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_favorite_app
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="appCode != null and appCode != ''">app_code,</if>
+            <if test="sort != null">sort,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="appCode != null and appCode != ''">#{appCode},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_favorite_app where id = #{id}
+    </delete>
+
+    <delete id="deleteByUserAndApp" parameterType="com.ruoyi.oa.portal.domain.OaFavoriteApp">
+        delete from oa_favorite_app where user_id = #{userId} and app_code = #{appCode}
+    </delete>
+
+</mapper>

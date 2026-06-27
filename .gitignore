@@ -38,6 +38,7 @@ nbdist/
 
 ######################################################################
 # Others
+.cron_review_state.json
 *.log
 *.xml.versionsBackup
 *.swp

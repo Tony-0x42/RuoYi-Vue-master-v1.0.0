@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.attendance.mapper.OaAttendanceGroupMapper">
+
+    <resultMap type="com.ruoyi.oa.attendance.domain.OaAttendanceGroup" id="OaAttendanceGroupResult">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="memberType" column="member_type"/>
+        <result property="memberIds" column="member_ids"/>
+        <result property="shiftId" column="shift_id"/>
+        <result property="checkInType" column="check_in_type"/>
+        <result property="workDays" column="work_days"/>
+        <result property="ruleJson" column="rule_json"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="shiftName" column="shift_name"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaAttendanceGroupVo">
+        select g.id, g.name, g.member_type, g.member_ids, g.shift_id, s.name as shift_name,
+               g.check_in_type, g.work_days, g.rule_json, g.tenant_id,
+               g.create_by, g.create_time, g.update_by, g.update_time, g.remark
+        from oa_attendance_group g
+        left join oa_attendance_shift s on s.id = g.shift_id
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaAttendanceGroupResult">
+        <include refid="selectOaAttendanceGroupVo"/>
+        where g.id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceGroup" resultMap="OaAttendanceGroupResult">
+        <include refid="selectOaAttendanceGroupVo"/>
+        <where>
+            <if test="name != null and name != ''">and g.name like concat('%', #{name}, '%')</if>
+            <if test="memberType != null and memberType != ''">and g.member_type = #{memberType}</if>
+            <if test="shiftId != null">and g.shift_id = #{shiftId}</if>
+            <if test="checkInType != null and checkInType != ''">and g.check_in_type = #{checkInType}</if>
+        </where>
+        order by g.create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceGroup" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_attendance_group
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="memberType != null and memberType != ''">member_type,</if>
+            <if test="memberIds != null and memberIds != ''">member_ids,</if>
+            <if test="shiftId != null">shift_id,</if>
+            <if test="checkInType != null and checkInType != ''">check_in_type,</if>
+            <if test="workDays != null and workDays != ''">work_days,</if>
+            <if test="ruleJson != null and ruleJson != ''">rule_json,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="memberType != null and memberType != ''">#{memberType},</if>
+            <if test="memberIds != null and memberIds != ''">#{memberIds},</if>
+            <if test="shiftId != null">#{shiftId},</if>
+            <if test="checkInType != null and checkInType != ''">#{checkInType},</if>
+            <if test="workDays != null and workDays != ''">#{workDays},</if>
+            <if test="ruleJson != null and ruleJson != ''">#{ruleJson},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceGroup">
+        update oa_attendance_group
+        <set>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="memberType != null and memberType != ''">member_type = #{memberType},</if>
+            <if test="memberIds != null">member_ids = #{memberIds},</if>
+            <if test="shiftId != null">shift_id = #{shiftId},</if>
+            <if test="checkInType != null and checkInType != ''">check_in_type = #{checkInType},</if>
+            <if test="workDays != null">work_days = #{workDays},</if>
+            <if test="ruleJson != null">rule_json = #{ruleJson},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_attendance_group where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_attendance_group where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

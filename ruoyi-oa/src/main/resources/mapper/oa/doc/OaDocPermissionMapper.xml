@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.doc.mapper.OaDocPermissionMapper">
+
+    <resultMap type="com.ruoyi.oa.doc.domain.OaDocPermission" id="OaDocPermissionResult">
+        <id property="id" column="id"/>
+        <result property="objectType" column="object_type"/>
+        <result property="objectId" column="object_id"/>
+        <result property="granteeType" column="grantee_type"/>
+        <result property="granteeId" column="grantee_id"/>
+        <result property="permission" column="permission"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaDocPermissionVo">
+        select id, object_type, object_id, grantee_type, grantee_id, permission, tenant_id, create_time, remark
+        from oa_doc_permission
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaDocPermissionResult">
+        <include refid="selectOaDocPermissionVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByObject" parameterType="com.ruoyi.oa.doc.domain.OaDocPermission" resultMap="OaDocPermissionResult">
+        <include refid="selectOaDocPermissionVo"/>
+        <where>
+            <if test="objectType != null and objectType != ''">and object_type = #{objectType}</if>
+            <if test="objectId != null">and object_id = #{objectId}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.doc.domain.OaDocPermission" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_doc_permission
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="objectType != null and objectType != ''">object_type,</if>
+            <if test="objectId != null">object_id,</if>
+            <if test="granteeType != null and granteeType != ''">grantee_type,</if>
+            <if test="granteeId != null">grantee_id,</if>
+            <if test="permission != null">permission,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="objectType != null and objectType != ''">#{objectType},</if>
+            <if test="objectId != null">#{objectId},</if>
+            <if test="granteeType != null and granteeType != ''">#{granteeType},</if>
+            <if test="granteeId != null">#{granteeId},</if>
+            <if test="permission != null">#{permission},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.doc.domain.OaDocPermission">
+        update oa_doc_permission
+        <set>
+            <if test="granteeType != null and granteeType != ''">grantee_type = #{granteeType},</if>
+            <if test="granteeId != null">grantee_id = #{granteeId},</if>
+            <if test="permission != null">permission = #{permission},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_doc_permission where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_doc_permission where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByObject" parameterType="com.ruoyi.oa.doc.domain.OaDocPermission">
+        delete from oa_doc_permission
+        where object_type = #{objectType} and object_id = #{objectId}
+    </delete>
+
+</mapper>
