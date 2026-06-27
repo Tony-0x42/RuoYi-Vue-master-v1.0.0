@@ -9,6 +9,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ruoyi.bpm.v2.domain.BpmProcessDefinition;
+import com.ruoyi.bpm.v2.domain.BpmProcessInstance;
+import com.ruoyi.bpm.v2.domain.BpmTask;
+import com.ruoyi.bpm.v2.service.IBpmProcessDefinitionService;
+import com.ruoyi.bpm.v2.service.IBpmProcessInstanceService;
+import com.ruoyi.bpm.v2.service.IBpmTaskService;
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oa.portal.domain.OaFavoriteApp;
@@ -18,6 +26,7 @@ import com.ruoyi.oa.portal.mapper.OaFavoriteAppMapper;
 import com.ruoyi.oa.portal.mapper.OaPortalLayoutMapper;
 import com.ruoyi.oa.portal.mapper.OaPortalWidgetMapper;
 import com.ruoyi.oa.portal.service.IOaPortalService;
+import com.ruoyi.system.mapper.SysUserMapper;
 
 /**
  * 门户工作台 服务层实现
@@ -33,6 +42,18 @@ public class OaPortalServiceImpl implements IOaPortalService
 
     @Autowired
     private OaFavoriteAppMapper favoriteAppMapper;
+
+    @Autowired
+    private IBpmTaskService bpmTaskService;
+
+    @Autowired
+    private IBpmProcessInstanceService bpmInstanceService;
+
+    @Autowired
+    private IBpmProcessDefinitionService bpmDefinitionService;
+
+    @Autowired
+    private SysUserMapper userMapper;
 
     private static final List<Map<String, Object>> APP_LIST = new ArrayList<>();
 
@@ -101,11 +122,59 @@ public class OaPortalServiceImpl implements IOaPortalService
     @Override
     public List<Map<String, Object>> selectTodos(Long userId, String processName, String initiator)
     {
-        List<Map<String, Object>> list = new ArrayList<>();
-        list.add(buildTodo("1", "请假审批", "张三", "2026-06-27 10:00:00", "urgent"));
-        list.add(buildTodo("2", "报销审批", "李四", "2026-06-27 09:30:00", "normal"));
-        list.add(buildTodo("3", "采购申请", "王五", "2026-06-26 18:00:00", "normal"));
-        return list;
+        List<BpmTask> tasks = bpmTaskService.selectTodoList(userId, getCurrentTenantId());
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (BpmTask task : tasks)
+        {
+            BpmProcessInstance instance = bpmInstanceService.selectById(task.getInstanceId());
+            if (instance == null)
+            {
+                continue;
+            }
+            SysUser starter = userMapper.selectUserById(instance.getStarter());
+            String procName = parseProcessName(instance);
+            if (StringUtils.isNotEmpty(processName) && !procName.contains(processName))
+            {
+                continue;
+            }
+            if (StringUtils.isNotEmpty(initiator) && (starter == null || !starter.getNickName().contains(initiator)))
+            {
+                continue;
+            }
+            Map<String, Object> item = new HashMap<>();
+            item.put("taskId", task.getId());
+            item.put("instanceId", instance.getId());
+            item.put("businessKey", instance.getBusinessKey());
+            item.put("processName", procName);
+            item.put("nodeName", task.getNodeName());
+            item.put("initiator", starter != null ? starter.getNickName() : "");
+            item.put("arriveTime", DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD_HH_MM_SS, task.getCreateTime()));
+            result.add(item);
+        }
+        return result;
+    }
+
+    private String parseProcessName(BpmProcessInstance instance)
+    {
+        BpmProcessDefinition definition = bpmDefinitionService.selectById(instance.getDefinitionId());
+        String key = definition != null ? definition.getProcessKey() : "";
+        Map<String, String> map = new HashMap<>();
+        map.put("oa_expense_report", "报销审批");
+        map.put("oa_expense_loan", "借款审批");
+        map.put("oa_asset_receive", "资产领用审批");
+        map.put("oa_asset_transfer", "资产调拨审批");
+        map.put("oa_asset_repair", "资产维修审批");
+        map.put("oa_asset_scrap", "资产报废审批");
+        map.put("oa_attendance_leave", "请假审批");
+        map.put("oa_attendance_overtime", "加班审批");
+        map.put("oa_attendance_trip", "出差审批");
+        map.put("oa_attendance_makeup", "补卡审批");
+        return map.getOrDefault(key, key);
+    }
+
+    private Long getCurrentTenantId()
+    {
+        return 0L;
     }
 
     @Override

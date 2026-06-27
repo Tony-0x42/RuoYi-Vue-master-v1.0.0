@@ -212,7 +212,7 @@ export default {
       })
     },
     handleTodo(row) {
-      this.$modal.msgInfo(this.$t('oa.portal.todoHandle', { name: row.processName }))
+      this.$router.push({ path: '/bpm/task/todo' })
     },
     handleMoreTodo() {
       this.$modal.msgInfo(this.$t('oa.portal.moreTodo'))
