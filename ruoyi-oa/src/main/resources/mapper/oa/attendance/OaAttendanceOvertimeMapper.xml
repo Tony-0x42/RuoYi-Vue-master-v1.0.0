@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.attendance.mapper.OaAttendanceOvertimeMapper">
+
+    <resultMap type="com.ruoyi.oa.attendance.domain.OaAttendanceOvertime" id="OaAttendanceOvertimeResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="hours" column="hours"/>
+        <result property="reason" column="reason"/>
+        <result property="status" column="status"/>
+        <result property="processInstanceId" column="process_instance_id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaAttendanceOvertimeVo">
+        select o.id, o.user_id, u.nick_name as user_name, o.start_time, o.end_time,
+               o.hours, o.reason, o.status, o.process_instance_id, o.tenant_id,
+               o.create_by, o.create_time, o.update_by, o.update_time, o.remark
+        from oa_attendance_overtime o
+        left join sys_user u on u.user_id = o.user_id
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaAttendanceOvertimeResult">
+        <include refid="selectOaAttendanceOvertimeVo"/>
+        where o.id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceOvertime" resultMap="OaAttendanceOvertimeResult">
+        <include refid="selectOaAttendanceOvertimeVo"/>
+        <where>
+            <if test="userId != null">and o.user_id = #{userId}</if>
+            <if test="userName != null and userName != ''">and u.nick_name like concat('%', #{userName}, '%')</if>
+            <if test="status != null and status != ''">and o.status = #{status}</if>
+            <if test="params.beginTime != null and params.beginTime != ''">and o.start_time &gt;= #{params.beginTime}</if>
+            <if test="params.endTime != null and params.endTime != ''">and o.end_time &lt;= #{params.endTime}</if>
+        </where>
+        order by o.create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceOvertime" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_attendance_overtime
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="hours != null">hours,</if>
+            <if test="reason != null and reason != ''">reason,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="processInstanceId != null and processInstanceId != ''">process_instance_id,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="hours != null">#{hours},</if>
+            <if test="reason != null and reason != ''">#{reason},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="processInstanceId != null and processInstanceId != ''">#{processInstanceId},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceOvertime">
+        update oa_attendance_overtime
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="hours != null">hours = #{hours},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_attendance_overtime where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_attendance_overtime where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

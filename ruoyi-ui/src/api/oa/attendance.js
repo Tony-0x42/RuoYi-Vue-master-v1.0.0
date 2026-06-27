@@ -215,3 +215,216 @@ export function delRecord(ids) {
     method: 'delete'
   })
 }
+
+// 查询请假申请列表
+export function listLeave(query) {
+  return request({
+    url: '/api/v1/oa/attendance/leaves',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询请假申请详细
+export function getLeave(id) {
+  return request({
+    url: '/api/v1/oa/attendance/leaves/' + id,
+    method: 'get'
+  })
+}
+
+// 新增请假申请
+export function addLeave(data) {
+  return request({
+    url: '/api/v1/oa/attendance/leaves',
+    method: 'post',
+    data: data
+  })
+}
+
+// 修改请假申请
+export function updateLeave(data) {
+  return request({
+    url: '/api/v1/oa/attendance/leaves/' + data.id,
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除请假申请
+export function delLeave(ids) {
+  return request({
+    url: '/api/v1/oa/attendance/leaves/' + ids,
+    method: 'delete'
+  })
+}
+
+// 提交请假申请
+export function submitLeave(id) {
+  return request({
+    url: '/api/v1/oa/attendance/leaves/' + id + '/submit',
+    method: 'post'
+  })
+}
+
+// 查询加班申请列表
+export function listOvertime(query) {
+  return request({
+    url: '/api/v1/oa/attendance/overtimes',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询加班申请详细
+export function getOvertime(id) {
+  return request({
+    url: '/api/v1/oa/attendance/overtimes/' + id,
+    method: 'get'
+  })
+}
+
+// 新增加班申请
+export function addOvertime(data) {
+  return request({
+    url: '/api/v1/oa/attendance/overtimes',
+    method: 'post',
+    data: data
+  })
+}
+
+// 修改加班申请
+export function updateOvertime(data) {
+  return request({
+    url: '/api/v1/oa/attendance/overtimes/' + data.id,
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除加班申请
+export function delOvertime(ids) {
+  return request({
+    url: '/api/v1/oa/attendance/overtimes/' + ids,
+    method: 'delete'
+  })
+}
+
+// 提交加班申请
+export function submitOvertime(id) {
+  return request({
+    url: '/api/v1/oa/attendance/overtimes/' + id + '/submit',
+    method: 'post'
+  })
+}
+
+// 查询出差申请列表
+export function listTrip(query) {
+  return request({
+    url: '/api/v1/oa/attendance/trips',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询出差申请详细
+export function getTrip(id) {
+  return request({
+    url: '/api/v1/oa/attendance/trips/' + id,
+    method: 'get'
+  })
+}
+
+// 新增出差申请
+export function addTrip(data) {
+  return request({
+    url: '/api/v1/oa/attendance/trips',
+    method: 'post',
+    data: data
+  })
+}
+
+// 修改出差申请
+export function updateTrip(data) {
+  return request({
+    url: '/api/v1/oa/attendance/trips/' + data.id,
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除出差申请
+export function delTrip(ids) {
+  return request({
+    url: '/api/v1/oa/attendance/trips/' + ids,
+    method: 'delete'
+  })
+}
+
+// 提交出差申请
+export function submitTrip(id) {
+  return request({
+    url: '/api/v1/oa/attendance/trips/' + id + '/submit',
+    method: 'post'
+  })
+}
+
+// 查询补卡申请列表
+export function listMakeup(query) {
+  return request({
+    url: '/api/v1/oa/attendance/makeups',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询补卡申请详细
+export function getMakeup(id) {
+  return request({
+    url: '/api/v1/oa/attendance/makeups/' + id,
+    method: 'get'
+  })
+}
+
+// 新增补卡申请
+export function addMakeup(data) {
+  return request({
+    url: '/api/v1/oa/attendance/makeups',
+    method: 'post',
+    data: data
+  })
+}
+
+// 修改补卡申请
+export function updateMakeup(data) {
+  return request({
+    url: '/api/v1/oa/attendance/makeups/' + data.id,
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除补卡申请
+export function delMakeup(ids) {
+  return request({
+    url: '/api/v1/oa/attendance/makeups/' + ids,
+    method: 'delete'
+  })
+}
+
+// 提交补卡申请
+export function submitMakeup(id) {
+  return request({
+    url: '/api/v1/oa/attendance/makeups/' + id + '/submit',
+    method: 'post'
+  })
+}
+
+// 考勤审批完成回调
+export function completeAttendanceApproval(data) {
+  return request({
+    url: '/api/v1/oa/attendance/approvals/complete',
+    method: 'post',
+    data: data
+  })
+}

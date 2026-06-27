@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.attendance.mapper.OaAttendanceMakeupMapper">
+
+    <resultMap type="com.ruoyi.oa.attendance.domain.OaAttendanceMakeup" id="OaAttendanceMakeupResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="makeupDate" column="makeup_date"/>
+        <result property="checkType" column="check_type"/>
+        <result property="checkTime" column="check_time"/>
+        <result property="reason" column="reason"/>
+        <result property="status" column="status"/>
+        <result property="processInstanceId" column="process_instance_id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectOaAttendanceMakeupVo">
+        select m.id, m.user_id, u.nick_name as user_name, m.makeup_date, m.check_type, m.check_time,
+               m.reason, m.status, m.process_instance_id, m.tenant_id,
+               m.create_by, m.create_time, m.update_by, m.update_time, m.remark
+        from oa_attendance_makeup m
+        left join sys_user u on u.user_id = m.user_id
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="OaAttendanceMakeupResult">
+        <include refid="selectOaAttendanceMakeupVo"/>
+        where m.id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceMakeup" resultMap="OaAttendanceMakeupResult">
+        <include refid="selectOaAttendanceMakeupVo"/>
+        <where>
+            <if test="userId != null">and m.user_id = #{userId}</if>
+            <if test="userName != null and userName != ''">and u.nick_name like concat('%', #{userName}, '%')</if>
+            <if test="checkType != null and checkType != ''">and m.check_type = #{checkType}</if>
+            <if test="status != null and status != ''">and m.status = #{status}</if>
+            <if test="params.beginTime != null and params.beginTime != ''">and m.makeup_date &gt;= #{params.beginTime}</if>
+            <if test="params.endTime != null and params.endTime != ''">and m.makeup_date &lt;= #{params.endTime}</if>
+        </where>
+        order by m.create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceMakeup" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_attendance_makeup
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="makeupDate != null">makeup_date,</if>
+            <if test="checkType != null and checkType != ''">check_type,</if>
+            <if test="checkTime != null">check_time,</if>
+            <if test="reason != null and reason != ''">reason,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="processInstanceId != null and processInstanceId != ''">process_instance_id,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="makeupDate != null">#{makeupDate},</if>
+            <if test="checkType != null and checkType != ''">#{checkType},</if>
+            <if test="checkTime != null">#{checkTime},</if>
+            <if test="reason != null and reason != ''">#{reason},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="processInstanceId != null and processInstanceId != ''">#{processInstanceId},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.attendance.domain.OaAttendanceMakeup">
+        update oa_attendance_makeup
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="makeupDate != null">makeup_date = #{makeupDate},</if>
+            <if test="checkType != null and checkType != ''">check_type = #{checkType},</if>
+            <if test="checkTime != null">check_time = #{checkTime},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from oa_attendance_makeup where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_attendance_makeup where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
