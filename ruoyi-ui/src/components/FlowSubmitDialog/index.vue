@@ -7,13 +7,20 @@
     :close-on-click-modal="false"
     @close="handleClose"
   >
-    <el-form v-loading="loading" label-width="100px">
+    <el-form
+      ref="form"
+      v-loading="loading"
+      :model="formModel"
+      :rules="rules"
+      label-width="100px"
+      @validate="onValidate"
+    >
       <el-form-item label="下一节点">
         <span>{{ nextNodeName || '-' }}</span>
       </el-form-item>
-      <el-form-item label="候选人">
+      <el-form-item label="候选人" prop="selectedCandidates">
         <el-select
-          v-model="selectedCandidates"
+          v-model="formModel.selectedCandidates"
           multiple
           placeholder="请选择候选人"
           style="width: 100%"
@@ -26,9 +33,9 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="审批意见">
+      <el-form-item label="审批意见" prop="opinion">
         <el-input
-          v-model="opinion"
+          v-model="formModel.opinion"
           type="textarea"
           :rows="3"
           placeholder="请输入审批意见"
@@ -40,9 +47,15 @@
         v-if="taskId"
         type="danger"
         :loading="returnLoading"
+        :disabled="!formModel.opinion"
         @click="handleReturn"
       >退回上一环节</el-button>
-      <el-button type="primary" :loading="submitLoading" @click="handleSubmit">提交</el-button>
+      <el-button
+        type="primary"
+        :loading="submitLoading"
+        :disabled="!submitEnabled"
+        @click="handleSubmit"
+      >提交</el-button>
       <el-button @click="handleClose">取消</el-button>
     </div>
   </el-dialog>
@@ -93,8 +106,22 @@ export default {
       returnLoading: false,
       nextNodeName: '',
       candidateList: [],
-      selectedCandidates: [],
-      opinion: ''
+      formModel: {
+        selectedCandidates: [],
+        opinion: ''
+      },
+      fieldValid: {
+        opinion: false,
+        selectedCandidates: false
+      },
+      rules: {
+        opinion: [
+          { required: true, message: '请输入审批意见', trigger: 'blur' }
+        ],
+        selectedCandidates: [
+          { required: true, type: 'array', min: 1, message: '请至少选择一个候选人', trigger: 'change' }
+        ]
+      }
     }
   },
   computed: {
@@ -109,6 +136,12 @@ export default {
         getters.id ||
         stateUser.id ||
         (stateUser.userInfo && stateUser.userInfo.userId)
+    },
+    submitEnabled() {
+      return this.fieldValid.opinion && this.fieldValid.selectedCandidates
+    },
+    selectedCandidates() {
+      return this.formModel.selectedCandidates.map(id => Number(id))
     }
   },
   watch: {
@@ -123,8 +156,20 @@ export default {
     resetData() {
       this.nextNodeName = ''
       this.candidateList = []
-      this.selectedCandidates = []
-      this.opinion = ''
+      this.formModel = {
+        selectedCandidates: [],
+        opinion: ''
+      }
+      this.fieldValid = {
+        opinion: false,
+        selectedCandidates: false
+      }
+      this.$nextTick(() => {
+        this.$refs.form && this.$refs.form.clearValidate()
+      })
+    },
+    onValidate(prop, valid) {
+      this.fieldValid[prop] = valid
     },
     loadPreview() {
       this.loading = true
@@ -140,45 +185,56 @@ export default {
           this.candidateList = node.candidates || []
         }
       }).catch(error => {
+        this.$message.error('流程预览失败')
         console.error('流程预览失败', error)
       }).finally(() => {
         this.loading = false
       })
     },
     handleSubmit() {
-      this.submitLoading = true
-      const variables = {
-        ...this.variables,
-        approvalAssignee: this.selectedCandidates
-      }
-      const promise = this.taskId
-        ? completeTask(this.taskId, {
-            operator: this.userId,
-            action: 'AGREE',
-            opinion: this.opinion,
-            formData: this.formData,
-            variables,
-            nextAssignees: this.selectedCandidates
-          })
-        : startProcess({
-            processDefinitionKey: this.processKey,
-            businessKey: this.businessKey,
-            starter: this.userId,
-            formData: this.formData,
-            variables
-          })
-      promise.then(response => {
-        this.$message.success('提交成功')
-        this.$emit('success', response.data)
-        this.handleClose()
-      }).catch(error => {
-        console.error('提交失败', error)
-      }).finally(() => {
-        this.submitLoading = false
+      this.$refs.form.validate(valid => {
+        if (!valid) {
+          return
+        }
+        this.submitLoading = true
+        const variables = {
+          ...this.variables,
+          approvalAssignee: this.selectedCandidates
+        }
+        const promise = this.taskId
+          ? completeTask(this.taskId, {
+              operator: this.userId,
+              action: 'AGREE',
+              opinion: this.formModel.opinion,
+              formData: this.formData,
+              variables,
+              nextAssignees: this.selectedCandidates
+            })
+          : startProcess({
+              processDefinitionKey: this.processKey,
+              businessKey: this.businessKey,
+              starter: this.userId,
+              formData: this.formData,
+              variables
+            })
+        promise.then(response => {
+          this.$message.success('提交成功')
+          this.$emit('success', response.data)
+          this.handleClose()
+        }).catch(error => {
+          this.$message.error('提交失败')
+          console.error('提交失败', error)
+        }).finally(() => {
+          this.submitLoading = false
+        })
       })
     },
     handleReturn() {
       if (!this.taskId) {
+        return
+      }
+      if (!this.formModel.opinion) {
+        this.$message.warning('请先填写审批意见')
         return
       }
       this.returnLoading = true
@@ -188,13 +244,14 @@ export default {
           operator: this.userId,
           targetNodeId: target.targetNodeId,
           returnAssignee: target.targetUserId,
-          opinion: this.opinion
+          opinion: this.formModel.opinion
         })
       }).then(response => {
         this.$message.success('退回成功')
         this.$emit('success', response.data)
         this.handleClose()
       }).catch(error => {
+        this.$message.error('退回失败')
         console.error('退回失败', error)
       }).finally(() => {
         this.returnLoading = false
