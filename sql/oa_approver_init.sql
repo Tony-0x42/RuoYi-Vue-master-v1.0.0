@@ -1,6 +1,8 @@
 -- OA 固定审批人用户与角色菜单权限初始化脚本
 -- 说明：由于 user_id=2 已被占用，本脚本使用下一个可用的 user_id（3）。
 -- 角色使用 role_id=3（若依默认角色 1=超级管理员，2=普通角色）。
+-- 注意：本脚本应在所有 OA 模块初始化脚本（如 oa_expense_init.sql）执行后运行，
+--       否则后续新增 menu_id 在 3000-3999 范围内的菜单可能无法通过范围授权自动分配。
 
 -- 创建审批人角色（如果不存在）
 INSERT IGNORE INTO sys_role (role_id, role_name, role_key, role_sort, data_scope, status, create_by, create_time, remark)
@@ -17,7 +19,7 @@ INSERT IGNORE INTO sys_user_role (user_id, role_id) VALUES (3, 3);
 INSERT IGNORE INTO sys_role_menu (role_id, menu_id)
 SELECT 3, menu_id FROM sys_menu WHERE menu_id BETWEEN 3000 AND 3999;
 
--- 显式补充费用审批权限（避免脚本执行顺序导致遗漏）
+-- 显式补充费用审批权限（双保险：即使本脚本先于 oa_expense_init.sql 执行也能保证权限完整）
 INSERT IGNORE INTO sys_role_menu (role_id, menu_id) VALUES
 (3, 3180),
 (3, 3181);

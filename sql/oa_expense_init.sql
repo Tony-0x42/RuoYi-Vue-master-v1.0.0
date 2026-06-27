@@ -252,6 +252,11 @@ INSERT IGNORE INTO `sys_menu` VALUES (3149, '借款删除', 3125, 4, '', '', '',
 INSERT IGNORE INTO `sys_menu` VALUES (3180, '报销审批', 3120, 5, '', '', '', '', 1, 0, 'F', '0', '0', 'oa:expenseReport:approve', '#', 'admin', NOW(), '', NULL, '');
 INSERT IGNORE INTO `sys_menu` VALUES (3181, '借款审批', 3125, 5, '', '', '', '', 1, 0, 'F', '0', '0', 'oa:expenseLoan:approve', '#', 'admin', NOW(), '', NULL, '');
 
+-- 为审批人角色分配费用审批按钮权限（避免脚本执行顺序导致遗漏）
+INSERT IGNORE INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES
+(3, 3180),
+(3, 3181);
+
 -- 为管理员角色分配费用报销菜单权限
 INSERT IGNORE INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES
 (1, 3000),
