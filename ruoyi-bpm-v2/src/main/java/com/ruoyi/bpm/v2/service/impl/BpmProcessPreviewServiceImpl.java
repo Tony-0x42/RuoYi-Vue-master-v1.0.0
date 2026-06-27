@@ -95,6 +95,7 @@ public class BpmProcessPreviewServiceImpl implements IBpmProcessPreviewService {
         List<BpmTaskHistory> histories = historyMapper.selectByInstanceId(task.getInstanceId());
         BpmTaskHistory prev = histories.stream()
                 .filter(h -> h.getOperateTime() != null)
+                .filter(h -> h.getOperator() != null)
                 .filter(h -> h.getNodeId() != null && !h.getNodeId().equals(task.getNodeId()))
                 .filter(h -> "AGREE".equalsIgnoreCase(h.getAction()) || "COMPLETE".equalsIgnoreCase(h.getAction()))
                 .max(Comparator.comparing(BpmTaskHistory::getOperateTime))

@@ -1,7 +1,5 @@
 package com.ruoyi.bpm.v2.controller;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,10 +38,6 @@ public class BpmProcessPreviewController {
     @GetMapping("/return-target")
     public AjaxResult returnTarget(@RequestParam String taskId) {
         ReturnTarget target = previewService.getReturnTarget(taskId);
-        Map<String, Object> data = new HashMap<>();
-        data.put("targetNodeId", target.getTargetNodeId());
-        data.put("targetUserId", target.getTargetUserId());
-        data.put("targetUserName", target.getTargetUserName());
-        return AjaxResult.success(data);
+        return AjaxResult.success(target);
     }
 }
