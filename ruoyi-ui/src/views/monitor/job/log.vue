@@ -102,8 +102,8 @@
     </el-row>
 
     <el-table v-loading="loading" :data="jobLogList" @selection-change="handleSelectionChange">
+      <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="日志编号" width="80" align="center" prop="jobLogId" />
       <el-table-column label="任务名称" align="center" prop="jobName" :show-overflow-tooltip="true" />
       <el-table-column label="任务组名" align="center" prop="jobGroup" :show-overflow-tooltip="true">
         <template slot-scope="scope">
