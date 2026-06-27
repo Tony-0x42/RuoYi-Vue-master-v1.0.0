@@ -7,7 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ruoyi.bpm.v2.domain.BpmDefinitionVersion;
 import com.ruoyi.bpm.v2.domain.BpmProcessDefinition;
+import com.ruoyi.bpm.v2.engine.model.BpmProcessModel;
 import com.ruoyi.bpm.v2.engine.parser.BpmnValidator;
+import com.ruoyi.bpm.v2.engine.parser.BpmnXmlParser;
+import com.ruoyi.bpm.v2.engine.parser.ProcessModelParser;
 import com.ruoyi.bpm.v2.mapper.BpmDefinitionVersionMapper;
 import com.ruoyi.bpm.v2.mapper.BpmProcessDefinitionMapper;
 import com.ruoyi.bpm.v2.service.IBpmProcessDefinitionService;
@@ -29,6 +32,12 @@ public class BpmProcessDefinitionServiceImpl implements IBpmProcessDefinitionSer
 
     @Autowired
     private BpmnValidator bpmnValidator;
+
+    @Autowired
+    private BpmnXmlParser bpmnXmlParser;
+
+    @Autowired
+    private ProcessModelParser processModelParser;
 
     @Override
     public BpmProcessDefinition selectById(Long id) {
@@ -94,6 +103,11 @@ public class BpmProcessDefinitionServiceImpl implements IBpmProcessDefinitionSer
         if (definition == null) {
             throw new ServiceException("流程定义不存在");
         }
+
+        // 从 BPMN XML 重新生成 extJson，保证运行时模型与图形一致
+        BpmProcessModel existingModel = processModelParser.parse(StringUtils.isEmpty(extJson) ? "" : extJson);
+        BpmProcessModel newModel = bpmnXmlParser.parse(xml, existingModel);
+        extJson = processModelParser.serialize(newModel);
 
         // 更新流程定义基础信息
         definition.setUpdateBy(SecurityUtils.getUsername());

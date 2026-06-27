@@ -28,10 +28,16 @@
             </el-form-item>
             <template v-if="isUserTask">
               <el-form-item label="办理人">
-                <el-input v-model="elementAssignee" placeholder="用户ID" @change="updateProperties" />
+                <UserSelect v-model="elementAssignee" @change="updateProperties" />
+              </el-form-item>
+              <el-form-item label="候选用户">
+                <UserMultiSelect v-model="elementCandidateUsers" @change="updateProperties" />
               </el-form-item>
               <el-form-item label="候选角色">
-                <el-input v-model="elementCandidateGroups" placeholder="角色ID，多个用逗号分隔" @change="updateProperties" />
+                <RoleMultiSelect v-model="elementCandidateGroups" @change="updateProperties" />
+              </el-form-item>
+              <el-form-item label="候选部门">
+                <DeptTreeSelect v-model="elementCandidateDepts" @change="updateProperties" />
               </el-form-item>
               <el-form-item label="会审">
                 <el-checkbox v-model="elementMultiInstance" @change="updateMultiInstance">启用多实例会审</el-checkbox>
@@ -61,6 +67,10 @@ import 'bpmn-js/dist/assets/diagram-js.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
 import flowableModdle from 'flowable-bpmn-moddle/resources/camunda.json'
 import { getDefinition, getModelXml, saveModel, deployDefinition } from '@/api/bpm/definition'
+import UserSelect from '@/components/UserSelect'
+import UserMultiSelect from '@/components/UserMultiSelect'
+import RoleMultiSelect from '@/components/RoleMultiSelect'
+import DeptTreeSelect from '@/components/DeptTreeSelect'
 
 const EMPTY_BPMN = `<?xml version="1.0" encoding="UTF-8"?>
 <bpmn2:definitions xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
@@ -78,6 +88,7 @@ const EMPTY_BPMN = `<?xml version="1.0" encoding="UTF-8"?>
 
 export default {
   name: 'BpmDesigner',
+  components: { UserSelect, UserMultiSelect, RoleMultiSelect, DeptTreeSelect },
   data() {
     return {
       definitionId: undefined,
@@ -86,7 +97,9 @@ export default {
       selectedElement: null,
       elementName: '',
       elementAssignee: '',
+      elementCandidateUsers: '',
       elementCandidateGroups: '',
+      elementCandidateDepts: '',
       elementMultiInstance: false,
       elementCollection: '',
       elementCondition: ''
@@ -181,7 +194,9 @@ export default {
       if (!this.selectedElement) {
         this.elementName = ''
         this.elementAssignee = ''
+        this.elementCandidateUsers = ''
         this.elementCandidateGroups = ''
+        this.elementCandidateDepts = ''
         this.elementMultiInstance = false
         this.elementCollection = ''
         this.elementCondition = ''
@@ -192,7 +207,10 @@ export default {
 
       if (this.isUserTask) {
         this.elementAssignee = businessObject.get('flowable:assignee') || ''
+        this.elementCandidateUsers = businessObject.get('flowable:candidateUsers') || ''
         this.elementCandidateGroups = businessObject.get('flowable:candidateGroups') || ''
+        const extensionElements = businessObject.get('extensionElements')
+        this.elementCandidateDepts = this.getExtensionValue(extensionElements, 'candidateDepts') || ''
         const loop = businessObject.get('loopCharacteristics')
         this.elementMultiInstance = !!loop
         this.elementCollection = loop ? (loop.get('collection') || '') : ''
@@ -211,16 +229,13 @@ export default {
     updateProperties() {
       if (!this.isUserTask) return
       const props = {}
-      if (this.elementAssignee) {
-        props['flowable:assignee'] = this.elementAssignee
-      } else {
-        props['flowable:assignee'] = undefined
-      }
-      if (this.elementCandidateGroups) {
-        props['flowable:candidateGroups'] = this.elementCandidateGroups
-      } else {
-        props['flowable:candidateGroups'] = undefined
-      }
+      props['flowable:assignee'] = this.elementAssignee || undefined
+      props['flowable:candidateUsers'] = this.elementCandidateUsers || undefined
+      props['flowable:candidateGroups'] = this.elementCandidateGroups || undefined
+
+      // Candidate departments are stored in extensionElements because Flowable has no standard attribute
+      this.setExtensionValue(this.selectedElement.businessObject, 'candidateDepts', this.elementCandidateDepts)
+
       const modeling = this.modeler.get('modeling')
       modeling.updateProperties(this.selectedElement, props)
     },
@@ -249,6 +264,27 @@ export default {
       } else {
         modeling.updateProperties(this.selectedElement, { conditionExpression: undefined })
       }
+    },
+    getExtensionValue(extensionElements, name) {
+      if (!extensionElements || !extensionElements.values) return ''
+      const elem = extensionElements.values.find(v => v.$type === 'flowable:' + name)
+      return elem ? (elem.value || '') : ''
+    },
+    setExtensionValue(businessObject, name, value) {
+      const bpmnFactory = this.modeler.get('bpmnFactory')
+      const moddle = this.modeler.get('moddle')
+      let extensionElements = businessObject.get('extensionElements')
+      if (!extensionElements) {
+        extensionElements = bpmnFactory.create('bpmn:ExtensionElements')
+        businessObject.set('extensionElements', extensionElements)
+      }
+      let values = extensionElements.get('values') || []
+      values = values.filter(v => v.$type !== 'flowable:' + name)
+      if (value) {
+        const newElem = moddle.createAny('flowable:' + name, 'http://flowable.org/bpmn', { value })
+        values.push(newElem)
+      }
+      extensionElements.set('values', values)
     },
     handleSave() {
       this.modeler.saveXML({ format: true }).then(result => {

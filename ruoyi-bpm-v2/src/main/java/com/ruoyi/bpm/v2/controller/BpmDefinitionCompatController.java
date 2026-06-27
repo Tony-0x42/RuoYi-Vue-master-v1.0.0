@@ -119,7 +119,18 @@ public class BpmDefinitionCompatController extends BaseController {
         if (definition == null) {
             return error("流程定义不存在");
         }
-        return success(StringUtils.isEmpty(definition.getXml()) ? "" : definition.getXml());
+        // 优先返回最新草稿版本的 XML，保存模型后设计器重载时可回显最新值
+        List<BpmDefinitionVersion> versions = definitionService.selectVersions(definitionId);
+        BpmDefinitionVersion draft = null;
+        for (BpmDefinitionVersion v : versions) {
+            if (v.getStatus() != null && v.getStatus() == 0) {
+                if (draft == null || compareVersion(v.getVersion(), draft.getVersion()) > 0) {
+                    draft = v;
+                }
+            }
+        }
+        String xml = draft != null && StringUtils.isNotEmpty(draft.getXml()) ? draft.getXml() : definition.getXml();
+        return success(StringUtils.isEmpty(xml) ? "" : xml);
     }
 
     @PostMapping("/saveModel/{definitionId}")
@@ -144,7 +155,7 @@ public class BpmDefinitionCompatController extends BaseController {
         String versionName = body.get("versionName") == null ? "" : body.get("versionName").toString();
         String changelog = body.get("changelog") == null ? "" : body.get("changelog").toString();
         String version = draft != null ? draft.getVersion() : null;
-        definitionService.saveDraft(definitionId, version, versionName, changelog, xml, definition.getExtJson());
+        definitionService.saveDraft(definitionId, version, versionName, changelog, xml, draft != null ? draft.getExtJson() : definition.getExtJson());
         return success();
     }
 

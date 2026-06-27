@@ -149,6 +149,15 @@
         <el-button @click="actionOpen = false">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 任务指派/特送用户选择对话框 -->
+    <UserSelectDialog
+      :visible.sync="assignDialogVisible"
+      :value="assignUserId"
+      :title="assignTitle"
+      @input="assignUserId = $event"
+      @change="handleAssignConfirm"
+    />
   </div>
 </template>
 
@@ -156,9 +165,11 @@
 import { todoList } from "@/api/bpm/task"
 import { listVariableByDefinition } from "@/api/bpm/variable"
 import { submitTask, returnTask, rejectTask, claimTask, assignTask, delegateTask } from "@/api/bpm/runtime"
+import UserSelectDialog from "@/components/UserSelectDialog"
 
 export default {
   name: "BpmTaskTodo",
+  components: { UserSelectDialog },
   data() {
     return {
       loading: true,
@@ -172,6 +183,11 @@ export default {
       currentTaskId: undefined,
       currentDefinitionId: undefined,
       actionType: undefined,
+      assignDialogVisible: false,
+      assignTitle: "",
+      assignAction: "",
+      assignRow: null,
+      assignUserId: "",
       queryParams: {
         pageNum: 1,
         pageSize: 10,
@@ -313,29 +329,32 @@ export default {
       }).catch(() => {})
     },
     handleAssign(row) {
-      this.$prompt('请输入指派用户ID', '任务指派', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        inputPattern: /^\d+$/,
-        inputErrorMessage: '用户ID必须为数字'
-      }).then(({ value }) => {
-        assignTask(row.flowableTaskId, value).then(() => {
-          this.$modal.msgSuccess("指派成功")
-          this.getList()
-        })
-      }).catch(() => {})
+      this.assignRow = row
+      this.assignTitle = "任务指派"
+      this.assignAction = "assign"
+      this.assignUserId = ""
+      this.assignDialogVisible = true
     },
     handleDelegate(row) {
-      this.$prompt('请输入特送用户ID', '任务特送', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        inputPattern: /^\d+$/,
-        inputErrorMessage: '用户ID必须为数字'
-      }).then(({ value }) => {
-        delegateTask(row.flowableTaskId, value).then(() => {
-          this.$modal.msgSuccess("特送成功")
-          this.getList()
-        })
+      this.assignRow = row
+      this.assignTitle = "任务特送"
+      this.assignAction = "delegate"
+      this.assignUserId = ""
+      this.assignDialogVisible = true
+    },
+    handleAssignConfirm() {
+      if (!this.assignUserId) {
+        this.$modal.msgError("请选择用户")
+        return
+      }
+      const taskId = this.assignRow.flowableTaskId
+      const action = this.assignAction === "assign"
+        ? assignTask(taskId, this.assignUserId)
+        : delegateTask(taskId, this.assignUserId)
+      action.then(() => {
+        this.$modal.msgSuccess(this.assignAction === "assign" ? "指派成功" : "特送成功")
+        this.assignDialogVisible = false
+        this.getList()
       }).catch(() => {})
     }
   }
