@@ -254,7 +254,7 @@ export default {
     },
     handleReturn(row) {
       this.$modal.confirm(this.$t('oa.asset.confirm.return', { name: row.name })).then(() => {
-        return returnAsset(row.id, this.currentUserId, this.currentUserName, 0)
+        return returnAsset(row.id, this.currentUserId, this.currentUserName)
       }).then(() => { this.$modal.msgSuccess(this.$t('common.success')); this.getList(); this.getStatistics() }).catch(() => {})
     },
     handleTransfer(row) {

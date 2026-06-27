@@ -107,9 +107,9 @@ public class OaAssetController extends BaseController
     @PreAuthorize("@ss.hasPermi('oa:asset:edit')")
     @Log(title = "资产台账", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/return")
-    public AjaxResult returnAsset(@PathVariable Long id, @RequestParam Long userId, @RequestParam String userName, @RequestParam Integer status)
+    public AjaxResult returnAsset(@PathVariable Long id, @RequestParam Long userId, @RequestParam String userName)
     {
-        return toAjax(assetService.returnAsset(id, userId, userName, status));
+        return toAjax(assetService.returnAsset(id, userId, userName));
     }
 
     /**

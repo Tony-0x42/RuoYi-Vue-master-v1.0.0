@@ -47,8 +47,8 @@ export function receiveAsset(id, userId, userName) {
   return request({ url: '/api/v1/oa/assets/' + id + '/receive', method: 'post', params: { userId, userName } })
 }
 
-export function returnAsset(id, userId, userName, status) {
-  return request({ url: '/api/v1/oa/assets/' + id + '/return', method: 'post', params: { userId, userName, status } })
+export function returnAsset(id, userId, userName) {
+  return request({ url: '/api/v1/oa/assets/' + id + '/return', method: 'post', params: { userId, userName } })
 }
 
 export function transferAsset(id, fromUserId, fromUserName, toUserId, toUserName) {

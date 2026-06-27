@@ -2,6 +2,7 @@ package com.ruoyi.oa.asset.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,9 +31,14 @@ public class OaAssetApprovalController extends BaseController
 
     @PreAuthorize("@ss.hasPermi('oa:asset:approve')")
     @PostMapping("/complete")
+    @Transactional(rollbackFor = Exception.class)
     public AjaxResult complete(@RequestBody @Validated CompleteTaskDTO dto)
     {
         BpmTask task = bpmHelper.completeTask(dto.getTaskId(), getUserId(), dto.getAction(), dto.getOpinion());
+        if (task == null)
+        {
+            return AjaxResult.error("任务不存在或已完成");
+        }
         BpmProcessInstance instance = bpmHelper.getInstance(task.getInstanceId());
         if (instance != null && instance.getBusinessKey() != null)
         {

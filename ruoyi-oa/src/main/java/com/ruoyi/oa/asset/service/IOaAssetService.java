@@ -25,7 +25,7 @@ public interface IOaAssetService
 
     int receive(Long id, Long userId, String userName);
 
-    int returnAsset(Long id, Long userId, String userName, Integer status);
+    int returnAsset(Long id, Long userId, String userName);
 
     int transfer(Long id, Long fromUserId, String fromUserName, Long toUserId, String toUserName);
 

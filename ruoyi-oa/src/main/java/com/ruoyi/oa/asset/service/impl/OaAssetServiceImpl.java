@@ -144,7 +144,7 @@ public class OaAssetServiceImpl implements IOaAssetService
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int returnAsset(Long id, Long userId, String userName, Integer status)
+    public int returnAsset(Long id, Long userId, String userName)
     {
         OaAsset asset = assetMapper.selectById(id);
         if (asset == null)
@@ -155,10 +155,9 @@ public class OaAssetServiceImpl implements IOaAssetService
         {
             throw new ServiceException("仅在用资产可归还");
         }
-        int newStatus = Integer.valueOf(1).equals(status) ? 2 : 0;
         OaAsset update = new OaAsset();
         update.setId(id);
-        update.setStatus(newStatus);
+        update.setStatus(0);
         update.setUserId(null);
         update.setUserName(null);
         update.setUpdateBy(SecurityUtils.getUsername());
@@ -169,7 +168,7 @@ public class OaAssetServiceImpl implements IOaAssetService
         record.setUserId(userId);
         record.setUserName(userName);
         record.setReturnTime(new Date());
-        record.setStatus(status);
+        record.setStatus(0);
         record.setCreateBy(SecurityUtils.getUsername());
         returnMapper.insert(record);
 
