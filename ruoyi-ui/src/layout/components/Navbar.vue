@@ -22,6 +22,8 @@
           <header-notice id="header-notice" class="right-menu-item hover-effect" />
         </el-tooltip>
 
+        <lang-select class="right-menu-item hover-effect" />
+
       </template>
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="hover">
@@ -59,6 +61,7 @@ import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
 import HeaderNotice from './HeaderNotice'
+import LangSelect from '@/components/LangSelect'
 
 export default {
   components: {
@@ -70,7 +73,8 @@ export default {
     Screenfull,
     SizeSelect,
     Search,
-    HeaderNotice
+    HeaderNotice,
+    LangSelect
   },
   computed: {
     ...mapGetters([
