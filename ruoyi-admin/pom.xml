@@ -54,10 +54,16 @@
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
 
-        <!-- 流程管理-->
+        <!-- 流程管理（保留工作台相关能力） -->
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-bpm</artifactId>
+        </dependency>
+
+        <!-- 统一流程引擎中台 v2 -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-bpm-v2</artifactId>
         </dependency>
 
     </dependencies>

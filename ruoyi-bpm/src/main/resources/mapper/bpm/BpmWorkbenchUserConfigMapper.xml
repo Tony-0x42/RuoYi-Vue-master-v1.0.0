@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bpm.mapper.BpmWorkbenchUserConfigMapper">
+
+    <resultMap type="BpmWorkbenchUserConfig" id="BpmWorkbenchUserConfigResult">
+        <id     property="configId"     column="config_id"     />
+        <result property="userId"       column="user_id"       />
+        <result property="configName"   column="config_name"   />
+        <result property="templateId"   column="template_id"   />
+        <result property="isDefault"    column="is_default"    />
+        <result property="configJson"   column="config_json"   />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <sql id="selectBpmWorkbenchUserConfigVo">
+        select c.config_id, c.user_id, c.config_name, c.template_id, c.is_default, c.config_json, c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
+               t.template_name as template_name
+        from bpm_workbench_user_config c
+        left join bpm_workbench_template t on c.template_id = t.template_id
+    </sql>
+
+    <select id="selectBpmWorkbenchUserConfigById" parameterType="Long" resultMap="BpmWorkbenchUserConfigResult">
+        <include refid="selectBpmWorkbenchUserConfigVo"/>
+        where c.config_id = #{configId}
+    </select>
+
+    <select id="selectBpmWorkbenchUserConfigList" parameterType="BpmWorkbenchUserConfig" resultMap="BpmWorkbenchUserConfigResult">
+        <include refid="selectBpmWorkbenchUserConfigVo"/>
+        <where>
+            <if test="userId != null">
+                AND c.user_id = #{userId}
+            </if>
+            <if test="configName != null and configName != ''">
+                AND c.config_name like concat('%', #{configName}, '%')
+            </if>
+            <if test="isDefault != null and isDefault != ''">
+                AND c.is_default = #{isDefault}
+            </if>
+        </where>
+        order by c.is_default desc, c.create_time desc
+    </select>
+
+    <select id="selectUserDefaultConfig" parameterType="Long" resultMap="BpmWorkbenchUserConfigResult">
+        <include refid="selectBpmWorkbenchUserConfigVo"/>
+        where c.user_id = #{userId} and c.is_default = '1'
+        order by c.create_time desc
+        limit 1
+    </select>
+
+    <insert id="insertBpmWorkbenchUserConfig" parameterType="BpmWorkbenchUserConfig" useGeneratedKeys="true" keyProperty="configId">
+        insert into bpm_workbench_user_config (
+            <if test="userId != null">user_id,</if>
+            <if test="configName != null and configName != ''">config_name,</if>
+            <if test="templateId != null">template_id,</if>
+            <if test="isDefault != null and isDefault != ''">is_default,</if>
+            <if test="configJson != null and configJson != ''">config_json,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        )values(
+            <if test="userId != null">#{userId},</if>
+            <if test="configName != null and configName != ''">#{configName},</if>
+            <if test="templateId != null">#{templateId},</if>
+            <if test="isDefault != null and isDefault != ''">#{isDefault},</if>
+            <if test="configJson != null and configJson != ''">#{configJson},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateBpmWorkbenchUserConfig" parameterType="BpmWorkbenchUserConfig">
+        update bpm_workbench_user_config
+        <set>
+            <if test="configName != null and configName != ''">config_name = #{configName},</if>
+            <if test="templateId != null">template_id = #{templateId},</if>
+            <if test="isDefault != null and isDefault != ''">is_default = #{isDefault},</if>
+            <if test="configJson != null">config_json = #{configJson},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where config_id = #{configId}
+    </update>
+
+    <update id="cancelUserDefaultConfig" parameterType="Long">
+        update bpm_workbench_user_config set is_default = '0' where user_id = #{userId}
+    </update>
+
+    <delete id="deleteBpmWorkbenchUserConfigById" parameterType="Long">
+        delete from bpm_workbench_user_config where config_id = #{configId}
+    </delete>
+
+    <delete id="deleteBpmWorkbenchUserConfigByIds" parameterType="Long">
+        delete from bpm_workbench_user_config where config_id in
+        <foreach item="configId" collection="array" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </delete>
+
+</mapper>

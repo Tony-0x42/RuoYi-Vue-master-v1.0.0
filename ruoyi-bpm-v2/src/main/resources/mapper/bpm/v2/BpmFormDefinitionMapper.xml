@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bpm.v2.mapper.BpmFormDefinitionMapper">
+
+    <resultMap type="com.ruoyi.bpm.v2.domain.BpmFormDefinition" id="BpmFormDefinitionResult">
+        <id property="id" column="id"/>
+        <result property="definitionId" column="definition_id"/>
+        <result property="versionId" column="version_id"/>
+        <result property="name" column="name"/>
+        <result property="schemaJson" column="schema_json"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectBpmFormDefinitionVo">
+        select id, definition_id, version_id, name, schema_json, tenant_id, create_by, create_time, update_by, update_time
+        from bpm_form_definition
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="BpmFormDefinitionResult">
+        <include refid="selectBpmFormDefinitionVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.bpm.v2.domain.BpmFormDefinition" resultMap="BpmFormDefinitionResult">
+        <include refid="selectBpmFormDefinitionVo"/>
+        <where>
+            <if test="definitionId != null">and definition_id = #{definitionId}</if>
+            <if test="versionId != null">and version_id = #{versionId}</if>
+            <if test="name != null and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="tenantId != null">and tenant_id = #{tenantId}</if>
+        </where>
+    </select>
+
+    <select id="selectByDefinitionAndVersion" resultMap="BpmFormDefinitionResult">
+        <include refid="selectBpmFormDefinitionVo"/>
+        where definition_id = #{definitionId}
+        <if test="versionId != null">and version_id = #{versionId}</if>
+        limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.bpm.v2.domain.BpmFormDefinition" useGeneratedKeys="true" keyProperty="id">
+        insert into bpm_form_definition
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="definitionId != null">definition_id,</if>
+            <if test="versionId != null">version_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="schemaJson != null and schemaJson != ''">schema_json,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="definitionId != null">#{definitionId},</if>
+            <if test="versionId != null">#{versionId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="schemaJson != null and schemaJson != ''">#{schemaJson},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.bpm.v2.domain.BpmFormDefinition">
+        update bpm_form_definition
+        <set>
+            <if test="definitionId != null">definition_id = #{definitionId},</if>
+            <if test="versionId != null">version_id = #{versionId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="schemaJson != null">schema_json = #{schemaJson},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from bpm_form_definition where id = #{id}
+    </delete>
+
+</mapper>

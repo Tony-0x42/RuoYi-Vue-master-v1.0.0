@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bpm.v2.mapper.BpmNotificationTemplateMapper">
+
+    <resultMap type="com.ruoyi.bpm.v2.domain.BpmNotificationTemplate" id="BpmNotificationTemplateResult">
+        <id property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="channel" column="channel"/>
+        <result property="subject" column="subject"/>
+        <result property="content" column="content"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectBpmNotificationTemplateVo">
+        select id, type, channel, subject, content, tenant_id, create_by, create_time, update_by, update_time
+        from bpm_notification_template
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="BpmNotificationTemplateResult">
+        <include refid="selectBpmNotificationTemplateVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.bpm.v2.domain.BpmNotificationTemplate" resultMap="BpmNotificationTemplateResult">
+        <include refid="selectBpmNotificationTemplateVo"/>
+        <where>
+            <if test="type != null and type != ''">and type = #{type}</if>
+            <if test="channel != null and channel != ''">and channel = #{channel}</if>
+            <if test="subject != null and subject != ''">and subject like concat('%', #{subject}, '%')</if>
+            <if test="tenantId != null">and tenant_id = #{tenantId}</if>
+        </where>
+    </select>
+
+    <select id="selectByTypeAndChannel" resultMap="BpmNotificationTemplateResult">
+        <include refid="selectBpmNotificationTemplateVo"/>
+        where type = #{type} and channel = #{channel}
+        <if test="tenantId != null">and tenant_id = #{tenantId}</if>
+        limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.bpm.v2.domain.BpmNotificationTemplate" useGeneratedKeys="true" keyProperty="id">
+        insert into bpm_notification_template
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="type != null and type != ''">type,</if>
+            <if test="channel != null and channel != ''">channel,</if>
+            <if test="subject != null and subject != ''">subject,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="type != null and type != ''">#{type},</if>
+            <if test="channel != null and channel != ''">#{channel},</if>
+            <if test="subject != null and subject != ''">#{subject},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.bpm.v2.domain.BpmNotificationTemplate">
+        update bpm_notification_template
+        <set>
+            <if test="type != null and type != ''">type = #{type},</if>
+            <if test="channel != null and channel != ''">channel = #{channel},</if>
+            <if test="subject != null and subject != ''">subject = #{subject},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from bpm_notification_template where id = #{id}
+    </delete>
+
+</mapper>

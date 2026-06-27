@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bpm.v2.mapper.BpmSignatureMapper">
+
+    <resultMap type="com.ruoyi.bpm.v2.domain.BpmSignature" id="BpmSignatureResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="signatureType" column="signature_type"/>
+        <result property="signatureData" column="signature_data"/>
+        <result property="certificate" column="certificate"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectBpmSignatureVo">
+        select id, user_id, signature_type, signature_data, certificate, tenant_id, create_time
+        from bpm_signature
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="BpmSignatureResult">
+        <include refid="selectBpmSignatureVo"/> where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.bpm.v2.domain.BpmSignature" resultMap="BpmSignatureResult">
+        <include refid="selectBpmSignatureVo"/>
+        <where>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="signatureType != null and signatureType != ''">and signature_type = #{signatureType}</if>
+            <if test="tenantId != null">and tenant_id = #{tenantId}</if>
+        </where>
+    </select>
+
+    <select id="selectByUserId" resultMap="BpmSignatureResult">
+        <include refid="selectBpmSignatureVo"/>
+        where user_id = #{userId}
+        <if test="tenantId != null">and tenant_id = #{tenantId}</if>
+        limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.bpm.v2.domain.BpmSignature" useGeneratedKeys="true" keyProperty="id">
+        insert into bpm_signature (user_id, signature_type, signature_data, certificate, tenant_id, create_time)
+        values (#{userId}, #{signatureType}, #{signatureData}, #{certificate}, #{tenantId}, sysdate())
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.bpm.v2.domain.BpmSignature">
+        update bpm_signature
+        <set>
+            <if test="signatureType != null and signatureType != ''">signature_type = #{signatureType},</if>
+            <if test="signatureData != null">signature_data = #{signatureData},</if>
+            <if test="certificate != null">certificate = #{certificate},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from bpm_signature where id = #{id}
+    </delete>
+
+</mapper>

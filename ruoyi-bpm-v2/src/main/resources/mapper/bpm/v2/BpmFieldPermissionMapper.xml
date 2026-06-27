@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bpm.v2.mapper.BpmFieldPermissionMapper">
+
+    <resultMap type="com.ruoyi.bpm.v2.domain.BpmFieldPermission" id="BpmFieldPermissionResult">
+        <id property="id" column="id"/>
+        <result property="definitionId" column="definition_id"/>
+        <result property="nodeId" column="node_id"/>
+        <result property="fieldCode" column="field_code"/>
+        <result property="permission" column="permission"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectBpmFieldPermissionVo">
+        select id, definition_id, node_id, field_code, permission, tenant_id, create_time
+        from bpm_field_permission
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="BpmFieldPermissionResult">
+        <include refid="selectBpmFieldPermissionVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.bpm.v2.domain.BpmFieldPermission" resultMap="BpmFieldPermissionResult">
+        <include refid="selectBpmFieldPermissionVo"/>
+        <where>
+            <if test="definitionId != null">and definition_id = #{definitionId}</if>
+            <if test="nodeId != null and nodeId != ''">and node_id = #{nodeId}</if>
+            <if test="fieldCode != null and fieldCode != ''">and field_code = #{fieldCode}</if>
+            <if test="permission != null and permission != ''">and permission = #{permission}</if>
+            <if test="tenantId != null">and tenant_id = #{tenantId}</if>
+        </where>
+    </select>
+
+    <select id="selectByDefinitionAndNode" resultMap="BpmFieldPermissionResult">
+        <include refid="selectBpmFieldPermissionVo"/>
+        where definition_id = #{definitionId} and node_id = #{nodeId}
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.bpm.v2.domain.BpmFieldPermission" useGeneratedKeys="true" keyProperty="id">
+        insert into bpm_field_permission
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="definitionId != null">definition_id,</if>
+            <if test="nodeId != null and nodeId != ''">node_id,</if>
+            <if test="fieldCode != null and fieldCode != ''">field_code,</if>
+            <if test="permission != null and permission != ''">permission,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="definitionId != null">#{definitionId},</if>
+            <if test="nodeId != null and nodeId != ''">#{nodeId},</if>
+            <if test="fieldCode != null and fieldCode != ''">#{fieldCode},</if>
+            <if test="permission != null and permission != ''">#{permission},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.bpm.v2.domain.BpmFieldPermission">
+        update bpm_field_permission
+        <set>
+            <if test="definitionId != null">definition_id = #{definitionId},</if>
+            <if test="nodeId != null and nodeId != ''">node_id = #{nodeId},</if>
+            <if test="fieldCode != null and fieldCode != ''">field_code = #{fieldCode},</if>
+            <if test="permission != null and permission != ''">permission = #{permission},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from bpm_field_permission where id = #{id}
+    </delete>
+
+    <delete id="deleteByDefinitionId" parameterType="Long">
+        delete from bpm_field_permission where definition_id = #{definitionId}
+    </delete>
+
+</mapper>

@@ -1,13 +1,13 @@
 # 项目相关配置
 ruoyi:
   # 名称
-  name: RuoYi
+  name: xxx
   # 版本
   version: 3.9.2
   # 版权年份
   copyrightYear: 2026
-  # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath）
-  profile: D:/ruoyi/uploadPath
+  # 文件路径 示例（ Windows配置D:/xxx/uploadPath，Linux配置 /home/xxx/uploadPath）
+  profile: D:/xxx/uploadPath
   # 获取ip地址开关
   addressEnabled: false
   # 验证码类型 math 数字计算 char 字符验证
@@ -135,7 +135,7 @@ referer:
   # 防盗链开关
   enabled: false
   # 允许的域名列表
-  allowed-domains: localhost,127.0.0.1,ruoyi.vip,www.ruoyi.vip
+  allowed-domains: localhost,127.0.0.1
 
 # 防止XSS攻击
 xss:
@@ -156,6 +156,6 @@ flowable:
   history-level: full
   # 异步执行器（默认关闭，需要时再开启）
   async-executor-activate: false
-  # 关闭 Flowable 自带的 IDM，使用若依用户体系
+  # 关闭 Flowable 自带的 IDM，使用本系统用户体系
   idm:
     enabled: false

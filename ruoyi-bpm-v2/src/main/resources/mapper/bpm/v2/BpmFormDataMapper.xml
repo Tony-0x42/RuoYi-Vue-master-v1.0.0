@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bpm.v2.mapper.BpmFormDataMapper">
+
+    <resultMap type="com.ruoyi.bpm.v2.domain.BpmFormData" id="BpmFormDataResult">
+        <id property="id" column="id"/>
+        <result property="instanceId" column="instance_id"/>
+        <result property="fieldCode" column="field_code"/>
+        <result property="fieldValue" column="field_value"/>
+        <result property="fieldType" column="field_type"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectBpmFormDataVo">
+        select id, instance_id, field_code, field_value, field_type, create_time
+        from bpm_form_data
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="BpmFormDataResult">
+        <include refid="selectBpmFormDataVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByInstanceId" parameterType="String" resultMap="BpmFormDataResult">
+        <include refid="selectBpmFormDataVo"/>
+        where instance_id = #{instanceId}
+    </select>
+
+    <select id="selectByInstanceAndField" resultMap="BpmFormDataResult">
+        <include refid="selectBpmFormDataVo"/>
+        where instance_id = #{instanceId} and field_code = #{fieldCode} limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.bpm.v2.domain.BpmFormData" useGeneratedKeys="true" keyProperty="id">
+        insert into bpm_form_data
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="instanceId != null and instanceId != ''">instance_id,</if>
+            <if test="fieldCode != null and fieldCode != ''">field_code,</if>
+            <if test="fieldValue != null and fieldValue != ''">field_value,</if>
+            <if test="fieldType != null and fieldType != ''">field_type,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="instanceId != null and instanceId != ''">#{instanceId},</if>
+            <if test="fieldCode != null and fieldCode != ''">#{fieldCode},</if>
+            <if test="fieldValue != null and fieldValue != ''">#{fieldValue},</if>
+            <if test="fieldType != null and fieldType != ''">#{fieldType},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.bpm.v2.domain.BpmFormData">
+        update bpm_form_data
+        <set>
+            <if test="fieldValue != null">field_value = #{fieldValue},</if>
+            <if test="fieldType != null and fieldType != ''">field_type = #{fieldType},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from bpm_form_data where id = #{id}
+    </delete>
+
+</mapper>

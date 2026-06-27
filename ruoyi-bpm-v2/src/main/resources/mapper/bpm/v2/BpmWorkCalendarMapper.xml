@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bpm.v2.mapper.BpmWorkCalendarMapper">
+
+    <resultMap type="com.ruoyi.bpm.v2.domain.BpmWorkCalendar" id="BpmWorkCalendarResult">
+        <id property="id" column="id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="year" column="year"/>
+        <result property="date" column="date"/>
+        <result property="type" column="type"/>
+        <result property="workHours" column="work_hours"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectBpmWorkCalendarVo">
+        select id, tenant_id, year, date, type, work_hours, create_by, create_time
+        from bpm_work_calendar
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="BpmWorkCalendarResult">
+        <include refid="selectBpmWorkCalendarVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.bpm.v2.domain.BpmWorkCalendar" resultMap="BpmWorkCalendarResult">
+        <include refid="selectBpmWorkCalendarVo"/>
+        <where>
+            <if test="tenantId != null">and tenant_id = #{tenantId}</if>
+            <if test="year != null">and year = #{year}</if>
+            <if test="type != null and type != ''">and type = #{type}</if>
+        </where>
+        order by date asc
+    </select>
+
+    <select id="selectByDate" resultMap="BpmWorkCalendarResult">
+        <include refid="selectBpmWorkCalendarVo"/>
+        where tenant_id = #{tenantId} and date = #{date} limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.bpm.v2.domain.BpmWorkCalendar" useGeneratedKeys="true" keyProperty="id">
+        insert into bpm_work_calendar
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="year != null">year,</if>
+            <if test="date != null">date,</if>
+            <if test="type != null and type != ''">type,</if>
+            <if test="workHours != null">work_hours,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="year != null">#{year},</if>
+            <if test="date != null">#{date},</if>
+            <if test="type != null and type != ''">#{type},</if>
+            <if test="workHours != null">#{workHours},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.bpm.v2.domain.BpmWorkCalendar">
+        update bpm_work_calendar
+        <set>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="year != null">year = #{year},</if>
+            <if test="date != null">date = #{date},</if>
+            <if test="type != null and type != ''">type = #{type},</if>
+            <if test="workHours != null">work_hours = #{workHours},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from bpm_work_calendar where id = #{id}
+    </delete>
+
+</mapper>

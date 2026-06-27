@@ -180,8 +180,8 @@
                 调用方法
                 <el-tooltip placement="top">
                   <div slot="content">
-                    Bean调用示例：ryTask.ryParams('ry')
-                    <br />Class类调用示例：com.ruoyi.quartz.task.RyTask.ryParams('ry')
+                    Bean调用示例：myTask.myParams('param')
+                    <br />Class类调用示例：com.xxx.quartz.task.MyTask.myParams('param')
                     <br />参数说明：支持字符串，布尔类型，长整型，浮点型，整型
                   </div>
                   <i class="el-icon-question"></i>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bpm.mapper.BpmWorkbenchTemplateScopeMapper">
+
+    <resultMap type="BpmWorkbenchTemplateScope" id="BpmWorkbenchTemplateScopeResult">
+        <id     property="scopeId"        column="scope_id"        />
+        <result property="templateId"     column="template_id"     />
+        <result property="scopeType"      column="scope_type"      />
+        <result property="scopeTargetId"  column="scope_target_id" />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+    </resultMap>
+
+    <sql id="selectBpmWorkbenchTemplateScopeVo">
+        select scope_id, template_id, scope_type, scope_target_id, create_by, create_time from bpm_workbench_template_scope
+    </sql>
+
+    <select id="selectBpmWorkbenchTemplateScopeList" parameterType="BpmWorkbenchTemplateScope" resultMap="BpmWorkbenchTemplateScopeResult">
+        <include refid="selectBpmWorkbenchTemplateScopeVo"/>
+        <where>
+            <if test="templateId != null">
+                AND template_id = #{templateId}
+            </if>
+            <if test="scopeType != null and scopeType != ''">
+                AND scope_type = #{scopeType}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertBpmWorkbenchTemplateScope" parameterType="BpmWorkbenchTemplateScope">
+        insert into bpm_workbench_template_scope (
+            <if test="templateId != null">template_id,</if>
+            <if test="scopeType != null and scopeType != ''">scope_type,</if>
+            <if test="scopeTargetId != null">scope_target_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        )values(
+            <if test="templateId != null">#{templateId},</if>
+            <if test="scopeType != null and scopeType != ''">#{scopeType},</if>
+            <if test="scopeTargetId != null">#{scopeTargetId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <delete id="deleteBpmWorkbenchTemplateScopeById" parameterType="Long">
+        delete from bpm_workbench_template_scope where scope_id = #{scopeId}
+    </delete>
+
+    <delete id="deleteBpmWorkbenchTemplateScopeByTemplateId" parameterType="Long">
+        delete from bpm_workbench_template_scope where template_id = #{templateId}
+    </delete>
+
+</mapper>

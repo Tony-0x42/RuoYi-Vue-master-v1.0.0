@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bpm.v2.mapper.BpmTaskMapper">
+
+    <resultMap type="com.ruoyi.bpm.v2.domain.BpmTask" id="BpmTaskResult">
+        <id property="id" column="id"/>
+        <result property="instanceId" column="instance_id"/>
+        <result property="nodeId" column="node_id"/>
+        <result property="nodeName" column="node_name"/>
+        <result property="assignee" column="assignee"/>
+        <result property="candidates" column="candidates"/>
+        <result property="status" column="status"/>
+        <result property="dueTime" column="due_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="action" column="action"/>
+        <result property="opinion" column="opinion"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectBpmTaskVo">
+        select id, instance_id, node_id, node_name, assignee, candidates, status, due_time, end_time, action, opinion, create_time
+        from bpm_task
+    </sql>
+
+    <select id="selectById" parameterType="String" resultMap="BpmTaskResult">
+        <include refid="selectBpmTaskVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.bpm.v2.domain.BpmTask" resultMap="BpmTaskResult">
+        <include refid="selectBpmTaskVo"/>
+        <where>
+            <if test="id != null and id != ''">and id = #{id}</if>
+            <if test="instanceId != null and instanceId != ''">and instance_id = #{instanceId}</if>
+            <if test="nodeId != null and nodeId != ''">and node_id = #{nodeId}</if>
+            <if test="assignee != null">and assignee = #{assignee}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectTodoList" resultMap="BpmTaskResult">
+        <include refid="selectBpmTaskVo"/>
+        <where>
+            <if test="assignee != null">and assignee = #{assignee}</if>
+            <if test="tenantId != null">and exists (select 1 from bpm_process_instance i where i.id = bpm_task.instance_id and i.tenant_id = #{tenantId})</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+            <if test="status == null or status == ''">and status = 'PENDING'</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectByInstanceId" parameterType="String" resultMap="BpmTaskResult">
+        <include refid="selectBpmTaskVo"/>
+        where instance_id = #{instanceId}
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.bpm.v2.domain.BpmTask">
+        insert into bpm_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">id,</if>
+            <if test="instanceId != null and instanceId != ''">instance_id,</if>
+            <if test="nodeId != null and nodeId != ''">node_id,</if>
+            <if test="nodeName != null and nodeName != ''">node_name,</if>
+            <if test="assignee != null">assignee,</if>
+            <if test="candidates != null and candidates != ''">candidates,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="dueTime != null">due_time,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">#{id},</if>
+            <if test="instanceId != null and instanceId != ''">#{instanceId},</if>
+            <if test="nodeId != null and nodeId != ''">#{nodeId},</if>
+            <if test="nodeName != null and nodeName != ''">#{nodeName},</if>
+            <if test="assignee != null">#{assignee},</if>
+            <if test="candidates != null and candidates != ''">#{candidates},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="dueTime != null">#{dueTime},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.bpm.v2.domain.BpmTask">
+        update bpm_task
+        <set>
+            <if test="instanceId != null and instanceId != ''">instance_id = #{instanceId},</if>
+            <if test="nodeId != null and nodeId != ''">node_id = #{nodeId},</if>
+            <if test="nodeName != null and nodeName != ''">node_name = #{nodeName},</if>
+            <if test="assignee != null">assignee = #{assignee},</if>
+            <if test="candidates != null">candidates = #{candidates},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="dueTime != null">due_time = #{dueTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="action != null and action != ''">action = #{action},</if>
+            <if test="opinion != null">opinion = #{opinion},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="String">
+        delete from bpm_task where id = #{id}
+    </delete>
+
+    <select id="selectPendingByNode" resultMap="BpmTaskResult">
+        <include refid="selectBpmTaskVo"/>
+        where instance_id = #{instanceId} and node_id = #{nodeId} and status = 'PENDING'
+    </select>
+
+</mapper>

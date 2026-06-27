@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bpm.v2.mapper.BpmUserOrgExtMapper">
+
+    <resultMap type="com.ruoyi.bpm.v2.domain.BpmUserOrgExt" id="BpmUserOrgExtResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="leaderId" column="leader_id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="position" column="position"/>
+        <result property="tags" column="tags"/>
+        <result property="status" column="status"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectBpmUserOrgExtVo">
+        select id, user_id, leader_id, dept_id, position, tags, status, tenant_id,
+               create_by, create_time, update_by, update_time
+        from bpm_user_org_ext
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="BpmUserOrgExtResult">
+        <include refid="selectBpmUserOrgExtVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.bpm.v2.domain.BpmUserOrgExt" resultMap="BpmUserOrgExtResult">
+        <include refid="selectBpmUserOrgExtVo"/>
+        <where>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="leaderId != null">and leader_id = #{leaderId}</if>
+            <if test="deptId != null">and dept_id = #{deptId}</if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="tenantId != null">and tenant_id = #{tenantId}</if>
+        </where>
+    </select>
+
+    <select id="selectByUserId" resultMap="BpmUserOrgExtResult">
+        <include refid="selectBpmUserOrgExtVo"/>
+        where user_id = #{userId}
+        <if test="tenantId != null">and tenant_id = #{tenantId}</if>
+        limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.bpm.v2.domain.BpmUserOrgExt" useGeneratedKeys="true" keyProperty="id">
+        insert into bpm_user_org_ext
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="leaderId != null">leader_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="position != null and position != ''">position,</if>
+            <if test="tags != null and tags != ''">tags,</if>
+            <if test="status != null">status,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="leaderId != null">#{leaderId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="position != null and position != ''">#{position},</if>
+            <if test="tags != null and tags != ''">#{tags},</if>
+            <if test="status != null">#{status},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.bpm.v2.domain.BpmUserOrgExt">
+        update bpm_user_org_ext
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="leaderId != null">leader_id = #{leaderId},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="position != null">position = #{position},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from bpm_user_org_ext where id = #{id}
+    </delete>
+
+    <delete id="deleteByUserId">
+        delete from bpm_user_org_ext where user_id = #{userId}
+        <if test="tenantId != null">and tenant_id = #{tenantId}</if>
+    </delete>
+
+</mapper>

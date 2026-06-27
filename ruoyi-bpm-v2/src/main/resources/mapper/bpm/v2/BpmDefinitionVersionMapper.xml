@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bpm.v2.mapper.BpmDefinitionVersionMapper">
+
+    <resultMap type="com.ruoyi.bpm.v2.domain.BpmDefinitionVersion" id="BpmDefinitionVersionResult">
+        <id property="id" column="id"/>
+        <result property="definitionId" column="definition_id"/>
+        <result property="version" column="version"/>
+        <result property="versionName" column="version_name"/>
+        <result property="changelog" column="changelog"/>
+        <result property="xml" column="xml"/>
+        <result property="extJson" column="ext_json"/>
+        <result property="status" column="status"/>
+        <result property="publishTime" column="publish_time"/>
+        <result property="publishBy" column="publish_by"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectBpmDefinitionVersionVo">
+        select id, definition_id, version, version_name, changelog, xml, ext_json, status, publish_time, publish_by,
+               create_by, create_time, update_by, update_time, remark
+        from bpm_definition_version
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="BpmDefinitionVersionResult">
+        <include refid="selectBpmDefinitionVersionVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByDefinitionId" parameterType="Long" resultMap="BpmDefinitionVersionResult">
+        <include refid="selectBpmDefinitionVersionVo"/>
+        where definition_id = #{definitionId}
+        order by id desc
+    </select>
+
+    <select id="selectPublishedByDefinitionId" parameterType="Long" resultMap="BpmDefinitionVersionResult">
+        <include refid="selectBpmDefinitionVersionVo"/>
+        where definition_id = #{definitionId} and status = 1
+        order by publish_time desc limit 1
+    </select>
+
+    <select id="selectByDefinitionIdAndVersion" resultMap="BpmDefinitionVersionResult">
+        <include refid="selectBpmDefinitionVersionVo"/>
+        where definition_id = #{definitionId} and version = #{version} limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.bpm.v2.domain.BpmDefinitionVersion" useGeneratedKeys="true" keyProperty="id">
+        insert into bpm_definition_version
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="definitionId != null">definition_id,</if>
+            <if test="version != null and version != ''">version,</if>
+            <if test="versionName != null and versionName != ''">version_name,</if>
+            <if test="changelog != null and changelog != ''">changelog,</if>
+            <if test="xml != null and xml != ''">xml,</if>
+            <if test="extJson != null and extJson != ''">ext_json,</if>
+            <if test="status != null">status,</if>
+            <if test="publishTime != null">publish_time,</if>
+            <if test="publishBy != null and publishBy != ''">publish_by,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="definitionId != null">#{definitionId},</if>
+            <if test="version != null and version != ''">#{version},</if>
+            <if test="versionName != null and versionName != ''">#{versionName},</if>
+            <if test="changelog != null and changelog != ''">#{changelog},</if>
+            <if test="xml != null and xml != ''">#{xml},</if>
+            <if test="extJson != null and extJson != ''">#{extJson},</if>
+            <if test="status != null">#{status},</if>
+            <if test="publishTime != null">#{publishTime},</if>
+            <if test="publishBy != null and publishBy != ''">#{publishBy},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.bpm.v2.domain.BpmDefinitionVersion">
+        update bpm_definition_version
+        <set>
+            <if test="definitionId != null">definition_id = #{definitionId},</if>
+            <if test="version != null and version != ''">version = #{version},</if>
+            <if test="versionName != null and versionName != ''">version_name = #{versionName},</if>
+            <if test="changelog != null">changelog = #{changelog},</if>
+            <if test="xml != null">xml = #{xml},</if>
+            <if test="extJson != null">ext_json = #{extJson},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="publishTime != null">publish_time = #{publishTime},</if>
+            <if test="publishBy != null and publishBy != ''">publish_by = #{publishBy},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from bpm_definition_version where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from bpm_definition_version where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

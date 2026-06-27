@@ -27,6 +27,12 @@
 - MySQL 命令行客户端位置：`/d/tools/MySQL/MySQL Workbench 8.0/mysql.exe`
 - MySQL 逻辑备份工具位置：`/d/tools/MySQL/MySQL Workbench 8.0/mysqldump.exe`
 - 图形客户端：`/d/tools/dbeaver/`
+- 本地默认连接信息（开发环境）：
+  - host：`localhost`
+  - port：`3306`
+  - user：`root`
+  - password：`root`
+  - database：`ry-vue`
 - 连接数据库示例（在 Bash 中执行）：
   ```bash
   MYSQL_BIN="/d/tools/MySQL/MySQL Workbench 8.0/mysql.exe"
@@ -46,6 +52,7 @@
   - 所有结构变更优先通过 `sql/` 目录下的脚本完成，并同时维护初始化脚本与增量迁移脚本。
   - 变更前必须备份；生产环境禁止自动连接修改，需由用户确认后手动或通过审批流程执行。
   - 命令行操作必须显式指定 `--default-character-set=utf8mb4`，避免中文乱码。
+  - 在用户提供数据库连接信息后，Agent 应直接在本地执行 `sql/` 下的增量脚本完成变更，无需再向用户展示或交付 SQL。
 
 ## 本地环境说明
 
