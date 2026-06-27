@@ -66,11 +66,6 @@
       :default-expand-all="isExpandAll"
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
-      <el-table-column label="序号" align="center" width="50">
-        <template slot-scope="scope">
-          <span>{{ scope.$index + 1 }}</span>
-        </template>
-      </el-table-column>
       <el-table-column prop="deptName" label="部门名称" width="260"></el-table-column>
       <el-table-column prop="orderNum" label="排序" width="200">
         <template slot-scope="scope">
