@@ -19,21 +19,36 @@ spec/
 │   ├── i18n.md                 # 系统国际化设计规范（前端/后端）
 │   └── table-index-column.md   # 前端列表展示规范（无 ID、首列序号）
 └── modules/                    # 模块规范：各功能模块的详细需求与业务规则
-    ├── M1-流程设计器核心.md
-    ├── M2-表单设计器.md
-    ├── M3-审批节点配置.md
-    ├── M4-流程控制与网关.md
-    ├── M5-BPMN事件体系.md
-    ├── M6-高级审批功能.md
-    ├── M7-超时与催办.md
-    ├── M8-流程版本管理.md
-    ├── M9-中台集成与开放能力.md
-    ├── M10-组织架构集成.md
-    ├── M11-数据权限与安全.md
-    ├── M12-流程监控与运营.md
-    ├── M13-打印与签章.md
-    ├── M14-系统管理与配置.md
-    └── M15-BPM流程定义使用手册.md
+    ├── 流程管理/                # 现有流程中台模块规范
+    │   ├── M1-流程设计器核心.md
+    │   ├── M2-表单设计器.md
+    │   ├── M3-审批节点配置.md
+    │   ├── M4-流程控制与网关.md
+    │   ├── M5-BPMN事件体系.md
+    │   ├── M6-高级审批功能.md
+    │   ├── M7-超时与催办.md
+    │   ├── M8-流程版本管理.md
+    │   ├── M9-中台集成与开放能力.md
+    │   ├── M10-组织架构集成.md
+    │   ├── M11-数据权限与安全.md
+    │   ├── M12-流程监控与运营.md
+    │   ├── M13-打印与签章.md
+    │   ├── M14-系统管理与配置.md
+    │   └── M15-BPM流程定义使用手册.md
+    └── todo_modules/            # 商用 OA 缺失模块待补齐规范
+        ├── todo_门户工作台/
+        ├── todo_消息通知中心/
+        ├── todo_日程管理/
+        ├── todo_会议管理/
+        ├── todo_文档管理/
+        ├── todo_知识库/
+        ├── todo_公告通知/
+        ├── todo_通讯录/
+        ├── todo_任务协作/
+        ├── todo_考勤管理/
+        ├── todo_费用报销/
+        ├── todo_资产管理/
+        └── modified_系统管理与配置/
 ```
 
 ## 按任务类型推荐阅读
@@ -63,7 +78,17 @@ spec/
 | 运营大盘、异常检测、效率/瓶颈分析 | [M12-流程监控与运营.md](./modules/M12-流程监控与运营.md) |
 | 打印模板、电子签名、手写签名 | [M13-打印与签章.md](./modules/M13-打印与签章.md) |
 | 流程分类、通知模板、工作日历、归档 | [M14-系统管理与配置.md](./modules/M14-系统管理与配置.md) |
-| 流程定义实际操作、办理人配置、会签、条件分支、版本管理 | [M15-BPM流程定义使用手册.md](./modules/M15-BPM流程定义使用手册.md) |
+| 流程定义实际操作、办理人配置、会签、条件分支、版本管理 | [M15-BPM流程定义使用手册.md](./modules/流程管理/M15-BPM流程定义使用手册.md) |
+| 门户工作台、应用中心、数据看板 | [todo_门户工作台/spec.md](./modules/todo_modules/todo_门户工作台/spec.md) |
+| 消息通知、站内信、邮件/短信/IM、订阅管理 | [todo_消息通知中心/spec.md](./modules/todo_modules/todo_消息通知中心/spec.md) |
+| 日程管理、会议预定、会议室资源 | [todo_日程管理/spec.md](./modules/todo_modules/todo_日程管理/spec.md) + [todo_会议管理/spec.md](./modules/todo_modules/todo_会议管理/spec.md) |
+| 文档管理、知识库、公告通知 | [todo_文档管理/spec.md](./modules/todo_modules/todo_文档管理/spec.md) + [todo_知识库/spec.md](./modules/todo_modules/todo_知识库/spec.md) + [todo_公告通知/spec.md](./modules/todo_modules/todo_公告通知/spec.md) |
+| 通讯录、组织架构浏览 | [todo_通讯录/spec.md](./modules/todo_modules/todo_通讯录/spec.md) |
+| 任务协作、看板、甘特图 | [todo_任务协作/spec.md](./modules/todo_modules/todo_任务协作/spec.md) |
+| 考勤打卡、排班、请假/加班/出差 | [todo_考勤管理/spec.md](./modules/todo_modules/todo_考勤管理/spec.md) |
+| 费用报销、发票识别、预算控制 | [todo_费用报销/spec.md](./modules/todo_modules/todo_费用报销/spec.md) |
+| 资产管理、盘点、报废 | [todo_资产管理/spec.md](./modules/todo_modules/todo_资产管理/spec.md) |
+| 系统管理增量更新（用户/角色/菜单/参数/字典/日志） | [modified_系统管理与配置/delta-spec.md](./modules/todo_modules/modified_系统管理与配置/delta-spec.md) |
 
 ## 快速参考
 
