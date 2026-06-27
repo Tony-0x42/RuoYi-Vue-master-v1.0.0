@@ -261,13 +261,10 @@ export default {
           const prefix = businessKey.substring(0, separatorIndex)
           const id = businessKey.substring(separatorIndex + 1)
           if (prefix === 'expense_report') {
-            this.$router.push({ path: '/oa/expense', query: { id } })
+            this.$router.push({ path: '/oa/expenseDir/expense', query: { id } })
             return
           } else if (prefix === 'expense_loan') {
-            this.$router.push({ path: '/oa/expenseLoan', query: { id } })
-            return
-          } else if (prefix === 'asset_receive') {
-            this.$router.push({ path: '/oa/asset', query: { id } })
+            this.$router.push({ path: '/oa/expenseDir/expenseLoan', query: { id } })
             return
           } else if (prefix === 'attendance_leave') {
             this.$router.push({ path: '/oa/hr/leave', query: { id } })
