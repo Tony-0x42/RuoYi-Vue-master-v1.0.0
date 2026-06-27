@@ -250,7 +250,7 @@ export default {
     handleReceive(row) {
       this.$modal.confirm(this.$t('oa.asset.confirm.receive', { name: row.name })).then(() => {
         return receiveAsset(row.id, this.currentUserId, this.currentUserName)
-      }).then(() => { this.$modal.msgSuccess(this.$t('common.success')); this.getList(); this.getStatistics() }).catch(() => {})
+      }).then(() => { this.$modal.msgSuccess(this.$t('oa.asset.submitApprovalSuccess')); this.getList(); this.getStatistics() }).catch(() => {})
     },
     handleReturn(row) {
       this.$modal.confirm(this.$t('oa.asset.confirm.return', { name: row.name })).then(() => {
@@ -261,19 +261,19 @@ export default {
       this.$prompt(this.$t('oa.asset.placeholder.transferUser'), this.$t('oa.asset.transfer'), { inputPlaceholder: this.$t('oa.asset.placeholder.transferUser') }).then(({ value }) => {
         if (!value) { this.$modal.msgError(this.$t('oa.asset.required.transferUser')); return }
         return transferAsset(row.id, this.currentUserId, this.currentUserName, parseInt(value) || 0, value)
-      }).then(() => { this.$modal.msgSuccess(this.$t('common.success')); this.getList(); this.getStatistics() }).catch(() => {})
+      }).then(() => { this.$modal.msgSuccess(this.$t('oa.asset.submitApprovalSuccess')); this.getList(); this.getStatistics() }).catch(() => {})
     },
     handleRepair(row) {
       this.$prompt(this.$t('oa.asset.placeholder.repairReason'), this.$t('oa.asset.repair'), { inputPlaceholder: this.$t('oa.asset.placeholder.repairReason') }).then(({ value }) => {
         if (!value) { this.$modal.msgError(this.$t('oa.asset.required.repairReason')); return }
         return repairAsset(row.id, value, 0, '')
-      }).then(() => { this.$modal.msgSuccess(this.$t('common.success')); this.getList(); this.getStatistics() }).catch(() => {})
+      }).then(() => { this.$modal.msgSuccess(this.$t('oa.asset.submitApprovalSuccess')); this.getList(); this.getStatistics() }).catch(() => {})
     },
     handleScrap(row) {
       this.$prompt(this.$t('oa.asset.placeholder.scrapReason'), this.$t('oa.asset.scrap'), { inputPlaceholder: this.$t('oa.asset.placeholder.scrapReason') }).then(({ value }) => {
         if (!value) { this.$modal.msgError(this.$t('oa.asset.required.scrapReason')); return }
         return scrapAsset(row.id, value, '')
-      }).then(() => { this.$modal.msgSuccess(this.$t('common.success')); this.getList(); this.getStatistics() }).catch(() => {})
+      }).then(() => { this.$modal.msgSuccess(this.$t('oa.asset.submitApprovalSuccess')); this.getList(); this.getStatistics() }).catch(() => {})
     }
   }
 }

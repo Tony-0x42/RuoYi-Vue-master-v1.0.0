@@ -29,11 +29,14 @@ public class OaAssetRepair extends BaseEntity
     /** 维修商 */
     private String vendor;
 
+    /** 流程实例ID */
+    private String processInstanceId;
+
     /** 维修时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date repairTime;
 
-    /** 状态（0维修中 1已完成） */
+    /** 状态（0待审批 1维修中 2已驳回 3已完成） */
     private Integer status;
 
     /** 租户ID */
@@ -89,6 +92,16 @@ public class OaAssetRepair extends BaseEntity
         this.vendor = vendor;
     }
 
+    public String getProcessInstanceId()
+    {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(String processInstanceId)
+    {
+        this.processInstanceId = processInstanceId;
+    }
+
     public Date getRepairTime()
     {
         return repairTime;
@@ -128,6 +141,7 @@ public class OaAssetRepair extends BaseEntity
                 .append("reason", getReason())
                 .append("cost", getCost())
                 .append("vendor", getVendor())
+                .append("processInstanceId", getProcessInstanceId())
                 .append("repairTime", getRepairTime())
                 .append("status", getStatus())
                 .append("tenantId", getTenantId())

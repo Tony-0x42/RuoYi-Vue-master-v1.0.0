@@ -38,6 +38,9 @@ public class OaAssetTransfer extends BaseEntity
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date transferTime;
 
+    /** 状态（0待审批 1已调拨 2已驳回） */
+    private Integer status;
+
     /** 租户ID */
     private Long tenantId;
 
@@ -121,6 +124,16 @@ public class OaAssetTransfer extends BaseEntity
         this.transferTime = transferTime;
     }
 
+    public Integer getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(Integer status)
+    {
+        this.status = status;
+    }
+
     public Long getTenantId()
     {
         return tenantId;
@@ -143,6 +156,7 @@ public class OaAssetTransfer extends BaseEntity
                 .append("toUserName", getToUserName())
                 .append("processInstanceId", getProcessInstanceId())
                 .append("transferTime", getTransferTime())
+                .append("status", getStatus())
                 .append("tenantId", getTenantId())
                 .append("createBy", getCreateBy())
                 .append("createTime", getCreateTime())

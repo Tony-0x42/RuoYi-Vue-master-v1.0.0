@@ -30,6 +30,8 @@ export default {
       transfer: '调拨',
       repair: '维修',
       scrap: '报废',
+      finishRepair: '完成维修',
+      submitApprovalSuccess: '申请已提交，等待审批',
       qrcode: '二维码',
       qrcodeTip: '扫码可查看资产详情',
       view: '查看',

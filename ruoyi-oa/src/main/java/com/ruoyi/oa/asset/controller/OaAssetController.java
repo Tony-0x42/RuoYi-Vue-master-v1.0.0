@@ -149,6 +149,17 @@ public class OaAssetController extends BaseController
     }
 
     /**
+     * 完成维修
+     */
+    @PreAuthorize("@ss.hasPermi('oa:asset:edit')")
+    @Log(title = "资产台账", businessType = BusinessType.UPDATE)
+    @PostMapping("/repairs/{repairId}/finish")
+    public AjaxResult finishRepair(@PathVariable Long repairId)
+    {
+        return toAjax(assetService.finishRepair(repairId));
+    }
+
+    /**
      * 扫码查看资产
      */
     @PreAuthorize("@ss.hasPermi('oa:asset:query')")

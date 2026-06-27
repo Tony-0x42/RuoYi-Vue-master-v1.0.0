@@ -11,6 +11,7 @@
         <result property="disposalMethod" column="disposal_method"/>
         <result property="processInstanceId" column="process_instance_id"/>
         <result property="scrapTime" column="scrap_time"/>
+        <result property="status" column="status"/>
         <result property="tenantId" column="tenant_id"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
@@ -20,7 +21,7 @@
     </resultMap>
 
     <sql id="selectOaAssetScrapVo">
-        select id, asset_id, reason, disposal_method, process_instance_id, scrap_time, tenant_id,
+        select id, asset_id, reason, disposal_method, process_instance_id, scrap_time, status, tenant_id,
                create_by, create_time, update_by, update_time, remark
         from oa_asset_scrap
     </sql>
@@ -34,6 +35,7 @@
         <include refid="selectOaAssetScrapVo"/>
         <where>
             <if test="assetId != null">and asset_id = #{assetId}</if>
+            <if test="status != null">and status = #{status}</if>
         </where>
         order by create_time desc
     </select>
@@ -52,6 +54,7 @@
             <if test="disposalMethod != null and disposalMethod != ''">disposal_method,</if>
             <if test="processInstanceId != null and processInstanceId != ''">process_instance_id,</if>
             <if test="scrapTime != null">scrap_time,</if>
+            <if test="status != null">status,</if>
             <if test="tenantId != null">tenant_id,</if>
             <if test="createBy != null and createBy != ''">create_by,</if>
             <if test="remark != null and remark != ''">remark,</if>
@@ -63,6 +66,7 @@
             <if test="disposalMethod != null and disposalMethod != ''">#{disposalMethod},</if>
             <if test="processInstanceId != null and processInstanceId != ''">#{processInstanceId},</if>
             <if test="scrapTime != null">#{scrapTime},</if>
+            <if test="status != null">#{status},</if>
             <if test="tenantId != null">#{tenantId},</if>
             <if test="createBy != null and createBy != ''">#{createBy},</if>
             <if test="remark != null and remark != ''">#{remark},</if>
@@ -78,6 +82,7 @@
             <if test="disposalMethod != null">disposal_method = #{disposalMethod},</if>
             <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
             <if test="scrapTime != null">scrap_time = #{scrapTime},</if>
+            <if test="status != null">status = #{status},</if>
             <if test="tenantId != null">tenant_id = #{tenantId},</if>
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
             <if test="remark != null">remark = #{remark},</if>

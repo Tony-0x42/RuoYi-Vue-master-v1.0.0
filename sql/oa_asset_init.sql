@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `oa_asset_receive` (
   `process_instance_id` varchar(100) DEFAULT NULL COMMENT '流程实例ID',
   `receive_time` datetime DEFAULT NULL COMMENT '领用时间',
   `return_time` datetime DEFAULT NULL COMMENT '归还时间',
-  `status` tinyint(1) DEFAULT '0' COMMENT '状态（0待审批 1已领用 2已归还）',
+  `status` tinyint(1) DEFAULT '0' COMMENT '状态（0待审批 1已领用 2已驳回）',
   `tenant_id` bigint DEFAULT NULL COMMENT '租户ID',
   `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS `oa_asset_transfer` (
   `to_user_name` varchar(100) DEFAULT NULL COMMENT '目标使用人名称',
   `process_instance_id` varchar(100) DEFAULT NULL COMMENT '流程实例ID',
   `transfer_time` datetime DEFAULT NULL COMMENT '调拨时间',
+  `status` tinyint(1) DEFAULT '0' COMMENT '状态（0待审批 1已调拨 2已驳回）',
   `tenant_id` bigint DEFAULT NULL COMMENT '租户ID',
   `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
@@ -130,8 +131,9 @@ CREATE TABLE IF NOT EXISTS `oa_asset_repair` (
   `reason` varchar(500) DEFAULT NULL COMMENT '维修原因',
   `cost` decimal(18,2) DEFAULT '0.00' COMMENT '维修费用',
   `vendor` varchar(200) DEFAULT NULL COMMENT '维修商',
+  `process_instance_id` varchar(100) DEFAULT NULL COMMENT '流程实例ID',
   `repair_time` datetime DEFAULT NULL COMMENT '维修时间',
-  `status` tinyint(1) DEFAULT '0' COMMENT '状态（0维修中 1已完成）',
+  `status` tinyint(1) DEFAULT '0' COMMENT '状态（0待审批 1维修中 2已驳回 3已完成）',
   `tenant_id` bigint DEFAULT NULL COMMENT '租户ID',
   `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
@@ -197,6 +199,7 @@ CREATE TABLE IF NOT EXISTS `oa_asset_scrap` (
   `disposal_method` varchar(200) DEFAULT NULL COMMENT '处置方式',
   `process_instance_id` varchar(100) DEFAULT NULL COMMENT '流程实例ID',
   `scrap_time` datetime DEFAULT NULL COMMENT '报废时间',
+  `status` tinyint(1) DEFAULT '0' COMMENT '状态（0待审批 1已报废 2已驳回）',
   `tenant_id` bigint DEFAULT NULL COMMENT '租户ID',
   `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
@@ -245,6 +248,10 @@ INSERT IGNORE INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`,
 (3162, '盘点修改', 3152, 3, '#', NULL, '', '', 1, 0, 'F', '0', '0', 'oa:assetInventory:edit', '#', 'admin', NOW(), '', NULL, ''),
 (3163, '盘点删除', 3152, 4, '#', NULL, '', '', 1, 0, 'F', '0', '0', 'oa:assetInventory:remove', '#', 'admin', NOW(), '', NULL, '');
 
+-- 资产审批按钮权限
+INSERT IGNORE INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES
+(3164, '资产审批', 3150, 6, '#', NULL, '', '', 1, 0, 'F', '0', '0', 'oa:asset:approve', '#', 'admin', NOW(), '', NULL, '');
+
 -- 为管理员角色分配资产管理菜单权限
 INSERT IGNORE INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES
 (1, 3000),
@@ -261,4 +268,9 @@ INSERT IGNORE INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES
 (1, 3160),
 (1, 3161),
 (1, 3162),
-(1, 3163);
+(1, 3163),
+(1, 3164);
+
+-- 为审批人角色分配资产审批权限
+INSERT IGNORE INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES
+(3, 3164);

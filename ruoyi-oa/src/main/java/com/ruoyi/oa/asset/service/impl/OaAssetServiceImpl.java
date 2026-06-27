@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.bpm.v2.domain.BpmProcessInstance;
 import com.ruoyi.oa.asset.domain.OaAsset;
 import com.ruoyi.oa.asset.domain.OaAssetReceive;
 import com.ruoyi.oa.asset.domain.OaAssetRepair;
@@ -21,6 +22,7 @@ import com.ruoyi.oa.asset.mapper.OaAssetRepairMapper;
 import com.ruoyi.oa.asset.mapper.OaAssetReturnMapper;
 import com.ruoyi.oa.asset.mapper.OaAssetScrapMapper;
 import com.ruoyi.oa.asset.mapper.OaAssetTransferMapper;
+import com.ruoyi.oa.common.OaBpmHelper;
 import com.ruoyi.oa.asset.service.IOaAssetService;
 
 /**
@@ -46,6 +48,9 @@ public class OaAssetServiceImpl implements IOaAssetService
 
     @Autowired
     private OaAssetScrapMapper scrapMapper;
+
+    @Autowired
+    private OaBpmHelper bpmHelper;
 
     @Override
     public OaAsset selectById(Long id)
@@ -122,23 +127,19 @@ public class OaAssetServiceImpl implements IOaAssetService
         {
             throw new ServiceException("仅闲置资产可领用");
         }
-        OaAsset update = new OaAsset();
-        update.setId(id);
-        update.setStatus(1);
-        update.setUserId(userId);
-        update.setUserName(userName);
-        update.setUpdateBy(SecurityUtils.getUsername());
-        assetMapper.update(update);
 
         OaAssetReceive receive = new OaAssetReceive();
         receive.setAssetId(id);
         receive.setUserId(userId);
         receive.setUserName(userName);
-        receive.setReceiveTime(new Date());
-        receive.setStatus(1);
-        receive.setProcessInstanceId("mock-proc-receive-" + id);
+        receive.setStatus(0);
         receive.setCreateBy(SecurityUtils.getUsername());
-        return receiveMapper.insert(receive);
+        receiveMapper.insert(receive);
+
+        BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_receive", "asset_receive:" + receive.getId(), userId);
+        receive.setProcessInstanceId(instance.getId());
+        receive.setUpdateBy(SecurityUtils.getUsername());
+        return receiveMapper.update(receive);
     }
 
     @Override
@@ -180,9 +181,12 @@ public class OaAssetServiceImpl implements IOaAssetService
         {
             for (OaAssetReceive r : receives)
             {
-                r.setReturnTime(new Date());
-                r.setStatus(2);
-                receiveMapper.update(r);
+                if (r.getReturnTime() == null)
+                {
+                    r.setReturnTime(new Date());
+                    r.setUpdateBy(SecurityUtils.getUsername());
+                    receiveMapper.update(r);
+                }
             }
         }
         return 1;
@@ -201,12 +205,6 @@ public class OaAssetServiceImpl implements IOaAssetService
         {
             throw new ServiceException("仅在用资产可调拨");
         }
-        OaAsset update = new OaAsset();
-        update.setId(id);
-        update.setUserId(toUserId);
-        update.setUserName(toUserName);
-        update.setUpdateBy(SecurityUtils.getUsername());
-        assetMapper.update(update);
 
         OaAssetTransfer transfer = new OaAssetTransfer();
         transfer.setAssetId(id);
@@ -214,10 +212,14 @@ public class OaAssetServiceImpl implements IOaAssetService
         transfer.setFromUserName(fromUserName);
         transfer.setToUserId(toUserId);
         transfer.setToUserName(toUserName);
-        transfer.setTransferTime(new Date());
-        transfer.setProcessInstanceId("mock-proc-transfer-" + id);
+        transfer.setStatus(0);
         transfer.setCreateBy(SecurityUtils.getUsername());
-        return transferMapper.insert(transfer);
+        transferMapper.insert(transfer);
+
+        BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_transfer", "asset_transfer:" + transfer.getId(), fromUserId);
+        transfer.setProcessInstanceId(instance.getId());
+        transfer.setUpdateBy(SecurityUtils.getUsername());
+        return transferMapper.update(transfer);
     }
 
     @Override
@@ -233,21 +235,20 @@ public class OaAssetServiceImpl implements IOaAssetService
         {
             throw new ServiceException("已报废资产不可维修");
         }
-        OaAsset update = new OaAsset();
-        update.setId(id);
-        update.setStatus(2);
-        update.setUpdateBy(SecurityUtils.getUsername());
-        assetMapper.update(update);
 
         OaAssetRepair repair = new OaAssetRepair();
         repair.setAssetId(id);
         repair.setReason(reason);
         repair.setCost(cost);
         repair.setVendor(vendor);
-        repair.setRepairTime(new Date());
         repair.setStatus(0);
         repair.setCreateBy(SecurityUtils.getUsername());
-        return repairMapper.insert(repair);
+        repairMapper.insert(repair);
+
+        BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_repair", "asset_repair:" + repair.getId(), SecurityUtils.getUserId());
+        repair.setProcessInstanceId(instance.getId());
+        repair.setUpdateBy(SecurityUtils.getUsername());
+        return repairMapper.update(repair);
     }
 
     @Override
@@ -259,7 +260,11 @@ public class OaAssetServiceImpl implements IOaAssetService
         {
             throw new ServiceException("维修记录不存在");
         }
-        repair.setStatus(1);
+        if (!Integer.valueOf(1).equals(repair.getStatus()))
+        {
+            throw new ServiceException("仅维修中的记录可完成");
+        }
+        repair.setStatus(3);
         repair.setUpdateBy(SecurityUtils.getUsername());
         repairMapper.update(repair);
 
@@ -283,22 +288,19 @@ public class OaAssetServiceImpl implements IOaAssetService
         {
             throw new ServiceException("资产已报废");
         }
-        OaAsset update = new OaAsset();
-        update.setId(id);
-        update.setStatus(3);
-        update.setUserId(null);
-        update.setUserName(null);
-        update.setUpdateBy(SecurityUtils.getUsername());
-        assetMapper.update(update);
 
         OaAssetScrap scrap = new OaAssetScrap();
         scrap.setAssetId(id);
         scrap.setReason(reason);
         scrap.setDisposalMethod(disposalMethod);
-        scrap.setScrapTime(new Date());
-        scrap.setProcessInstanceId("mock-proc-scrap-" + id);
+        scrap.setStatus(0);
         scrap.setCreateBy(SecurityUtils.getUsername());
-        return scrapMapper.insert(scrap);
+        scrapMapper.insert(scrap);
+
+        BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_scrap", "asset_scrap:" + scrap.getId(), SecurityUtils.getUserId());
+        scrap.setProcessInstanceId(instance.getId());
+        scrap.setUpdateBy(SecurityUtils.getUsername());
+        return scrapMapper.update(scrap);
     }
 
     @Override

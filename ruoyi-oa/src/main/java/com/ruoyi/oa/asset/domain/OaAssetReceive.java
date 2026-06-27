@@ -36,7 +36,7 @@ public class OaAssetReceive extends BaseEntity
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date returnTime;
 
-    /** 状态（0待审批 1已领用 2已归还） */
+    /** 状态（0待审批 1已领用 2已驳回） */
     private Integer status;
 
     /** 租户ID */

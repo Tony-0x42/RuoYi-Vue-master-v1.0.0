@@ -13,6 +13,7 @@
         <result property="toUserName" column="to_user_name"/>
         <result property="processInstanceId" column="process_instance_id"/>
         <result property="transferTime" column="transfer_time"/>
+        <result property="status" column="status"/>
         <result property="tenantId" column="tenant_id"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
@@ -22,7 +23,7 @@
     </resultMap>
 
     <sql id="selectOaAssetTransferVo">
-        select id, asset_id, from_user_id, from_user_name, to_user_id, to_user_name, process_instance_id, transfer_time, tenant_id,
+        select id, asset_id, from_user_id, from_user_name, to_user_id, to_user_name, process_instance_id, transfer_time, status, tenant_id,
                create_by, create_time, update_by, update_time, remark
         from oa_asset_transfer
     </sql>
@@ -38,6 +39,7 @@
             <if test="assetId != null">and asset_id = #{assetId}</if>
             <if test="fromUserId != null">and from_user_id = #{fromUserId}</if>
             <if test="toUserId != null">and to_user_id = #{toUserId}</if>
+            <if test="status != null">and status = #{status}</if>
         </where>
         order by create_time desc
     </select>
@@ -58,6 +60,7 @@
             <if test="toUserName != null and toUserName != ''">to_user_name,</if>
             <if test="processInstanceId != null and processInstanceId != ''">process_instance_id,</if>
             <if test="transferTime != null">transfer_time,</if>
+            <if test="status != null">status,</if>
             <if test="tenantId != null">tenant_id,</if>
             <if test="createBy != null and createBy != ''">create_by,</if>
             <if test="remark != null and remark != ''">remark,</if>
@@ -71,6 +74,7 @@
             <if test="toUserName != null and toUserName != ''">#{toUserName},</if>
             <if test="processInstanceId != null and processInstanceId != ''">#{processInstanceId},</if>
             <if test="transferTime != null">#{transferTime},</if>
+            <if test="status != null">#{status},</if>
             <if test="tenantId != null">#{tenantId},</if>
             <if test="createBy != null and createBy != ''">#{createBy},</if>
             <if test="remark != null and remark != ''">#{remark},</if>
@@ -88,6 +92,7 @@
             <if test="toUserName != null">to_user_name = #{toUserName},</if>
             <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
             <if test="transferTime != null">transfer_time = #{transferTime},</if>
+            <if test="status != null">status = #{status},</if>
             <if test="tenantId != null">tenant_id = #{tenantId},</if>
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
             <if test="remark != null">remark = #{remark},</if>

@@ -32,6 +32,9 @@ public class OaAssetScrap extends BaseEntity
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date scrapTime;
 
+    /** 状态（0待审批 1已报废 2已驳回） */
+    private Integer status;
+
     /** 租户ID */
     private Long tenantId;
 
@@ -95,6 +98,16 @@ public class OaAssetScrap extends BaseEntity
         this.scrapTime = scrapTime;
     }
 
+    public Integer getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(Integer status)
+    {
+        this.status = status;
+    }
+
     public Long getTenantId()
     {
         return tenantId;
@@ -115,6 +128,7 @@ public class OaAssetScrap extends BaseEntity
                 .append("disposalMethod", getDisposalMethod())
                 .append("processInstanceId", getProcessInstanceId())
                 .append("scrapTime", getScrapTime())
+                .append("status", getStatus())
                 .append("tenantId", getTenantId())
                 .append("createBy", getCreateBy())
                 .append("createTime", getCreateTime())

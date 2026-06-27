@@ -63,6 +63,14 @@ export function scrapAsset(id, reason, disposalMethod) {
   return request({ url: '/api/v1/oa/assets/' + id + '/scrap', method: 'post', params: { reason, disposalMethod } })
 }
 
+export function finishRepair(repairId) {
+  return request({ url: '/api/v1/oa/assets/repairs/' + repairId + '/finish', method: 'post' })
+}
+
+export function completeAssetApproval(data) {
+  return request({ url: '/api/v1/oa/assets/approvals/complete', method: 'post', data })
+}
+
 // 二维码与统计
 export function qrcodeAsset(code) {
   return request({ url: '/api/v1/oa/assets/' + code + '/qrcode', method: 'get' })

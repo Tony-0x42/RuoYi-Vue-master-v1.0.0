@@ -30,6 +30,8 @@ export default {
       transfer: 'Transfer',
       repair: 'Repair',
       scrap: 'Scrap',
+      finishRepair: 'Finish Repair',
+      submitApprovalSuccess: 'Application submitted, pending approval',
       qrcode: 'QR Code',
       qrcodeTip: 'Scan to view asset details',
       view: 'View',
