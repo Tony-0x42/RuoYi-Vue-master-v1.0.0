@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.addressbook.mapper.OaRecentContactMapper">
+
+    <resultMap type="OaRecentContact" id="OaRecentContactResult">
+        <id     property="recentId"       column="recent_id"      />
+        <result property="userId"         column="user_id"        />
+        <result property="contactUserId"  column="contact_user_id"/>
+        <result property="contactTime"    column="contact_time"   />
+        <result property="createBy"       column="create_by"      />
+        <result property="createTime"     column="create_time"    />
+    </resultMap>
+
+    <sql id="selectOaRecentContactVo">
+        select recent_id, user_id, contact_user_id, contact_time, create_by, create_time
+        from oa_recent_contact
+    </sql>
+
+    <select id="selectOaRecentContactList" parameterType="OaRecentContact" resultMap="OaRecentContactResult">
+        <include refid="selectOaRecentContactVo"/>
+        <where>
+            <if test="userId != null">AND user_id = #{userId}</if>
+            <if test="contactUserId != null">AND contact_user_id = #{contactUserId}</if>
+        </where>
+        order by contact_time desc
+        limit 20
+    </select>
+
+    <insert id="insertOaRecentContact" parameterType="OaRecentContact" useGeneratedKeys="true" keyProperty="recentId">
+        insert into oa_recent_contact(
+            <if test="userId != null">user_id,</if>
+            <if test="contactUserId != null">contact_user_id,</if>
+            <if test="contactTime != null">contact_time,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        )values(
+            <if test="userId != null">#{userId},</if>
+            <if test="contactUserId != null">#{contactUserId},</if>
+            <if test="contactTime != null">#{contactTime},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateOaRecentContactTime" parameterType="OaRecentContact">
+        update oa_recent_contact
+        set contact_time = #{contactTime}
+        where user_id = #{userId} and contact_user_id = #{contactUserId}
+    </update>
+
+    <delete id="deleteOaRecentContactByUserId" parameterType="Long">
+        delete from oa_recent_contact where user_id = #{userId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.notice.mapper.OaNoticeAttachmentMapper">
+
+    <resultMap type="com.ruoyi.oa.notice.domain.OaNoticeAttachment" id="OaNoticeAttachmentResult">
+        <id property="id" column="id"/>
+        <result property="noticeId" column="notice_id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="filePath" column="file_path"/>
+        <result property="fileSize" column="file_size"/>
+    </resultMap>
+
+    <sql id="selectOaNoticeAttachmentVo">
+        select id, notice_id, file_name, file_path, file_size from oa_notice_attachment
+    </sql>
+
+    <select id="selectByNoticeId" parameterType="Long" resultMap="OaNoticeAttachmentResult">
+        <include refid="selectOaNoticeAttachmentVo"/>
+        where notice_id = #{noticeId}
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.notice.domain.OaNoticeAttachment" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_notice_attachment (notice_id, file_name, file_path, file_size)
+        values (#{noticeId}, #{fileName}, #{filePath}, #{fileSize})
+    </insert>
+
+    <insert id="batchInsert">
+        insert into oa_notice_attachment (notice_id, file_name, file_path, file_size)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.noticeId}, #{item.fileName}, #{item.filePath}, #{item.fileSize})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByNoticeId" parameterType="Long">
+        delete from oa_notice_attachment where notice_id = #{noticeId}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from oa_notice_attachment where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

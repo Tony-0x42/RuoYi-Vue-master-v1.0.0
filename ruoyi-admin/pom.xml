@@ -66,6 +66,12 @@
             <artifactId>ruoyi-bpm-v2</artifactId>
         </dependency>
 
+        <!-- OA协同办公模块 -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-oa</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

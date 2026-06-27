@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.notice.mapper.OaNoticeReadMapper">
+
+    <resultMap type="com.ruoyi.oa.notice.domain.OaNoticeRead" id="OaNoticeReadResult">
+        <id property="id" column="id"/>
+        <result property="noticeId" column="notice_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="readTime" column="read_time"/>
+        <result property="confirmed" column="confirmed"/>
+        <result property="tenantId" column="tenant_id"/>
+    </resultMap>
+
+    <sql id="selectOaNoticeReadVo">
+        select r.id, r.notice_id, r.user_id, u.user_name, r.read_time, r.confirmed, r.tenant_id
+        from oa_notice_read r
+        left join sys_user u on u.user_id = r.user_id
+    </sql>
+
+    <select id="selectByNoticeAndUser" parameterType="com.ruoyi.oa.notice.domain.OaNoticeRead" resultMap="OaNoticeReadResult">
+        <include refid="selectOaNoticeReadVo"/>
+        where r.notice_id = #{noticeId} and r.user_id = #{userId}
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.oa.notice.domain.OaNoticeRead" useGeneratedKeys="true" keyProperty="id">
+        insert into oa_notice_read (notice_id, user_id, read_time, confirmed, tenant_id)
+        values (#{noticeId}, #{userId}, #{readTime}, #{confirmed}, #{tenantId})
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.oa.notice.domain.OaNoticeRead">
+        update oa_notice_read
+        <set>
+            <if test="readTime != null">read_time = #{readTime},</if>
+            <if test="confirmed != null">confirmed = #{confirmed},</if>
+        </set>
+        where notice_id = #{noticeId} and user_id = #{userId}
+    </update>
+
+    <update id="markRead" parameterType="com.ruoyi.oa.notice.domain.OaNoticeRead">
+        insert into oa_notice_read (notice_id, user_id, read_time, confirmed)
+        values (#{noticeId}, #{userId}, #{readTime}, 0)
+        on duplicate key update read_time = #{readTime}
+    </update>
+
+    <update id="confirm" parameterType="com.ruoyi.oa.notice.domain.OaNoticeRead">
+        insert into oa_notice_read (notice_id, user_id, read_time, confirmed)
+        values (#{noticeId}, #{userId}, #{readTime}, 1)
+        on duplicate key update read_time = #{readTime}, confirmed = 1
+    </update>
+
+    <select id="selectReadUsers" parameterType="Long" resultMap="OaNoticeReadResult">
+        <include refid="selectOaNoticeReadVo"/>
+        where r.notice_id = #{noticeId}
+        order by r.read_time desc
+    </select>
+
+    <select id="selectUnreadUsers" parameterType="Long" resultMap="OaNoticeReadResult">
+        select u.user_id as user_id, u.user_name as user_name
+        from sys_user u
+        where u.status = '0' and u.del_flag = '0'
+          and not exists (
+              select 1 from oa_notice_read r where r.notice_id = #{noticeId} and r.user_id = u.user_id
+          )
+    </select>
+
+    <select id="selectReadCount" parameterType="Long" resultType="Long">
+        select count(*) from oa_notice_read where notice_id = #{noticeId}
+    </select>
+
+    <delete id="deleteByNoticeId" parameterType="Long">
+        delete from oa_notice_read where notice_id = #{noticeId}
+    </delete>
+
+    <delete id="deleteByNoticeIds">
+        delete from oa_notice_read where notice_id in
+        <foreach item="noticeId" collection="array" open="(" separator="," close=")">
+            #{noticeId}
+        </foreach>
+    </delete>
+
+</mapper>

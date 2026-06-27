@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.oa.addressbook.mapper.OaContactGroupMapper">
+
+    <resultMap type="OaContactGroup" id="OaContactGroupResult">
+        <id     property="groupId"       column="group_id"      />
+        <result property="userId"        column="user_id"       />
+        <result property="groupName"     column="group_name"    />
+        <result property="groupSort"     column="group_sort"    />
+        <result property="createBy"      column="create_by"     />
+        <result property="createTime"    column="create_time"   />
+        <result property="updateBy"      column="update_by"     />
+        <result property="updateTime"    column="update_time"   />
+        <result property="remark"        column="remark"        />
+    </resultMap>
+
+    <sql id="selectOaContactGroupVo">
+        select group_id, user_id, group_name, group_sort, create_by, create_time, remark
+        from oa_contact_group
+    </sql>
+
+    <select id="selectOaContactGroupList" parameterType="OaContactGroup" resultMap="OaContactGroupResult">
+        <include refid="selectOaContactGroupVo"/>
+        <where>
+            <if test="userId != null">AND user_id = #{userId}</if>
+            <if test="groupName != null and groupName != ''">AND group_name like concat('%', #{groupName}, '%')</if>
+        </where>
+        order by group_sort asc, group_id asc
+    </select>
+
+    <select id="selectOaContactGroupById" parameterType="Long" resultMap="OaContactGroupResult">
+        <include refid="selectOaContactGroupVo"/>
+        where group_id = #{groupId}
+    </select>
+
+    <insert id="insertOaContactGroup" parameterType="OaContactGroup" useGeneratedKeys="true" keyProperty="groupId">
+        insert into oa_contact_group(
+            <if test="userId != null">user_id,</if>
+            <if test="groupName != null and groupName != ''">group_name,</if>
+            <if test="groupSort != null">group_sort,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        )values(
+            <if test="userId != null">#{userId},</if>
+            <if test="groupName != null and groupName != ''">#{groupName},</if>
+            <if test="groupSort != null">#{groupSort},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateOaContactGroup" parameterType="OaContactGroup">
+        update oa_contact_group
+        <set>
+            <if test="groupName != null and groupName != ''">group_name = #{groupName},</if>
+            <if test="groupSort != null">group_sort = #{groupSort},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where group_id = #{groupId}
+    </update>
+
+    <delete id="deleteOaContactGroupById" parameterType="Long">
+        delete from oa_contact_group where group_id = #{groupId}
+    </delete>
+
+</mapper>

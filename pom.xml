@@ -187,6 +187,13 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
+            <!-- OA协同办公模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-oa</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
             <!-- 通用工具-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
@@ -206,6 +213,7 @@
         <module>ruoyi-common</module>
         <module>ruoyi-bpm</module>
         <module>ruoyi-bpm-v2</module>
+        <module>ruoyi-oa</module>
     </modules>
     <packaging>pom</packaging>
 
