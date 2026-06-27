@@ -144,7 +144,7 @@ public class BpmDefinitionCompatController extends BaseController {
         String versionName = body.get("versionName") == null ? "" : body.get("versionName").toString();
         String changelog = body.get("changelog") == null ? "" : body.get("changelog").toString();
         String version = draft != null ? draft.getVersion() : null;
-        definitionService.saveDraft(definitionId, version, versionName, changelog, xml, definition.getExtJson());
+        definitionService.saveDraft(definitionId, version, versionName, changelog, xml, draft != null ? draft.getExtJson() : definition.getExtJson());
         return success();
     }
 
