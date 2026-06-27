@@ -44,8 +44,8 @@
         </el-row>
 
         <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
-          <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
           <el-table-column type="selection" width="50" align="center" />
+          <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
           <el-table-column label="用户名称" align="center" key="userName" v-if="columns.userName.visible" :show-overflow-tooltip="true">
             <template slot-scope="scope">
               <a class="link-type" style="cursor:pointer" @click="handleViewData(scope.row)">{{ scope.row.userName }}</a>

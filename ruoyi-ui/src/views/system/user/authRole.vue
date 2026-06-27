@@ -18,8 +18,8 @@
 
     <h4 class="form-header h4">角色信息</h4>
     <el-table v-loading="loading" :row-key="getRowKey" @row-click="clickRow" ref="table" @selection-change="handleSelectionChange" :data="roles.slice((pageNum-1)*pageSize,pageNum*pageSize)">
-      <index-column :page="pageNum" :size="pageSize" />
       <el-table-column type="selection" :reserve-selection="true" :selectable="checkSelectable" width="55" />
+      <index-column :page="pageNum" :size="pageSize" />
       <el-table-column label="角色名称" align="center" prop="roleName" />
       <el-table-column label="权限字符" align="center" prop="roleKey" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">

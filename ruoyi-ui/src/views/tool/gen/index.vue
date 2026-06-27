@@ -92,8 +92,8 @@
     </el-row>
 
     <el-table ref="tables" v-loading="loading" :data="tableList" @selection-change="handleSelectionChange" :default-sort="defaultSort" @sort-change="handleSortChange">
-      <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
       <el-table-column type="selection" align="center" width="55"></el-table-column>
+      <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
       <el-table-column label="表名称" align="center" prop="tableName" :show-overflow-tooltip="true" width="140" />
       <el-table-column label="表描述" align="center" prop="tableComment" :show-overflow-tooltip="true" width="140" />
       <el-table-column label="实体" align="center" prop="className" :show-overflow-tooltip="true" width="140" />
