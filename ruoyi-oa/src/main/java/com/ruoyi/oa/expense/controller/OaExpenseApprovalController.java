@@ -32,7 +32,7 @@ public class OaExpenseApprovalController extends BaseController
     @Autowired
     private ExpenseLoanApprovalCallback loanCallback;
 
-    @PreAuthorize("@ss.hasPermi('oa:expenseReport:query') or @ss.hasPermi('oa:expenseLoan:query')")
+    @PreAuthorize("@ss.hasPermi('oa:expenseReport:approve') or @ss.hasPermi('oa:expenseLoan:approve')")
     @PostMapping("/complete")
     public AjaxResult complete(@RequestBody @Validated CompleteTaskDTO dto)
     {

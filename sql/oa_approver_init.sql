@@ -16,3 +16,8 @@ INSERT IGNORE INTO sys_user_role (user_id, role_id) VALUES (3, 3);
 -- 为审批人角色分配所有 OA 菜单权限（menu_id 3000-3999 的所有菜单，包含新增二级目录及其子孙菜单）
 INSERT IGNORE INTO sys_role_menu (role_id, menu_id)
 SELECT 3, menu_id FROM sys_menu WHERE menu_id BETWEEN 3000 AND 3999;
+
+-- 显式补充费用审批权限（避免脚本执行顺序导致遗漏）
+INSERT IGNORE INTO sys_role_menu (role_id, menu_id) VALUES
+(3, 3180),
+(3, 3181);
