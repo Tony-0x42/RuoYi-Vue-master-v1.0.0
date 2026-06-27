@@ -264,22 +264,22 @@ export default {
             this.$router.push({ path: '/oa/expense', query: { id } })
             return
           } else if (prefix === 'expense_loan') {
-            this.$router.push({ path: '/oa/expense/loan', query: { id } })
+            this.$router.push({ path: '/oa/expenseLoan', query: { id } })
             return
-          } else if (['asset_receive', 'asset_transfer', 'asset_repair', 'asset_scrap'].includes(prefix)) {
-            this.$router.push({ path: '/oa/asset/detail/' + id })
+          } else if (prefix === 'asset_receive') {
+            this.$router.push({ path: '/oa/asset', query: { id } })
             return
           } else if (prefix === 'attendance_leave') {
-            this.$router.push({ path: '/oa/attendance/leave', query: { id } })
+            this.$router.push({ path: '/oa/hr/leave', query: { id } })
             return
           } else if (prefix === 'attendance_overtime') {
-            this.$router.push({ path: '/oa/attendance/overtime', query: { id } })
+            this.$router.push({ path: '/oa/hr/overtime', query: { id } })
             return
           } else if (prefix === 'attendance_trip') {
-            this.$router.push({ path: '/oa/attendance/trip', query: { id } })
+            this.$router.push({ path: '/oa/hr/trip', query: { id } })
             return
           } else if (prefix === 'attendance_makeup') {
-            this.$router.push({ path: '/oa/attendance/makeup', query: { id } })
+            this.$router.push({ path: '/oa/hr/makeup', query: { id } })
             return
           }
         }
