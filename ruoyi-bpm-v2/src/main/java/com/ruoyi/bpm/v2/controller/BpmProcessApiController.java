@@ -17,6 +17,7 @@ import com.ruoyi.bpm.v2.domain.BpmProcessInstance;
 import com.ruoyi.bpm.v2.domain.BpmTask;
 import com.ruoyi.bpm.v2.domain.BpmTaskHistory;
 import com.ruoyi.bpm.v2.dto.CompleteTaskDTO;
+import com.ruoyi.bpm.v2.dto.ReturnTaskDTO;
 import com.ruoyi.bpm.v2.dto.StartProcessDTO;
 import com.ruoyi.bpm.v2.service.IBpmProcessDefinitionService;
 import com.ruoyi.bpm.v2.service.IBpmProcessInstanceService;
@@ -107,8 +108,9 @@ public class BpmProcessApiController {
 
     @PostMapping("/tasks/{taskId}/returnToPrevious")
     public BpmApiResult<Map<String, Object>> returnToPrevious(@PathVariable String taskId,
-                                                              @RequestBody CompleteTaskDTO dto) {
-        BpmTask task = taskService.returnToPrevious(taskId, dto.getOperator(), dto.getOpinion());
+                                                              @RequestBody ReturnTaskDTO dto) {
+        BpmTask task = taskService.returnToPrevious(taskId, dto.getOperator(), dto.getTargetNodeId(),
+                dto.getReturnAssignee(), dto.getOpinion());
         List<BpmTask> nextTasks = taskService.selectTodoList(null, null).stream()
                 .filter(t -> t.getInstanceId().equals(task.getInstanceId()))
                 .collect(Collectors.toList());
@@ -116,7 +118,7 @@ public class BpmProcessApiController {
         Map<String, Object> result = new HashMap<>();
         result.put("taskId", taskId);
         result.put("instanceId", task.getInstanceId());
-        result.put("nextNode", nextTasks.isEmpty() ? "" : nextTasks.get(0).getNodeName());
+        result.put("returnedNode", nextTasks.isEmpty() ? "" : nextTasks.get(0).getNodeName());
         result.put("nextTasks", nextTasks.stream().map(this::toTaskVO).collect(Collectors.toList()));
         return BpmApiResult.ok(result);
     }

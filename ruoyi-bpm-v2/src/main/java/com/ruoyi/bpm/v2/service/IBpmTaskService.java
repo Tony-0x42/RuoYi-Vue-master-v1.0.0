@@ -43,6 +43,7 @@ public interface IBpmTaskService {
 
     /**
      * 退回到上一办理人
+     * @param returnAssignee 强制指定的退回办理人，覆盖目标节点的 assigneeType 解析结果
      */
-    BpmTask returnToPrevious(String taskId, Long operator, String opinion);
+    BpmTask returnToPrevious(String taskId, Long operator, String targetNodeId, Long returnAssignee, String opinion);
 }

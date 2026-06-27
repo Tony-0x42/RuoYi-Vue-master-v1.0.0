@@ -7,13 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson2.JSON;
-import com.ruoyi.bpm.v2.domain.BpmProcessInstance;
 import com.ruoyi.bpm.v2.domain.BpmTask;
-import com.ruoyi.bpm.v2.dto.ReturnTarget;
 import com.ruoyi.bpm.v2.engine.runtime.BpmRuntimeEngine;
-import com.ruoyi.bpm.v2.mapper.BpmProcessInstanceMapper;
 import com.ruoyi.bpm.v2.mapper.BpmTaskMapper;
-import com.ruoyi.bpm.v2.service.IBpmProcessPreviewService;
 import com.ruoyi.bpm.v2.service.IBpmTaskService;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
@@ -29,12 +25,6 @@ public class BpmTaskServiceImpl implements IBpmTaskService {
 
     @Autowired
     private BpmTaskMapper taskMapper;
-
-    @Autowired
-    private BpmProcessInstanceMapper instanceMapper;
-
-    @Autowired
-    private IBpmProcessPreviewService previewService;
 
     @Override
     public BpmTask selectById(String id) {
@@ -75,7 +65,7 @@ public class BpmTaskServiceImpl implements IBpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BpmTask returnToPrevious(String taskId, Long operator, String opinion) {
+    public BpmTask returnToPrevious(String taskId, Long operator, String targetNodeId, Long returnAssignee, String opinion) {
         BpmTask task = taskMapper.selectById(taskId);
         if (task == null) {
             throw new ServiceException("任务不存在");
@@ -83,18 +73,10 @@ public class BpmTaskServiceImpl implements IBpmTaskService {
         if (!hasTaskPermission(task, operator)) {
             throw new ServiceException("无权限处理该任务");
         }
-        ReturnTarget target = previewService.getReturnTarget(taskId);
 
-        BpmProcessInstance instance = instanceMapper.selectById(task.getInstanceId());
-        if (instance == null) {
-            throw new ServiceException("流程实例不存在");
-        }
-        Map<String, Object> vars = runtimeEngine.parseVariables(instance.getVariables());
-        vars.put("approvalAssignee", target.getTargetUserId());
-        instance.setVariables(JSON.toJSONString(vars));
-        instanceMapper.update(instance);
-
-        return runtimeEngine.returnTask(taskId, operator, target.getTargetNodeId(), opinion);
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("returnAssignee", returnAssignee);
+        return runtimeEngine.returnTask(taskId, operator, targetNodeId, opinion, vars);
     }
 
     private boolean hasTaskPermission(BpmTask task, Long operator) {

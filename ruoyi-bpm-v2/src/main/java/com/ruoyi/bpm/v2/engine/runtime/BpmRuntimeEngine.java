@@ -211,6 +211,15 @@ public class BpmRuntimeEngine {
      */
     @Transactional(rollbackFor = Exception.class)
     public BpmTask returnTask(String taskId, Long operator, String targetNodeId, String opinion) {
+        return returnTask(taskId, operator, targetNodeId, opinion, null);
+    }
+
+    /**
+     * 退回任务（支持传入流程变量，可强制指定退回办理人）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public BpmTask returnTask(String taskId, Long operator, String targetNodeId, String opinion,
+                              Map<String, Object> variables) {
         BpmTask task = taskMapper.selectById(taskId);
         if (task == null) {
             throw new ServiceException("任务不存在");
@@ -231,7 +240,22 @@ public class BpmRuntimeEngine {
         if (targetNode == null) {
             throw new ServiceException("目标节点不存在");
         }
-        enterNode(instance, model, targetNode, parseVariables(instance.getVariables()));
+        Map<String, Object> mergedVars = parseVariables(instance.getVariables());
+        if (variables != null) {
+            mergedVars.putAll(variables);
+        }
+        enterNode(instance, model, targetNode, mergedVars);
+
+        // 若显式指定退回办理人，则覆盖目标节点自身分配结果
+        Long returnAssignee = extractSingleReturnAssignee(variables == null ? null : variables.get("returnAssignee"));
+        if (returnAssignee != null) {
+            List<BpmTask> activeTasks = taskMapper.selectPendingByNode(instance.getId(), targetNodeId);
+            for (BpmTask activeTask : activeTasks) {
+                activeTask.setAssignee(returnAssignee);
+                activeTask.setCandidates(null);
+                taskMapper.update(activeTask);
+            }
+        }
         return task;
     }
 
@@ -616,6 +640,20 @@ public class BpmRuntimeEngine {
             return new HashMap<>();
         }
         return JSON.parseObject(variablesJson, Map.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Long extractSingleReturnAssignee(Object value) {
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        if (value instanceof List) {
+            List<?> list = (List<?>) value;
+            if (list.size() == 1 && list.get(0) instanceof Number) {
+                return ((Number) list.get(0)).longValue();
+            }
+        }
+        return null;
     }
 
     private void saveHistory(String taskId, String instanceId, String nodeId, Long operator, String action,
