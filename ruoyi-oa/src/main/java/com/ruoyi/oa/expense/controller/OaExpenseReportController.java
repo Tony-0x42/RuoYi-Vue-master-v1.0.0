@@ -74,9 +74,7 @@ public class OaExpenseReportController extends BaseController
     @PostMapping("/{id}/submit")
     public AjaxResult submit(@PathVariable Long id)
     {
-        OaExpenseReport report = new OaExpenseReport();
-        report.setId(id);
-        return toAjax(reportService.submit(report));
+        return toAjax(reportService.submit(id));
     }
 
     @PreAuthorize("@ss.hasPermi('oa:expenseReport:list')")

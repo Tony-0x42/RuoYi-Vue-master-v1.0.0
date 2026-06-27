@@ -48,4 +48,9 @@ public interface IOaExpenseLoanService
      * 新增还款记录
      */
     int addRepayment(OaExpenseRepayment repayment);
+
+    /**
+     * 提交借款单并启动审批流程
+     */
+    int submit(Long id);
 }

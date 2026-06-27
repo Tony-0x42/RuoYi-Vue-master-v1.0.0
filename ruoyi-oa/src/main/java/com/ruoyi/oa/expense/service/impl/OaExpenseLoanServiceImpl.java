@@ -4,7 +4,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.bpm.v2.domain.BpmProcessInstance;
+import com.ruoyi.oa.common.OaBpmHelper;
 import com.ruoyi.oa.expense.domain.OaExpenseLoan;
 import com.ruoyi.oa.expense.domain.OaExpenseRepayment;
 import com.ruoyi.oa.expense.mapper.OaExpenseLoanMapper;
@@ -22,6 +25,9 @@ public class OaExpenseLoanServiceImpl implements IOaExpenseLoanService
 
     @Autowired
     private OaExpenseRepaymentMapper repaymentMapper;
+
+    @Autowired
+    private OaBpmHelper bpmHelper;
 
     @Override
     public OaExpenseLoan selectById(Long id)
@@ -98,5 +104,25 @@ public class OaExpenseLoanServiceImpl implements IOaExpenseLoanService
             loanMapper.updateRepaidAmount(loan);
         }
         return rows;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int submit(Long id)
+    {
+        OaExpenseLoan existing = loanMapper.selectById(id);
+        if (existing == null)
+        {
+            throw new ServiceException("借款单不存在");
+        }
+        if (existing.getStatus() == null || existing.getStatus() != 0)
+        {
+            throw new ServiceException("只有草稿状态可提交");
+        }
+        BpmProcessInstance instance = bpmHelper.startApproval("oa_expense_loan", "expense_loan:" + id, existing.getUserId());
+        existing.setStatus(1);
+        existing.setProcessInstanceId(instance.getId());
+        existing.setUpdateBy(SecurityUtils.getUsername());
+        return loanMapper.update(existing);
     }
 }

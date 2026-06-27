@@ -65,6 +65,8 @@ export default {
       repayment: 'Repayment',
       repaymentAmount: 'Repayment Amount',
       repaymentSuccess: 'Repayment successful',
+      loanSubmit: 'Submit',
+      loanSubmitSuccess: 'Submitted successfully',
       loanDraft: 'Draft',
       loanApproving: 'Approving',
       loanPassed: 'Approved',
@@ -123,7 +125,8 @@ export default {
         deleteStandard: 'Are you sure to delete standard(s) "{ids}"?',
         deleteInvoice: 'Are you sure to delete invoice(s) "{ids}"?',
         deleteBudget: 'Are you sure to delete budget(s) "{ids}"?',
-        deleteLoan: 'Are you sure to delete loan(s) "{ids}"?'
+        deleteLoan: 'Are you sure to delete loan(s) "{ids}"?',
+        submitLoan: 'Are you sure to submit loan "{id}"?'
       }
     }
   }

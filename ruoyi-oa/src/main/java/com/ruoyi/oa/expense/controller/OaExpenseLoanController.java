@@ -85,4 +85,12 @@ public class OaExpenseLoanController extends BaseController
         repayment.setLoanId(id);
         return toAjax(loanService.addRepayment(repayment));
     }
+
+    @PreAuthorize("@ss.hasPermi('oa:expenseLoan:edit')")
+    @Log(title = "借款单提交", businessType = BusinessType.UPDATE)
+    @PostMapping("/{id}/submit")
+    public AjaxResult submit(@PathVariable Long id)
+    {
+        return toAjax(loanService.submit(id));
+    }
 }

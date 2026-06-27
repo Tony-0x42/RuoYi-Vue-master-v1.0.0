@@ -40,9 +40,9 @@ public interface IOaExpenseReportService
     int deleteByIds(Long[] ids);
 
     /**
-     * 提交报销单（MVP模拟审批）
+     * 提交报销单并启动审批流程
      */
-    int submit(OaExpenseReport report);
+    int submit(Long id);
 
     /**
      * 费用统计

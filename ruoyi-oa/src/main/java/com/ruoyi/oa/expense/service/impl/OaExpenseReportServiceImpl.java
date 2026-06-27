@@ -8,7 +8,10 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.bpm.v2.domain.BpmProcessInstance;
+import com.ruoyi.oa.common.OaBpmHelper;
 import com.ruoyi.oa.expense.domain.OaExpenseBudget;
 import com.ruoyi.oa.expense.domain.OaExpenseInvoice;
 import com.ruoyi.oa.expense.domain.OaExpenseItem;
@@ -46,6 +49,9 @@ public class OaExpenseReportServiceImpl implements IOaExpenseReportService
 
     @Autowired
     private OaExpenseInvoiceMapper invoiceMapper;
+
+    @Autowired
+    private OaBpmHelper bpmHelper;
 
     @Override
     public OaExpenseReport selectById(Long id)
@@ -112,24 +118,22 @@ public class OaExpenseReportServiceImpl implements IOaExpenseReportService
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int submit(OaExpenseReport report)
+    public int submit(Long id)
     {
-        OaExpenseReport existing = reportMapper.selectById(report.getId());
+        OaExpenseReport existing = reportMapper.selectById(id);
         if (existing == null)
         {
-            return 0;
+            throw new ServiceException("报销单不存在");
         }
-        // MVP: 模拟提交后直接审批通过进入待付款，不接入真实流程引擎
-        existing.setStatus(3);
+        if (existing.getStatus() == null || existing.getStatus() != 0)
+        {
+            throw new ServiceException("只有草稿状态可提交");
+        }
+        BpmProcessInstance instance = bpmHelper.startApproval("oa_expense_report", "expense_report:" + id, existing.getUserId());
+        existing.setStatus(1);
         existing.setSubmitTime(new Date());
-        existing.setProcessInstanceId("expense_" + System.currentTimeMillis());
+        existing.setProcessInstanceId(instance.getId());
         existing.setUpdateBy(SecurityUtils.getUsername());
-
-        // 预算占用
-        occupyBudget(existing);
-        // 借款冲销
-        offsetLoan(existing);
-
         return reportMapper.updateStatus(existing);
     }
 

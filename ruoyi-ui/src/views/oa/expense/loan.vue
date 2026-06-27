@@ -86,6 +86,14 @@
           <el-button
             size="mini"
             type="text"
+            icon="el-icon-s-promotion"
+            @click="handleSubmit(scope.row)"
+            v-hasPermi="['oa:expenseLoan:edit']"
+            v-if="scope.row.status === 0"
+          >{{ $t('oa.expense.loanSubmit') }}</el-button>
+          <el-button
+            size="mini"
+            type="text"
             icon="el-icon-money"
             @click="handleRepayment(scope.row)"
             v-hasPermi="['oa:expenseLoan:edit']"
@@ -153,7 +161,7 @@
 </template>
 
 <script>
-import { listLoan, getLoan, addLoan, updateLoan, delLoan, repaymentLoan } from "@/api/oa/expense"
+import { listLoan, getLoan, addLoan, updateLoan, delLoan, repaymentLoan, submitLoan } from "@/api/oa/expense"
 
 export default {
   name: "OaExpenseLoan",
@@ -255,6 +263,14 @@ export default {
       this.currentLoanId = row.id
       this.repaymentForm = { amount: 0 }
       this.repaymentOpen = true
+    },
+    handleSubmit(row) {
+      this.$modal.confirm(this.$t('oa.expense.confirm.submitLoan', { id: row.id })).then(function() {
+        return submitLoan(row.id)
+      }).then(() => {
+        this.getList()
+        this.$modal.msgSuccess(this.$t('oa.expense.loanSubmitSuccess'))
+      }).catch(() => {})
     },
     submitForm() {
       this.$refs["form"].validate(valid => {

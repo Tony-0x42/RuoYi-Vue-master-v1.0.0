@@ -65,6 +65,8 @@ export default {
       repayment: '还款',
       repaymentAmount: '还款金额',
       repaymentSuccess: '还款成功',
+      loanSubmit: '提交审批',
+      loanSubmitSuccess: '提交成功',
       loanDraft: '草稿',
       loanApproving: '审批中',
       loanPassed: '已通过',
@@ -123,7 +125,8 @@ export default {
         deleteStandard: '是否确认删除费用标准编号为"{ids}"的数据项？',
         deleteInvoice: '是否确认删除发票编号为"{ids}"的数据项？',
         deleteBudget: '是否确认删除预算编号为"{ids}"的数据项？',
-        deleteLoan: '是否确认删除借款单编号为"{ids}"的数据项？'
+        deleteLoan: '是否确认删除借款单编号为"{ids}"的数据项？',
+        submitLoan: '是否确认提交借款单编号为"{id}"的数据项？'
       }
     }
   }
