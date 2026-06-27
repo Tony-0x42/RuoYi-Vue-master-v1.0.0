@@ -69,7 +69,7 @@
 
     <el-table v-loading="loading" :data="variableList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="变量编号" align="center" prop="variableId" />
+      <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
       <el-table-column label="变量名称" align="center" prop="variableName" :show-overflow-tooltip="true" />
       <el-table-column label="变量编码" align="center" prop="variableCode" :show-overflow-tooltip="true" />
       <el-table-column label="变量类型" align="center" prop="variableType">

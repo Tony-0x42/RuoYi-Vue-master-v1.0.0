@@ -61,6 +61,7 @@
 
     <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
+      <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
       <el-table-column label="用户名称" prop="userName" :show-overflow-tooltip="true" />
       <el-table-column label="用户昵称" prop="nickName" :show-overflow-tooltip="true" />
       <el-table-column label="邮箱" prop="email" :show-overflow-tooltip="true" />

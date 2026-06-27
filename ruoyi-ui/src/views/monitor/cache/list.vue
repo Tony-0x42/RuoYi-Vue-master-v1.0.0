@@ -20,11 +20,11 @@
             @row-click="getCacheKeys"
             style="width: 100%"
           >
-            <el-table-column
-              label="序号"
-              width="60"
-              type="index"
-            ></el-table-column>
+            <el-table-column label="序号" align="center" width="60">
+              <template slot-scope="scope">
+                <span>{{ scope.$index + 1 }}</span>
+              </template>
+            </el-table-column>
 
             <el-table-column
               label="缓存名称"
@@ -78,11 +78,11 @@
             @row-click="handleCacheValue"
             style="width: 100%"
           >
-            <el-table-column
-              label="序号"
-              width="60"
-              type="index"
-            ></el-table-column>
+            <el-table-column label="序号" align="center" width="60">
+              <template slot-scope="scope">
+                <span>{{ scope.$index + 1 }}</span>
+              </template>
+            </el-table-column>
             <el-table-column
               label="缓存键名"
               align="center"

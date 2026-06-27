@@ -31,7 +31,7 @@
 
     <el-table v-loading="loading" :data="templateList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="模板ID" align="center" prop="templateId" width="80" />
+      <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
       <el-table-column label="模板名称" align="center" prop="templateName" />
       <el-table-column label="编码" align="center" prop="templateCode" />
       <el-table-column label="默认模板" align="center" prop="isDefault" width="90">

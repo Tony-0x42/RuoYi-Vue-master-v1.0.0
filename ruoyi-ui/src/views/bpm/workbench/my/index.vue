@@ -62,6 +62,11 @@
             <el-button type="primary" size="small" icon="el-icon-plus" @click="addLayoutItem">添加</el-button>
           </div>
           <el-table :data="layoutList" size="small" border style="margin-top: 10px;">
+            <el-table-column label="序号" width="50" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.$index + 1 }}</span>
+              </template>
+            </el-table-column>
             <el-table-column label="排序" width="60" align="center">
               <template slot-scope="scope">
                 <el-button size="mini" type="text" icon="el-icon-top" @click="moveUp(scope.$index)"></el-button>

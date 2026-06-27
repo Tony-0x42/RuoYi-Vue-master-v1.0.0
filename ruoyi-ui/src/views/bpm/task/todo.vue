@@ -30,7 +30,7 @@
     </el-row>
 
     <el-table v-loading="loading" :data="taskList">
-      <el-table-column label="Flowable任务ID" align="center" prop="flowableTaskId" :show-overflow-tooltip="true" />
+      <index-column :page="queryParams.pageNum" :size="queryParams.pageSize" />
       <el-table-column label="流程标题" align="center" prop="instanceTitle" :show-overflow-tooltip="true" />
       <el-table-column label="节点名称" align="center" prop="nodeName" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
