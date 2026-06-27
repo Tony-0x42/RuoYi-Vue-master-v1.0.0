@@ -13,8 +13,6 @@ VALUES (3, 100, 'approver', '审批人', '00', 'approver@example.com', '13800138
 -- 关联用户与角色
 INSERT IGNORE INTO sys_user_role (user_id, role_id) VALUES (3, 3);
 
--- 为审批人角色分配所有 OA 菜单权限（3000 及其所有子菜单、孙菜单）
+-- 为审批人角色分配所有 OA 菜单权限（menu_id 3000-3999 的所有菜单，包含新增二级目录及其子孙菜单）
 INSERT IGNORE INTO sys_role_menu (role_id, menu_id)
-SELECT 3, menu_id FROM sys_menu WHERE menu_id = 3000 OR parent_id = 3000
-UNION
-SELECT 3, menu_id FROM sys_menu WHERE parent_id IN (SELECT menu_id FROM sys_menu WHERE parent_id = 3000);
+SELECT 3, menu_id FROM sys_menu WHERE menu_id BETWEEN 3000 AND 3999;
