@@ -132,8 +132,7 @@
 </template>
 
 <script>
-import { listReport, delReport, submitReport } from "@/api/oa/expense"
-import { listCategory } from "@/api/oa/expense"
+import { listReport, delReport, submitReport, listCategory } from "@/api/oa/expense"
 
 export default {
   name: "OaExpenseReport",

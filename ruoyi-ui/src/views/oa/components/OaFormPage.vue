@@ -40,24 +40,8 @@ export default {
     }
   },
   methods: {
-    getFormComponent() {
-      const slot = this.$slots.form
-      if (!slot || !slot.length) {
-        return null
-      }
-      return slot[0].componentInstance || null
-    },
     handleSubmit() {
-      const form = this.getFormComponent()
-      if (form && typeof form.validate === "function") {
-        form.validate(valid => {
-          if (valid) {
-            this.$emit("submit")
-          }
-        })
-      } else {
-        this.$emit("submit")
-      }
+      this.$emit("submit")
     },
     handleSave() {
       this.$emit("save")

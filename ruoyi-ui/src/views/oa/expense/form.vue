@@ -1,5 +1,5 @@
 <template>
-  <oa-form-page :title="$t('oa.expense.report')" @submit="handleSubmit" @save="handleSave" @close="handleClose">
+  <oa-form-page @submit="handleSubmit" @save="handleSave" @close="handleClose">
     <template #form>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
@@ -186,7 +186,7 @@ export default {
         if (!this.form.items) {
           this.form.items = []
         }
-      })
+      }).catch(() => {})
     },
     addItem() {
       this.form.items.push({
@@ -209,21 +209,26 @@ export default {
         if (data.id != undefined) {
           updateReport(data).then(() => {
             this.$modal.msgSuccess(this.$t('common.editSuccess'))
-          })
+          }).catch(() => {})
         } else {
           addReport(data).then(response => {
             this.form.id = response.data
             this.$modal.msgSuccess(this.$t('common.addSuccess'))
-          })
+          }).catch(() => {})
         }
       })
     },
     handleSubmit() {
-      if (!this.form.id) {
-        this.$modal.msgWarning("请先保存报销单")
-        return
-      }
-      this.flowVisible = true
+      this.$refs["form"].validate(valid => {
+        if (!valid) {
+          return
+        }
+        if (!this.form.id) {
+          this.$modal.msgWarning("请先保存报销单")
+          return
+        }
+        this.flowVisible = true
+      })
     },
     handleClose() {
       this.$router.back()
