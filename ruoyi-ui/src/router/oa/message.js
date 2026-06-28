@@ -5,7 +5,6 @@ export default [
     path: '/oa/message/form',
     component: Layout,
     hidden: true,
-    permissions: ['oa:message:send'],
     children: [
       {
         path: '',

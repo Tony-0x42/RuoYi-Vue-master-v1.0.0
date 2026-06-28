@@ -5,7 +5,6 @@ export default [
     path: '/oa/assetDir/asset/form',
     component: Layout,
     hidden: true,
-    permissions: ['oa:asset:add'],
     children: [
       {
         path: '',

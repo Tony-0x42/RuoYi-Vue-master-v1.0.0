@@ -6,7 +6,6 @@ export default [
     path: '/oa/addressbook/form',
     component: Layout,
     hidden: true,
-    permissions: ['oa:addressbook:list'],
     children: [
       {
         path: '',

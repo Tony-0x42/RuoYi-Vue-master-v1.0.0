@@ -5,7 +5,6 @@ export default [
     path: '/oa/messageTemplate/form',
     component: Layout,
     hidden: true,
-    permissions: ['oa:messageTemplate:edit'],
     children: [
       {
         path: '',

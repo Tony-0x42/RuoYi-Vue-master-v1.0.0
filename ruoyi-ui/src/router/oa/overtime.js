@@ -5,7 +5,6 @@ export default [
     path: '/oa/hr/overtime/form',
     component: Layout,
     hidden: true,
-    permissions: ['oa:attendanceOvertime:add'],
     children: [
       {
         path: '',

@@ -5,7 +5,6 @@ export default [
     path: '/oa/assetDir/assetInventory/form',
     component: Layout,
     hidden: true,
-    permissions: ['oa:assetInventory:add'],
     children: [
       {
         path: '',
