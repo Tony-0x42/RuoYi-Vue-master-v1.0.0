@@ -96,9 +96,9 @@ public class OaAssetController extends BaseController
     @PreAuthorize("@ss.hasPermi('oa:asset:edit')")
     @Log(title = "资产台账", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/receive")
-    public AjaxResult receive(@PathVariable Long id, @RequestParam Long userId, @RequestParam String userName)
+    public AjaxResult receive(@PathVariable Long id, @RequestBody Map<String, Object> body)
     {
-        return toAjax(assetService.receive(id, userId, userName));
+        return success(assetService.receive(id, body));
     }
 
     /**
@@ -118,10 +118,9 @@ public class OaAssetController extends BaseController
     @PreAuthorize("@ss.hasPermi('oa:asset:edit')")
     @Log(title = "资产台账", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/transfer")
-    public AjaxResult transfer(@PathVariable Long id, @RequestParam Long fromUserId, @RequestParam String fromUserName,
-                               @RequestParam Long toUserId, @RequestParam String toUserName)
+    public AjaxResult transfer(@PathVariable Long id, @RequestBody Map<String, Object> body)
     {
-        return toAjax(assetService.transfer(id, fromUserId, fromUserName, toUserId, toUserName));
+        return success(assetService.transfer(id, body));
     }
 
     /**
@@ -130,11 +129,9 @@ public class OaAssetController extends BaseController
     @PreAuthorize("@ss.hasPermi('oa:asset:edit')")
     @Log(title = "资产台账", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/repair")
-    public AjaxResult repair(@PathVariable Long id, @RequestParam String reason,
-                             @RequestParam(required = false) java.math.BigDecimal cost,
-                             @RequestParam(required = false) String vendor)
+    public AjaxResult repair(@PathVariable Long id, @RequestBody Map<String, Object> body)
     {
-        return toAjax(assetService.repair(id, reason, cost, vendor));
+        return success(assetService.repair(id, body));
     }
 
     /**
@@ -143,9 +140,9 @@ public class OaAssetController extends BaseController
     @PreAuthorize("@ss.hasPermi('oa:asset:edit')")
     @Log(title = "资产台账", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/scrap")
-    public AjaxResult scrap(@PathVariable Long id, @RequestParam String reason, @RequestParam(required = false) String disposalMethod)
+    public AjaxResult scrap(@PathVariable Long id, @RequestBody Map<String, Object> body)
     {
-        return toAjax(assetService.scrap(id, reason, disposalMethod));
+        return success(assetService.scrap(id, body));
     }
 
     /**

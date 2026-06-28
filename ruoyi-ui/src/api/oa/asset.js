@@ -43,24 +43,24 @@ export function delAsset(id) {
 }
 
 // 资产操作
-export function receiveAsset(id, userId, userName) {
-  return request({ url: '/api/v1/oa/assets/' + id + '/receive', method: 'post', params: { userId, userName } })
+export function receiveAsset(id, data) {
+  return request({ url: '/api/v1/oa/assets/' + id + '/receive', method: 'post', data })
 }
 
 export function returnAsset(id, userId, userName) {
   return request({ url: '/api/v1/oa/assets/' + id + '/return', method: 'post', params: { userId, userName } })
 }
 
-export function transferAsset(id, fromUserId, fromUserName, toUserId, toUserName) {
-  return request({ url: '/api/v1/oa/assets/' + id + '/transfer', method: 'post', params: { fromUserId, fromUserName, toUserId, toUserName } })
+export function transferAsset(id, data) {
+  return request({ url: '/api/v1/oa/assets/' + id + '/transfer', method: 'post', data })
 }
 
-export function repairAsset(id, reason, cost, vendor) {
-  return request({ url: '/api/v1/oa/assets/' + id + '/repair', method: 'post', params: { reason, cost, vendor } })
+export function repairAsset(id, data) {
+  return request({ url: '/api/v1/oa/assets/' + id + '/repair', method: 'post', data })
 }
 
-export function scrapAsset(id, reason, disposalMethod) {
-  return request({ url: '/api/v1/oa/assets/' + id + '/scrap', method: 'post', params: { reason, disposalMethod } })
+export function scrapAsset(id, data) {
+  return request({ url: '/api/v1/oa/assets/' + id + '/scrap', method: 'post', data })
 }
 
 export function finishRepair(repairId) {

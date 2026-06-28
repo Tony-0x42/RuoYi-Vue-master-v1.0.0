@@ -23,17 +23,17 @@ public interface IOaAssetService
 
     int deleteByIds(Long[] ids);
 
-    int receive(Long id, Long userId, String userName);
+    Long receive(Long id, Map<String, Object> params);
 
     int returnAsset(Long id, Long userId, String userName);
 
-    int transfer(Long id, Long fromUserId, String fromUserName, Long toUserId, String toUserName);
+    Long transfer(Long id, Map<String, Object> params);
 
-    int repair(Long id, String reason, java.math.BigDecimal cost, String vendor);
+    Long repair(Long id, Map<String, Object> params);
 
     int finishRepair(Long repairId);
 
-    int scrap(Long id, String reason, String disposalMethod);
+    Long scrap(Long id, Map<String, Object> params);
 
     Map<String, Object> statistics();
 }

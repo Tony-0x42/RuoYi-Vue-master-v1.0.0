@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :title="dialogTitle"
-    :visible="visible"
+    :visible.sync="dialogVisible"
     width="600px"
     append-to-body
     :close-on-click-modal="false"
@@ -97,10 +97,15 @@ export default {
     formData: {
       type: Object,
       default: () => ({})
+    },
+    submitApi: {
+      type: Function,
+      default: null
     }
   },
   data() {
     return {
+      dialogVisible: this.visible,
       loading: false,
       submitLoading: false,
       returnLoading: false,
@@ -146,10 +151,14 @@ export default {
   },
   watch: {
     visible(val) {
+      this.dialogVisible = val
       if (val) {
         this.resetData()
         this.loadPreview()
       }
+    },
+    dialogVisible(val) {
+      this.$emit('update:visible', val)
     }
   },
   methods: {
@@ -200,22 +209,27 @@ export default {
           ...this.variables,
           approvalAssignee: this.selectedCandidates
         }
-        const promise = this.taskId
-          ? completeTask(this.taskId, {
-              operator: this.userId,
-              action: 'AGREE',
-              opinion: this.formModel.opinion,
-              formData: this.formData,
-              variables,
-              nextAssignees: this.selectedCandidates
-            })
-          : startProcess({
-              processDefinitionKey: this.processKey,
-              businessKey: this.businessKey,
-              starter: this.userId,
-              formData: this.formData,
-              variables
-            })
+        let promise
+        if (this.submitApi) {
+          promise = this.submitApi({ approvalAssignee: this.selectedCandidates, variables, opinion: this.formModel.opinion })
+        } else if (this.taskId) {
+          promise = completeTask(this.taskId, {
+            operator: this.userId,
+            action: 'AGREE',
+            opinion: this.formModel.opinion,
+            formData: this.formData,
+            variables,
+            nextAssignees: this.selectedCandidates
+          })
+        } else {
+          promise = startProcess({
+            processDefinitionKey: this.processKey,
+            businessKey: this.businessKey,
+            starter: this.userId,
+            formData: this.formData,
+            variables
+          })
+        }
         promise.then(response => {
           this.$message.success('提交成功')
           this.$emit('success', response.data)
@@ -255,6 +269,7 @@ export default {
       })
     },
     handleClose() {
+      this.dialogVisible = false
       this.$emit('close')
     }
   }

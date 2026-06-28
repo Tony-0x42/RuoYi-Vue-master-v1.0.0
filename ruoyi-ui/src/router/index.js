@@ -6,7 +6,16 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/layout'
 import oaAssetRoutes from './oa/asset'
+import oaAssetReceiveRoutes from './oa/assetReceive'
+import oaAssetTransferRoutes from './oa/assetTransfer'
+import oaAssetRepairRoutes from './oa/assetRepair'
+import oaAssetScrapRoutes from './oa/assetScrap'
 import oaExpenseRoutes from './oa/expense'
+import oaExpenseLoanRoutes from './oa/expenseLoan'
+import oaLeaveRoutes from './oa/leave'
+import oaOvertimeRoutes from './oa/overtime'
+import oaTripRoutes from './oa/trip'
+import oaMakeupRoutes from './oa/makeup'
 
 /**
  * Note: 路由配置项
@@ -213,7 +222,16 @@ export const dynamicRoutes = [
     ]
   },
   ...oaAssetRoutes,
-  ...oaExpenseRoutes
+  ...oaAssetReceiveRoutes,
+  ...oaAssetTransferRoutes,
+  ...oaAssetRepairRoutes,
+  ...oaAssetScrapRoutes,
+  ...oaExpenseRoutes,
+  ...oaExpenseLoanRoutes,
+  ...oaLeaveRoutes,
+  ...oaOvertimeRoutes,
+  ...oaTripRoutes,
+  ...oaMakeupRoutes
 ]
 
 // 防止连续点击多次路由报错

@@ -311,9 +311,10 @@ export function repaymentLoan(id, data) {
 }
 
 // 提交借款单
-export function submitLoan(id) {
+export function submitLoan(id, data) {
   return request({
     url: '/api/v1/oa/expense/loans/' + id + '/submit',
-    method: 'post'
+    method: 'post',
+    data: data
   })
 }
