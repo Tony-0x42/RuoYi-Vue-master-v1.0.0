@@ -41,8 +41,11 @@ public interface IOaExpenseReportService
 
     /**
      * 提交报销单并启动审批流程
+     *
+     * @param id 报销单 ID
+     * @param approverId 审批人，可以是 {@link Long} 或 {@code List<Long>}
      */
-    int submit(Long id);
+    int submit(Long id, Object approverId);
 
     /**
      * 费用统计

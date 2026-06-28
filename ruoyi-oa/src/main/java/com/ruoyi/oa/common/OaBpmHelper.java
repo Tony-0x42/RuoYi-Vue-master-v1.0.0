@@ -8,6 +8,7 @@ import com.ruoyi.bpm.v2.domain.BpmProcessInstance;
 import com.ruoyi.bpm.v2.domain.BpmTask;
 import com.ruoyi.bpm.v2.service.IBpmProcessInstanceService;
 import com.ruoyi.bpm.v2.service.IBpmTaskService;
+import com.ruoyi.common.utils.SecurityUtils;
 
 /**
  * OA 流程处理工具类，封装 BPM v2 引擎的常用审批操作。
@@ -46,9 +47,23 @@ public class OaBpmHelper {
      * @return 流程实例
      */
     public BpmProcessInstance startApproval(String processKey, String businessKey, Long starter, Long approverId) {
+        return startApproval(processKey, businessKey, starter, (Object) approverId);
+    }
+
+    /**
+     * 启动审批流程实例，指定办理人（支持单个用户 ID 或用户 ID 列表）。
+     *
+     * @param processKey 流程定义 Key
+     * @param businessKey 业务标识
+     * @param starter 发起人用户 ID
+     * @param approver 办理人，可以是 {@link Long} 或 {@code List<Long>}
+     * @return 流程实例
+     */
+    public BpmProcessInstance startApproval(String processKey, String businessKey, Long starter, Object approver) {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("approvalAssignee", approverId);
-        return instanceService.start(processKey, businessKey, starter, null, variables);
+        variables.put("approvalAssignee", approver);
+        Long realStarter = starter != null ? starter : SecurityUtils.getUserId();
+        return instanceService.start(processKey, businessKey, realStarter, null, variables);
     }
 
     /**

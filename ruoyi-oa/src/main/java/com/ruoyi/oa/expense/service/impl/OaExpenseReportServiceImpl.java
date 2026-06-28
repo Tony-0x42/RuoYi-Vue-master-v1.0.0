@@ -118,7 +118,7 @@ public class OaExpenseReportServiceImpl implements IOaExpenseReportService
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int submit(Long id)
+    public int submit(Long id, Object approverId)
     {
         OaExpenseReport existing = reportMapper.selectById(id);
         if (existing == null)
@@ -129,7 +129,8 @@ public class OaExpenseReportServiceImpl implements IOaExpenseReportService
         {
             throw new ServiceException("只有草稿状态可提交");
         }
-        BpmProcessInstance instance = bpmHelper.startApproval("oa_expense_report", "expense_report:" + id, existing.getUserId());
+        Long starter = existing.getUserId() != null ? existing.getUserId() : SecurityUtils.getUserId();
+        BpmProcessInstance instance = bpmHelper.startApproval("oa_expense_report", "expense_report:" + id, starter, approverId);
         existing.setStatus(1);
         existing.setSubmitTime(new Date());
         existing.setProcessInstanceId(instance.getId());

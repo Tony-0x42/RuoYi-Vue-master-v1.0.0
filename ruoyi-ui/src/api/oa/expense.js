@@ -191,10 +191,11 @@ export function delReport(id) {
 }
 
 // 提交报销单
-export function submitReport(id) {
+export function submitReport(id, data) {
   return request({
     url: '/api/v1/oa/expense/reports/' + id + '/submit',
-    method: 'post'
+    method: 'post',
+    data: data
   })
 }
 
@@ -305,6 +306,15 @@ export function delLoan(id) {
 export function repaymentLoan(id, data) {
   return request({
     url: '/api/v1/oa/expense/loans/' + id + '/repayment',
+    method: 'post',
+    data: data
+  })
+}
+
+// 费用审批完成（报销/借款通用）
+export function completeExpenseApproval(data) {
+  return request({
+    url: '/api/v1/oa/expense/approvals/complete',
     method: 'post',
     data: data
   })

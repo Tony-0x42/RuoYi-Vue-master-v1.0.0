@@ -106,6 +106,22 @@
           <el-button
             size="mini"
             type="text"
+            icon="el-icon-check"
+            @click="handleApprove(scope.row, 'agree')"
+            v-hasPermi="['oa:expenseReport:approve']"
+            v-if="scope.row.status === 1"
+          >同意</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-close"
+            @click="handleApprove(scope.row, 'reject')"
+            v-hasPermi="['oa:expenseReport:approve']"
+            v-if="scope.row.status === 1"
+          >驳回</el-button>
+          <el-button
+            size="mini"
+            type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['oa:expenseReport:edit']"
@@ -227,15 +243,25 @@
         <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
       </div>
     </el-dialog>
+
+    <flow-submit-dialog
+      :visible.sync="submitOpen"
+      process-key="oa_expense_report"
+      :business-key="currentRow ? 'expense_report:' + currentRow.id : ''"
+      :submit-api="submitApi"
+      @success="handleSubmitSuccess"
+    />
   </div>
 </template>
 
 <script>
-import { listReport, getReport, addReport, updateReport, delReport, submitReport } from "@/api/oa/expense"
+import { listReport, getReport, addReport, updateReport, delReport, submitReport, completeExpenseApproval } from "@/api/oa/expense"
 import { listCategory, listInvoice, listAvailableLoan } from "@/api/oa/expense"
+import FlowSubmitDialog from "@/components/FlowSubmitDialog"
 
 export default {
   name: "OaExpenseReport",
+  components: { FlowSubmitDialog },
   data() {
     return {
       loading: true,
@@ -250,6 +276,8 @@ export default {
       availableLoanList: [],
       title: "",
       open: false,
+      submitOpen: false,
+      currentRow: null,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
@@ -382,11 +410,31 @@ export default {
       })
     },
     handleSubmit(row) {
-      this.$modal.confirm(this.$t('oa.expense.confirm.submit', { id: row.id })).then(function() {
-        return submitReport(row.id)
-      }).then(() => {
-        this.getList()
-        this.$modal.msgSuccess(this.$t('oa.expense.submitSuccess'))
+      this.currentRow = row
+      this.submitOpen = true
+    },
+    submitApi(data) {
+      return submitReport(this.currentRow.id, data)
+    },
+    handleSubmitSuccess() {
+      this.getList()
+      this.$modal.msgSuccess(this.$t('oa.expense.submitSuccess'))
+    },
+    handleApprove(row, action) {
+      const taskId = this.$route.query.taskId
+      if (!taskId) {
+        this.$modal.msgError('缺少任务标识，请从待办入口进入')
+        return
+      }
+      this.$prompt('请输入审批意见', action === 'agree' ? '同意' : '驳回', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPlaceholder: '审批意见'
+      }).then(({ value }) => {
+        completeExpenseApproval({ taskId: taskId, action: action, opinion: value || '' }).then(() => {
+          this.$modal.msgSuccess(action === 'agree' ? '审批通过' : '已驳回')
+          this.getList()
+        })
       }).catch(() => {})
     },
     handleDelete(row) {

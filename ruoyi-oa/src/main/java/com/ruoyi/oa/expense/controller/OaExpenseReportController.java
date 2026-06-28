@@ -1,6 +1,7 @@
 package com.ruoyi.oa.expense.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -72,9 +73,9 @@ public class OaExpenseReportController extends BaseController
     @PreAuthorize("@ss.hasPermi('oa:expenseReport:edit')")
     @Log(title = "报销单提交", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/submit")
-    public AjaxResult submit(@PathVariable Long id)
+    public AjaxResult submit(@PathVariable Long id, @RequestBody Map<String, Object> body)
     {
-        return toAjax(reportService.submit(id));
+        return toAjax(reportService.submit(id, body.get("approvalAssignee")));
     }
 
     @PreAuthorize("@ss.hasPermi('oa:expenseReport:list')")
