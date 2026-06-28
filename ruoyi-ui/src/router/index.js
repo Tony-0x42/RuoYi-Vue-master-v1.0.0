@@ -6,6 +6,7 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/layout'
 import oaAssetRoutes from './oa/asset'
+import oaAssetFormRoutes from './oa/assetForm'
 import oaAssetReceiveRoutes from './oa/assetReceive'
 import oaAssetTransferRoutes from './oa/assetTransfer'
 import oaAssetRepairRoutes from './oa/assetRepair'
@@ -241,6 +242,7 @@ export const dynamicRoutes = [
     ]
   },
   ...oaAssetRoutes,
+  ...oaAssetFormRoutes,
   ...oaAssetReceiveRoutes,
   ...oaAssetTransferRoutes,
   ...oaAssetRepairRoutes,

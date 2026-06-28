@@ -2,7 +2,7 @@ import Layout from '@/layout'
 
 export default [
   {
-    path: '/oa/expenseInvoice/form',
+    path: '/oa/expenseDir/expenseInvoice/form',
     component: Layout,
     hidden: true,
     children: [
@@ -10,7 +10,7 @@ export default [
         path: '',
         component: () => import('@/views/oa/expense/invoiceForm'),
         name: 'OaExpenseInvoiceForm',
-        meta: { title: '发票', activeMenu: '/oa/expenseInvoice' }
+        meta: { title: '发票', activeMenu: '/oa/expenseDir/expenseInvoice' }
       }
     ]
   }

@@ -190,14 +190,14 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push('/oa/calendar/form?mode=add')
+      this.$router.push({ path: '/oa/schedule/calendar/form' })
     },
     handleUpdate(row) {
       const eventId = row ? row.eventId : this.ids[0]
-      this.$router.push('/oa/calendar/form?mode=edit&id=' + eventId)
+      this.$router.push({ path: '/oa/schedule/calendar/form', query: { id: eventId } })
     },
     handleView(row) {
-      this.$router.push('/oa/calendar/form?mode=detail&id=' + row.eventId)
+      this.$router.push({ path: '/oa/schedule/calendar/form', query: { mode: 'detail', id: row.eventId } })
     },
     handleDelete(row) {
       const eventIds = row.eventId || this.ids

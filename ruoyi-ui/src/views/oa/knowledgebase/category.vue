@@ -100,27 +100,6 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item :label="$t('oa.knowledgebase.categoryName')" prop="name">
-          <el-input v-model="form.name" :placeholder="$t('oa.knowledgebase.categoryName')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.knowledgebase.categoryCode')" prop="code">
-          <el-input v-model="form.code" :placeholder="$t('oa.knowledgebase.categoryCode')" />
-        </el-form-item>
-        <el-form-item :label="$t('common.status')" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio :label="1">{{ $t('oa.knowledgebase.enable') }}</el-radio>
-            <el-radio :label="0">{{ $t('oa.knowledgebase.disable') }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -172,11 +151,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push('/oa/knowledgebaseCategory/form?mode=add')
+      this.$router.push({ path: '/oa/knowledge/knowledgebaseCategory/form' })
     },
     handleUpdate(row) {
-      const id = row ? row.id : this.ids[0]
-      this.$router.push('/oa/knowledgebaseCategory/form?mode=edit&id=' + id)
+      const id = row.id || this.ids
+      this.$router.push({ path: '/oa/knowledge/knowledgebaseCategory/form', query: { id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

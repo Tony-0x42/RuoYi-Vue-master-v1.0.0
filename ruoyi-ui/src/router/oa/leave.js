@@ -2,7 +2,7 @@ import Layout from '@/layout'
 
 export default [
   {
-    path: '/oa/attendance/leave/form',
+    path: '/oa/hr/leave/form',
     component: Layout,
     hidden: true,
     children: [
@@ -10,7 +10,7 @@ export default [
         path: '',
         component: () => import('@/views/oa/attendance/leaveForm'),
         name: 'OaAttendanceLeaveForm',
-        meta: { title: '请假申请', activeMenu: '/oa/attendance/leave' }
+        meta: { title: '请假申请', activeMenu: '/oa/hr/leave' }
       }
     ]
   }

@@ -106,53 +106,11 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item :label="$t('oa.expense.category')" prop="categoryId">
-          <el-select v-model="form.categoryId" :placeholder="$t('oa.expense.placeholder.category')" style="width:100%">
-            <el-option
-              v-for="item in categoryList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('oa.expense.level')" prop="level">
-          <el-input v-model="form.level" :placeholder="$t('oa.expense.placeholder.level')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.expense.city')" prop="city">
-          <el-input v-model="form.city" :placeholder="$t('oa.expense.placeholder.city')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.expense.limitAmount')" prop="limitAmount">
-          <el-input-number v-model="form.limitAmount" :min="0" :precision="2" style="width:100%" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.expense.periodType')" prop="periodType">
-          <el-select v-model="form.periodType" :placeholder="$t('oa.expense.placeholder.periodType')" style="width:100%">
-            <el-option :label="$t('oa.expense.periodDay')" value="day" />
-            <el-option :label="$t('oa.expense.periodTime')" value="time" />
-            <el-option :label="$t('oa.expense.periodMonth')" value="month" />
-            <el-option :label="$t('oa.expense.periodYear')" value="year" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('common.status')" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio :label="1">{{ $t('common.enable') }}</el-radio>
-            <el-radio :label="0">{{ $t('common.disable') }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listStandard, getStandard, addStandard, updateStandard, delStandard } from "@/api/oa/expense"
+import { listStandard, delStandard } from "@/api/oa/expense"
 import { listCategory } from "@/api/oa/expense"
 
 export default {
@@ -167,22 +125,11 @@ export default {
       total: 0,
       standardList: [],
       categoryList: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         categoryId: undefined,
         level: undefined
-      },
-      form: {},
-      rules: {
-        categoryId: [
-          { required: true, message: this.$t('oa.expense.required.category'), trigger: "change" }
-        ],
-        limitAmount: [
-          { required: true, message: this.$t('oa.expense.required.limitAmount'), trigger: "blur" }
-        ]
       }
     }
   },
@@ -204,23 +151,6 @@ export default {
         this.loading = false
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        categoryId: undefined,
-        level: undefined,
-        city: undefined,
-        deptId: undefined,
-        limitAmount: 0,
-        periodType: "time",
-        status: 1
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -235,38 +165,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.expense.addStandard')
+      this.$router.push({ path: '/oa/expenseDir/expenseStandard/form' })
     },
     handleUpdate(row) {
-      this.reset()
       const id = row.id || this.ids
-      getStandard(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('oa.expense.editStandard')
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          const data = { ...this.form }
-          if (data.id != undefined) {
-            updateStandard(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addStandard(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+      this.$router.push({ path: '/oa/expenseDir/expenseStandard/form', query: { id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

@@ -145,11 +145,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push('/oa/attendance/makeup/form?mode=add')
+      this.$router.push({ path: '/oa/hr/makeup/form' })
     },
     handleUpdate(row) {
       const id = row ? row.id : this.ids[0]
-      this.$router.push('/oa/attendance/makeup/form?mode=edit&id=' + id)
+      this.$router.push({ path: '/oa/hr/makeup/form', query: { id } })
     },
     handleSubmit(row) {
       this.submitRow = row || {}

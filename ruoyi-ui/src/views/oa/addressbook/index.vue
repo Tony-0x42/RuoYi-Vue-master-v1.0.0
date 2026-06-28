@@ -247,7 +247,7 @@ export default {
         this.$modal.msgWarning(this.$t('addressBook.noData'))
         return
       }
-      this.$router.push('/oa/addressbook/form?mode=add&contactUserId=' + this.selectedUser.userId)
+      this.$router.push({ path: '/oa/addressbook/form', query: { contactUserId: this.selectedUser.userId } })
     }
   }
 }

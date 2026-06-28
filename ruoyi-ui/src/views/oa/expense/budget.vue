@@ -93,58 +93,11 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.deptId')" prop="deptId">
-              <el-input-number v-model="form.deptId" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.projectId')" prop="projectId">
-              <el-input-number v-model="form.projectId" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.itemId')" prop="itemId">
-              <el-input-number v-model="form.itemId" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.year')" prop="year">
-              <el-input-number v-model="form.year" :min="2000" :max="2100" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.totalAmount')" prop="totalAmount">
-              <el-input-number v-model="form.totalAmount" :min="0" :precision="2" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.usedAmount')" prop="usedAmount">
-              <el-input-number v-model="form.usedAmount" :min="0" :precision="2" style="width:100%" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item :label="$t('common.status')" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio :label="1">{{ $t('common.enable') }}</el-radio>
-            <el-radio :label="0">{{ $t('common.disable') }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listBudget, getBudget, addBudget, updateBudget, delBudget } from "@/api/oa/expense"
+import { listBudget, delBudget } from "@/api/oa/expense"
 
 export default {
   name: "OaExpenseBudget",
@@ -157,21 +110,10 @@ export default {
       showSearch: true,
       total: 0,
       budgetList: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         year: new Date().getFullYear()
-      },
-      form: {},
-      rules: {
-        year: [
-          { required: true, message: this.$t('oa.expense.required.year'), trigger: "blur" }
-        ],
-        totalAmount: [
-          { required: true, message: this.$t('oa.expense.required.totalAmount'), trigger: "blur" }
-        ]
       }
     }
   },
@@ -187,23 +129,6 @@ export default {
         this.loading = false
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        deptId: undefined,
-        projectId: undefined,
-        itemId: undefined,
-        year: new Date().getFullYear(),
-        totalAmount: 0,
-        usedAmount: 0,
-        status: 1
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -218,43 +143,16 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.expense.addBudget')
+      this.$router.push({ path: '/oa/expenseDir/expenseBudget/form' })
     },
     handleUpdate(row) {
-      this.reset()
       const id = row.id || this.ids
-      getBudget(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('oa.expense.editBudget')
-      })
+      this.$router.push({ path: '/oa/expenseDir/expenseBudget/form', query: { id } })
     },
     calculateRate(row) {
       if (!row.totalAmount || row.totalAmount === 0) return 0
       const used = row.usedAmount || 0
       return Math.round(used * 100 / row.totalAmount)
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          const data = { ...this.form }
-          if (data.id != undefined) {
-            updateBudget(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addBudget(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

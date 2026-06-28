@@ -187,11 +187,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push('/oa/expense/form?mode=add')
+      this.$router.push({ path: '/oa/expenseDir/expense/form' })
     },
     handleUpdate(row) {
       const id = row ? row.id : this.ids[0]
-      this.$router.push('/oa/expense/form?mode=edit&id=' + id)
+      this.$router.push({ path: '/oa/expenseDir/expense/form', query: { id } })
     },
     handleSubmit(row) {
       this.$modal.confirm(this.$t('oa.expense.confirm.submit', { id: row.id })).then(function() {

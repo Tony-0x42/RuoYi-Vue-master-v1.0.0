@@ -133,10 +133,10 @@ export default {
     handleQuery() { this.queryParams.pageNum = 1; this.getList() },
     resetQuery() { this.resetForm("queryForm"); this.handleQuery() },
     handleSelectionChange(selection) { this.ids = selection.map(item => item.id); this.single = selection.length != 1; this.multiple = !selection.length },
-    handleAdd() { this.$router.push({ path: '/oa/assetDir/assetInventory/form', query: { mode: 'add' } }) },
+    handleAdd() { this.$router.push({ path: '/oa/assetDir/assetInventory/form' }) },
     handleUpdate(row) {
       const id = row.id || this.ids
-      this.$router.push({ path: '/oa/assetDir/assetInventory/form', query: { mode: 'edit', id: id } })
+      this.$router.push({ path: '/oa/assetDir/assetInventory/form', query: { id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

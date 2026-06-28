@@ -182,11 +182,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push('/oa/attendance/record/form?mode=add')
+      this.$router.push({ path: '/oa/hr/attendance/record/form' })
     },
     handleUpdate(row) {
       const id = row ? row.id : this.ids[0]
-      this.$router.push('/oa/attendance/record/form?mode=edit&id=' + id)
+      this.$router.push({ path: '/oa/hr/attendance/record/form', query: { id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

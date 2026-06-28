@@ -163,11 +163,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push('/oa/attendance/group/form?mode=add')
+      this.$router.push({ path: '/oa/hr/attendance/group/form' })
     },
     handleUpdate(row) {
       const id = row ? row.id : this.ids[0]
-      this.$router.push('/oa/attendance/group/form?mode=edit&id=' + id)
+      this.$router.push({ path: '/oa/hr/attendance/group/form', query: { id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

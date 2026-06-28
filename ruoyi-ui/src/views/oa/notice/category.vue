@@ -151,11 +151,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push('/oa/noticeCategory/form?mode=add')
+      this.$router.push({ path: '/oa/comm/notice/noticeCategory/form' })
     },
     handleUpdate(row) {
       const id = row ? row.id : this.ids[0]
-      this.$router.push('/oa/noticeCategory/form?mode=edit&id=' + id)
+      this.$router.push({ path: '/oa/comm/notice/noticeCategory/form', query: { id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

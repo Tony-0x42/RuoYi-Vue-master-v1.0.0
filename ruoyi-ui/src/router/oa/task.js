@@ -2,7 +2,7 @@ import Layout from '@/layout'
 
 export default [
   {
-    path: '/oa/task/form',
+    path: '/oa/schedule/task/form',
     component: Layout,
     hidden: true,
     children: [
@@ -10,7 +10,7 @@ export default [
         path: '',
         component: () => import('@/views/oa/task/taskForm'),
         name: 'OaTaskForm',
-        meta: { title: '任务', activeMenu: '/oa/task' }
+        meta: { title: '任务', activeMenu: '/oa/schedule/task' }
       }
     ]
   }

@@ -210,11 +210,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push('/oa/expenseLoan/form?mode=add')
+      this.$router.push({ path: '/oa/expenseDir/expenseLoan/form' })
     },
     handleUpdate(row) {
       const id = row ? row.id : this.ids[0]
-      this.$router.push('/oa/expenseLoan/form?mode=edit&id=' + id)
+      this.$router.push({ path: '/oa/expenseDir/expenseLoan/form', query: { id } })
     },
     handleRepayment(row) {
       this.currentLoanId = row.id

@@ -139,11 +139,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push({ path: '/oa/attendance/overtime/form', query: { mode: 'add' } })
+      this.$router.push({ path: '/oa/hr/overtime/form' })
     },
     handleUpdate(row) {
       const id = row.id || this.ids
-      this.$router.push({ path: '/oa/attendance/overtime/form', query: { mode: 'edit', id: id } })
+      this.$router.push({ path: '/oa/hr/overtime/form', query: { id } })
     },
     handleSubmit(row) {
       this.currentRow = row

@@ -230,14 +230,14 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push('/oa/task/form?mode=add')
+      this.$router.push({ path: '/oa/schedule/task/form' })
     },
     handleUpdate(row) {
       const id = row ? row.id : this.ids[0]
-      this.$router.push('/oa/task/form?mode=edit&id=' + id)
+      this.$router.push({ path: '/oa/schedule/task/form', query: { id } })
     },
     handleView(row) {
-      this.$router.push('/oa/task/form?mode=detail&id=' + row.id)
+      this.$router.push({ path: '/oa/schedule/task/form', query: { mode: 'detail', id: row.id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

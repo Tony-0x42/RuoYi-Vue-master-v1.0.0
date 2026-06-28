@@ -2,7 +2,7 @@ import Layout from '@/layout'
 
 export default [
   {
-    path: '/oa/meetingRoom/form',
+    path: '/oa/meetingDir/meetingRoom/form',
     component: Layout,
     hidden: true,
     children: [
@@ -10,7 +10,7 @@ export default [
         path: '',
         component: () => import('@/views/oa/meeting/meetingRoomForm'),
         name: 'OaMeetingRoomForm',
-        meta: { title: '会议室', activeMenu: '/oa/meetingRoom' }
+        meta: { title: '会议室', activeMenu: '/oa/meetingDir/meetingRoom' }
       }
     ]
   }

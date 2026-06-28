@@ -202,14 +202,14 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push('/oa/notice/form?mode=add')
+      this.$router.push({ path: '/oa/comm/notice/form' })
     },
     handleUpdate(row) {
       const id = row ? row.id : this.ids[0]
-      this.$router.push('/oa/notice/form?mode=edit&id=' + id)
+      this.$router.push({ path: '/oa/comm/notice/form', query: { id } })
     },
     handleView(row) {
-      this.$router.push('/oa/notice/form?mode=detail&id=' + row.id)
+      this.$router.push({ path: '/oa/comm/notice/form', query: { mode: 'detail', id: row.id } })
     },
     handleOffline(row) {
       this.$modal.confirm(this.$t('oa.notice.confirm.offline', { title: row.title })).then(function() {

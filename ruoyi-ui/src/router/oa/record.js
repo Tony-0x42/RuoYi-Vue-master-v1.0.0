@@ -2,7 +2,7 @@ import Layout from '@/layout'
 
 export default [
   {
-    path: '/oa/attendance/record/form',
+    path: '/oa/hr/attendance/record/form',
     component: Layout,
     hidden: true,
     children: [
@@ -10,7 +10,7 @@ export default [
         path: '',
         component: () => import('@/views/oa/attendance/recordForm'),
         name: 'OaAttendanceRecordForm',
-        meta: { title: '打卡记录', activeMenu: '/oa/attendance/record' }
+        meta: { title: '打卡记录', activeMenu: '/oa/hr/attendance/record' }
       }
     ]
   }

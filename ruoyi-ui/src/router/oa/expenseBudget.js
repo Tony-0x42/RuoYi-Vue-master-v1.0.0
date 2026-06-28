@@ -2,7 +2,7 @@ import Layout from '@/layout'
 
 export default [
   {
-    path: '/oa/expenseBudget/form',
+    path: '/oa/expenseDir/expenseBudget/form',
     component: Layout,
     hidden: true,
     children: [
@@ -10,7 +10,7 @@ export default [
         path: '',
         component: () => import('@/views/oa/expense/budgetForm'),
         name: 'OaExpenseBudgetForm',
-        meta: { title: '预算', activeMenu: '/oa/expenseBudget' }
+        meta: { title: '预算', activeMenu: '/oa/expenseDir/expenseBudget' }
       }
     ]
   }

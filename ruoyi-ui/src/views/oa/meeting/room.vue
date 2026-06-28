@@ -163,11 +163,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push('/oa/meetingRoom/form?mode=add')
+      this.$router.push({ path: '/oa/meetingDir/meetingRoom/form' })
     },
     handleUpdate(row) {
       const id = row ? row.id : this.ids[0]
-      this.$router.push('/oa/meetingRoom/form?mode=edit&id=' + id)
+      this.$router.push({ path: '/oa/meetingDir/meetingRoom/form', query: { id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

@@ -99,11 +99,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.$router.push({ path: '/oa/assetDir/assetCategory/form', query: { mode: 'add' } })
+      this.$router.push({ path: '/oa/assetDir/assetCategory/form' })
     },
     handleUpdate(row) {
       const id = row.id || this.ids
-      this.$router.push({ path: '/oa/assetDir/assetCategory/form', query: { mode: 'edit', id: id } })
+      this.$router.push({ path: '/oa/assetDir/assetCategory/form', query: { id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids
