@@ -81,7 +81,7 @@ public class OaAttendanceTripServiceImpl implements IOaAttendanceTripService
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int submit(Long id)
+    public int submit(Long id, Object approverId)
     {
         OaAttendanceTrip existing = tripMapper.selectById(id);
         if (existing == null)
@@ -92,7 +92,7 @@ public class OaAttendanceTripServiceImpl implements IOaAttendanceTripService
         {
             throw new ServiceException("只有草稿状态可提交");
         }
-        BpmProcessInstance instance = bpmHelper.startApproval("oa_attendance_trip", "attendance_trip:" + id, existing.getUserId());
+        BpmProcessInstance instance = bpmHelper.startApproval("oa_attendance_trip", "attendance_trip:" + id, existing.getUserId(), approverId);
         existing.setStatus("approving");
         existing.setProcessInstanceId(instance.getId());
         existing.setUpdateBy(SecurityUtils.getUsername());

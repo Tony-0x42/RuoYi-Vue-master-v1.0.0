@@ -40,6 +40,10 @@ public interface IOaAttendanceMakeupService
 
     /**
      * 提交补卡申请并启动审批流程
+     *
+     * @param id 补卡申请 ID
+     * @param approvalAssignee 审批人（单个用户 ID 或候选用户 ID 列表）
+     * @return 影响行数
      */
-    int submit(Long id);
+    int submit(Long id, Object approvalAssignee);
 }

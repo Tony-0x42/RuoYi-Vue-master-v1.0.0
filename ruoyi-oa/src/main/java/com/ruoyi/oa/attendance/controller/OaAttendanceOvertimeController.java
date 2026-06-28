@@ -1,6 +1,7 @@
 package com.ruoyi.oa.attendance.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -92,8 +93,8 @@ public class OaAttendanceOvertimeController extends BaseController
     @PreAuthorize("@ss.hasPermi('oa:attendanceOvertime:edit')")
     @Log(title = "加班申请提交", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/submit")
-    public AjaxResult submit(@PathVariable Long id)
+    public AjaxResult submit(@PathVariable Long id, @RequestBody Map<String, Object> body)
     {
-        return toAjax(overtimeService.submit(id));
+        return toAjax(overtimeService.submit(id, body.get("approvalAssignee")));
     }
 }

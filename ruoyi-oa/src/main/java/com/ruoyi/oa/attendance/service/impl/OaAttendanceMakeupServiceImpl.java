@@ -81,7 +81,7 @@ public class OaAttendanceMakeupServiceImpl implements IOaAttendanceMakeupService
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int submit(Long id)
+    public int submit(Long id, Object approvalAssignee)
     {
         OaAttendanceMakeup existing = makeupMapper.selectById(id);
         if (existing == null)
@@ -92,7 +92,7 @@ public class OaAttendanceMakeupServiceImpl implements IOaAttendanceMakeupService
         {
             throw new ServiceException("只有草稿状态可提交");
         }
-        BpmProcessInstance instance = bpmHelper.startApproval("oa_attendance_makeup", "attendance_makeup:" + id, existing.getUserId());
+        BpmProcessInstance instance = bpmHelper.startApproval("oa_attendance_makeup", "attendance_makeup:" + id, existing.getUserId(), approvalAssignee);
         existing.setStatus("approving");
         existing.setProcessInstanceId(instance.getId());
         existing.setUpdateBy(SecurityUtils.getUsername());

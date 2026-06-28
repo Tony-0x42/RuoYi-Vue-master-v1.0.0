@@ -125,27 +125,6 @@
       @pagination="getList"
     />
 
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item :label="$t('oa.expense.userName')" prop="userName">
-          <el-input v-model="form.userName" :placeholder="$t('oa.expense.placeholder.userName')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.expense.amount')" prop="amount">
-          <el-input-number v-model="form.amount" :min="0" :precision="2" style="width:100%" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.expense.reason')" prop="reason">
-          <el-input v-model="form.reason" type="textarea" :placeholder="$t('oa.expense.placeholder.reason')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.expense.dueDate')" prop="dueDate">
-          <el-date-picker v-model="form.dueDate" type="date" value-format="yyyy-MM-dd" style="width:100%" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
-
     <el-dialog :title="$t('oa.expense.repayment')" :visible.sync="repaymentOpen" width="500px" append-to-body>
       <el-form ref="repaymentForm" :model="repaymentForm" :rules="repaymentRules" label-width="100px">
         <el-form-item :label="$t('oa.expense.repaymentAmount')" prop="amount">
@@ -157,14 +136,27 @@
         <el-button @click="repaymentOpen = false">{{ $t('common.cancel') }}</el-button>
       </div>
     </el-dialog>
+
+    <flow-submit-dialog
+      :visible="flowVisible"
+      process-key="oa_expense_loan"
+      :business-key="'expense_loan:' + currentLoanId"
+      :submit-api="submitApi"
+      @close="flowVisible = false"
+      @success="handleSubmitSuccess"
+    />
   </div>
 </template>
 
 <script>
-import { listLoan, getLoan, addLoan, updateLoan, delLoan, repaymentLoan, submitLoan } from "@/api/oa/expense"
+import FlowSubmitDialog from "@/components/FlowSubmitDialog"
+import { listLoan, delLoan, repaymentLoan, submitLoan } from "@/api/oa/expense"
 
 export default {
   name: "OaExpenseLoan",
+  components: {
+    FlowSubmitDialog
+  },
   data() {
     return {
       loading: true,
@@ -174,9 +166,7 @@ export default {
       showSearch: true,
       total: 0,
       loanList: [],
-      title: "",
-      open: false,
-      repaymentOpen: false,
+      flowVisible: false,
       currentLoanId: undefined,
       queryParams: {
         pageNum: 1,
@@ -184,17 +174,8 @@ export default {
         userName: undefined,
         status: undefined
       },
-      form: {},
       repaymentForm: {
         amount: 0
-      },
-      rules: {
-        userName: [
-          { required: true, message: this.$t('oa.expense.required.userName'), trigger: "blur" }
-        ],
-        amount: [
-          { required: true, message: this.$t('oa.expense.required.amount'), trigger: "blur" }
-        ]
       },
       repaymentRules: {
         amount: [
@@ -215,23 +196,6 @@ export default {
         this.loading = false
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        userId: undefined,
-        userName: undefined,
-        amount: 0,
-        repaidAmount: 0,
-        reason: undefined,
-        status: 0,
-        dueDate: undefined
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -246,18 +210,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.expense.addLoan')
+      this.$router.push({ path: '/oa/expenseDir/expenseLoan/form' })
     },
     handleUpdate(row) {
-      this.reset()
-      const id = row.id || this.ids
-      getLoan(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('oa.expense.editLoan')
-      })
+      const id = row ? row.id : this.ids[0]
+      this.$router.push({ path: '/oa/expenseDir/expenseLoan/form', query: { id } })
     },
     handleRepayment(row) {
       this.currentLoanId = row.id
@@ -265,32 +222,15 @@ export default {
       this.repaymentOpen = true
     },
     handleSubmit(row) {
-      this.$modal.confirm(this.$t('oa.expense.confirm.submitLoan', { id: row.id })).then(function() {
-        return submitLoan(row.id)
-      }).then(() => {
-        this.getList()
-        this.$modal.msgSuccess(this.$t('oa.expense.loanSubmitSuccess'))
-      }).catch(() => {})
+      this.currentLoanId = row.id
+      this.flowVisible = true
     },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          const data = { ...this.form }
-          if (data.id != undefined) {
-            updateLoan(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addLoan(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+    submitApi(data) {
+      return submitLoan(this.currentLoanId, data)
+    },
+    handleSubmitSuccess() {
+      this.flowVisible = false
+      this.getList()
     },
     submitRepayment() {
       this.$refs["repaymentForm"].validate(valid => {

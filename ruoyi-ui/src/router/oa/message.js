@@ -1,2 +1,17 @@
-// 消息通知中心隐藏路由（主菜单由后端 sys_menu 动态生成）
-export default []
+import Layout from '@/layout'
+
+export default [
+  {
+    path: '/oa/message/form',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/oa/message/messageForm'),
+        name: 'OaMessageForm',
+        meta: { title: 'oa.message.sendMessage', activeMenu: '/oa/message' }
+      }
+    ]
+  }
+]

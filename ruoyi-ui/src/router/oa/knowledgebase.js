@@ -11,7 +11,7 @@ export default [
         path: ':id',
         component: () => import('@/views/oa/knowledgebase/detail'),
         name: 'OaKnowledgebaseDetail',
-        meta: { title: 'oa.knowledgebase.detail', activeMenu: '/oa/knowledgebase' }
+        meta: { title: 'oa.knowledgebase.detail', activeMenu: '/oa/knowledge/knowledgebase' }
       }
     ]
   }

@@ -116,49 +116,11 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item :label="$t('oa.message.template.code')" prop="code">
-          <el-input v-model="form.code" :placeholder="$t('oa.message.template.code')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.message.template.name')" prop="name">
-          <el-input v-model="form.name" :placeholder="$t('oa.message.template.name')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.message.template.type')" prop="type">
-          <el-select v-model="form.type" :placeholder="$t('oa.message.template.type')" style="width:100%">
-            <el-option :label="$t('oa.message.todo')" value="todo" />
-            <el-option :label="$t('oa.message.result')" value="result" />
-            <el-option :label="$t('oa.message.notice')" value="notice" />
-            <el-option :label="$t('oa.message.system')" value="system" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('oa.message.template.channelsJson')" prop="channelsJson">
-          <el-input v-model="form.channelsJson" type="textarea" :rows="2" :placeholder="'[\"site\"]'" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.message.template.contentJson')" prop="contentJson">
-          <el-input v-model="form.contentJson" type="textarea" :rows="4" :placeholder='"{\"site\":\"内容 {{name}}\"}"' />
-        </el-form-item>
-        <el-form-item :label="$t('oa.message.template.variables')" prop="variables">
-          <el-input v-model="form.variables" :placeholder="'name,time'" />
-        </el-form-item>
-        <el-form-item :label="$t('common.status')" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio :label="1">{{ $t('oa.message.template.enabled') }}</el-radio>
-            <el-radio :label="0">{{ $t('oa.message.template.disabled') }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listTemplate, getTemplate, addTemplate, updateTemplate, delTemplate } from "@/api/oa/message"
+import { listTemplate, delTemplate } from "@/api/oa/message"
 
 export default {
   name: "OaMessageTemplate",
@@ -171,23 +133,12 @@ export default {
       showSearch: true,
       total: 0,
       templateList: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         code: undefined,
         name: undefined,
         type: undefined
-      },
-      form: {},
-      rules: {
-        code: [
-          { required: true, message: this.$t('oa.message.template.required.code'), trigger: "blur" }
-        ],
-        name: [
-          { required: true, message: this.$t('oa.message.template.required.name'), trigger: "blur" }
-        ]
       }
     }
   },
@@ -203,23 +154,6 @@ export default {
         this.loading = false
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        code: undefined,
-        name: undefined,
-        type: "system",
-        channelsJson: '["site"]',
-        contentJson: '',
-        variables: '',
-        status: 1
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -234,37 +168,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.message.template.addTemplate')
+      this.$router.push({ path: '/oa/messageTemplate/form', query: { mode: 'add' } })
     },
     handleUpdate(row) {
-      this.reset()
       const id = row.id || this.ids
-      getTemplate(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('oa.message.template.editTemplate')
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.id != undefined) {
-            updateTemplate(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addTemplate(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+      this.$router.push({ path: '/oa/messageTemplate/form', query: { mode: 'edit', id: id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

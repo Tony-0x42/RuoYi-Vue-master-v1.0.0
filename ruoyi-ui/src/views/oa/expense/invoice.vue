@@ -118,66 +118,11 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.invoiceCode')" prop="invoiceCode">
-              <el-input v-model="form.invoiceCode" :placeholder="$t('oa.expense.placeholder.invoiceCode')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.invoiceNo')" prop="invoiceNo">
-              <el-input v-model="form.invoiceNo" :placeholder="$t('oa.expense.placeholder.invoiceNo')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.invoiceType')" prop="invoiceType">
-              <el-select v-model="form.invoiceType" :placeholder="$t('oa.expense.placeholder.invoiceType')" style="width:100%">
-                <el-option :label="$t('oa.expense.typeVat')" value="增值税普通发票" />
-                <el-option :label="$t('oa.expense.typeElectronic')" value="增值税电子普通发票" />
-                <el-option :label="$t('oa.expense.typeTrain')" value="火车票" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.invoiceDate')" prop="invoiceDate">
-              <el-date-picker v-model="form.invoiceDate" type="date" value-format="yyyy-MM-dd" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.amount')" prop="amount">
-              <el-input-number v-model="form.amount" :min="0" :precision="2" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.tax')" prop="tax">
-              <el-input-number v-model="form.tax" :min="0" :precision="2" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.buyer')" prop="buyer">
-              <el-input v-model="form.buyer" :placeholder="$t('oa.expense.placeholder.buyer')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.seller')" prop="seller">
-              <el-input v-model="form.seller" :placeholder="$t('oa.expense.placeholder.seller')" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listInvoice, getInvoice, addInvoice, updateInvoice, delInvoice, recognizeInvoice, verifyInvoice } from "@/api/oa/expense"
+import { listInvoice, delInvoice, recognizeInvoice, verifyInvoice, getInvoice } from "@/api/oa/expense"
 
 export default {
   name: "OaExpenseInvoice",
@@ -190,22 +135,11 @@ export default {
       showSearch: true,
       total: 0,
       invoiceList: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         invoiceNo: undefined,
         status: undefined
-      },
-      form: {},
-      rules: {
-        invoiceNo: [
-          { required: true, message: this.$t('oa.expense.required.invoiceNo'), trigger: "blur" }
-        ],
-        amount: [
-          { required: true, message: this.$t('oa.expense.required.amount'), trigger: "blur" }
-        ]
       }
     }
   },
@@ -221,25 +155,6 @@ export default {
         this.loading = false
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        invoiceCode: undefined,
-        invoiceNo: undefined,
-        invoiceType: undefined,
-        amount: 0,
-        tax: 0,
-        invoiceDate: undefined,
-        buyer: undefined,
-        seller: undefined,
-        status: 0
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -254,18 +169,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.expense.addInvoice')
+      this.$router.push({ path: '/oa/expenseDir/expenseInvoice/form' })
     },
     handleUpdate(row) {
-      this.reset()
       const id = row.id || this.ids
-      getInvoice(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('oa.expense.editInvoice')
-      })
+      this.$router.push({ path: '/oa/expenseDir/expenseInvoice/form', query: { id } })
     },
     handleRecognize() {
       const id = this.ids[0]
@@ -283,26 +191,6 @@ export default {
           this.$modal.msgSuccess(res.data.duplicate ? this.$t('oa.expense.verifyDuplicate') : this.$t('oa.expense.verifySuccess'))
           this.getList()
         })
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          const data = { ...this.form }
-          if (data.id != undefined) {
-            updateInvoice(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addInvoice(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
       })
     },
     handleDelete(row) {

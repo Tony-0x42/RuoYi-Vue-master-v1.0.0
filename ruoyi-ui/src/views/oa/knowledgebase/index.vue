@@ -135,67 +135,11 @@
       @pagination="getList"
     />
 
-    <el-dialog :title="title" :visible.sync="open" width="850px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.knowledgebase.articleTitle')" prop="title">
-              <el-input v-model="form.title" :placeholder="$t('oa.knowledgebase.placeholder.title')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.knowledgebase.category')" prop="categoryId">
-              <el-select v-model="form.categoryId" :placeholder="$t('oa.knowledgebase.placeholder.category')" style="width:100%">
-                <el-option
-                  v-for="item in categoryList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item :label="$t('oa.knowledgebase.summary')" prop="summary">
-              <el-input v-model="form.summary" type="textarea" :rows="2" :placeholder="$t('oa.knowledgebase.placeholder.summary')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.knowledgebase.tags')" prop="tags">
-              <el-input v-model="form.tags" :placeholder="$t('oa.knowledgebase.placeholder.tags')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.knowledgebase.status')" prop="status">
-              <el-radio-group v-model="form.status">
-                <el-radio :label="0">{{ $t('oa.knowledgebase.statusDraft') }}</el-radio>
-                <el-radio :label="1">{{ $t('oa.knowledgebase.statusPublished') }}</el-radio>
-                <el-radio :label="2">{{ $t('oa.knowledgebase.statusOffline') }}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item>
-              <el-checkbox v-model="form.top">{{ $t('oa.knowledgebase.top') }}</el-checkbox>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item :label="$t('oa.knowledgebase.content')" prop="content">
-              <editor v-model="form.content" :min-height="192" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listArticle, getArticle, addArticle, updateArticle, delArticle, updateArticleStatus, listCategory } from "@/api/oa/knowledgebase"
+import { listArticle, delArticle, updateArticleStatus, listCategory } from "@/api/oa/knowledgebase"
 
 export default {
   name: "OaKnowledgebase",
@@ -209,26 +153,12 @@ export default {
       total: 0,
       articleList: [],
       categoryList: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         title: undefined,
         categoryId: undefined,
         status: undefined
-      },
-      form: {},
-      rules: {
-        title: [
-          { required: true, message: this.$t('oa.knowledgebase.required.title'), trigger: "blur" }
-        ],
-        categoryId: [
-          { required: true, message: this.$t('oa.knowledgebase.required.category'), trigger: "change" }
-        ],
-        content: [
-          { required: true, message: this.$t('oa.knowledgebase.required.content'), trigger: "blur" }
-        ]
       }
     }
   },
@@ -250,24 +180,6 @@ export default {
         this.loading = false
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        title: undefined,
-        categoryId: undefined,
-        summary: undefined,
-        content: undefined,
-        tags: undefined,
-        status: 0,
-        top: false,
-        version: 1
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -282,40 +194,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.knowledgebase.addArticle')
+      this.$router.push({ path: '/oa/knowledge/knowledgebase/form' })
     },
     handleUpdate(row) {
-      this.reset()
-      const id = row.id || this.ids
-      getArticle(id).then(response => {
-        this.form = response.data
-        this.form.top = this.form.top === 1
-        this.open = true
-        this.title = this.$t('oa.knowledgebase.editArticle')
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          const data = { ...this.form }
-          data.top = data.top ? 1 : 0
-          if (data.id != undefined) {
-            updateArticle(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addArticle(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+      const id = row ? row.id : this.ids[0]
+      this.$router.push({ path: '/oa/knowledge/knowledgebase/form', query: { id } })
     },
     handleView(row) {
       this.$router.push('/oa/knowledgebase/detail/' + row.id)

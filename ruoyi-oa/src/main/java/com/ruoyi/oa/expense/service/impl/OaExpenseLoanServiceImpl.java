@@ -108,7 +108,7 @@ public class OaExpenseLoanServiceImpl implements IOaExpenseLoanService
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int submit(Long id)
+    public int submit(Long id, Object approvalAssignee)
     {
         OaExpenseLoan existing = loanMapper.selectById(id);
         if (existing == null)
@@ -119,7 +119,7 @@ public class OaExpenseLoanServiceImpl implements IOaExpenseLoanService
         {
             throw new ServiceException("只有草稿状态可提交");
         }
-        BpmProcessInstance instance = bpmHelper.startApproval("oa_expense_loan", "expense_loan:" + id, existing.getUserId());
+        BpmProcessInstance instance = bpmHelper.startApproval("oa_expense_loan", "expense_loan:" + id, existing.getUserId(), approvalAssignee);
         existing.setStatus(1);
         existing.setProcessInstanceId(instance.getId());
         existing.setUpdateBy(SecurityUtils.getUsername());

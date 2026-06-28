@@ -83,69 +83,6 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.asset.code')" prop="code">
-              <el-input v-model="form.code" :placeholder="$t('oa.asset.placeholder.code')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.asset.name')" prop="name">
-              <el-input v-model="form.name" :placeholder="$t('oa.asset.placeholder.name')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.asset.category')" prop="categoryId">
-              <el-select v-model="form.categoryId" :placeholder="$t('oa.asset.category')" style="width:100%">
-                <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('common.status')" prop="status">
-              <el-select v-model="form.status" :placeholder="$t('common.status')" style="width:100%">
-                <el-option :label="$t('oa.asset.statusIdle')" :value="0" />
-                <el-option :label="$t('oa.asset.statusInUse')" :value="1" />
-                <el-option :label="$t('oa.asset.statusRepairing')" :value="2" />
-                <el-option :label="$t('oa.asset.statusScrapped')" :value="3" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.asset.model')" prop="model">
-              <el-input v-model="form.model" :placeholder="$t('oa.asset.placeholder.model')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.asset.purchaseDate')" prop="purchaseDate">
-              <el-date-picker v-model="form.purchaseDate" type="date" :placeholder="$t('oa.asset.purchaseDate')" value-format="yyyy-MM-dd" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.asset.value')" prop="value">
-              <el-input-number v-model="form.value" :min="0" :precision="2" controls-position="right" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.asset.location')" prop="location">
-              <el-input v-model="form.location" :placeholder="$t('oa.asset.placeholder.location')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item :label="$t('oa.asset.spec')" prop="spec">
-              <el-input v-model="form.spec" type="textarea" :rows="2" :placeholder="$t('oa.asset.placeholder.spec')" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
-
     <el-dialog :title="$t('oa.asset.qrcode')" :visible.sync="qrcodeOpen" width="400px" append-to-body>
       <div style="text-align:center">
         <img v-if="qrcodeData.qrcode" :src="qrcodeData.qrcode" style="width:200px;height:200px" />
@@ -157,7 +94,7 @@
 </template>
 
 <script>
-import { listAsset, getAsset, addAsset, updateAsset, delAsset, receiveAsset, returnAsset, transferAsset, repairAsset, scrapAsset, qrcodeAsset, statisticsAsset, listCategory } from "@/api/oa/asset"
+import { listAsset, delAsset, returnAsset, qrcodeAsset, statisticsAsset, listCategory } from "@/api/oa/asset"
 
 export default {
   name: "OaAsset",
@@ -172,16 +109,9 @@ export default {
       assetList: [],
       categoryList: [],
       stats: { total: 0, idle: 0, inUse: 0, repairing: 0, scrapped: 0, totalValue: 0 },
-      title: "",
-      open: false,
       qrcodeOpen: false,
       qrcodeData: {},
-      queryParams: { pageNum: 1, pageSize: 10, code: undefined, name: undefined, categoryId: undefined, status: undefined },
-      form: {},
-      rules: {
-        name: [{ required: true, message: this.$t('oa.asset.required.name'), trigger: "blur" }],
-        categoryId: [{ required: true, message: this.$t('oa.asset.required.category'), trigger: "change" }]
-      }
+      queryParams: { pageNum: 1, pageSize: 10, code: undefined, name: undefined, categoryId: undefined, status: undefined }
     }
   },
   computed: {
@@ -213,31 +143,13 @@ export default {
         this.loading = false
       })
     },
-    cancel() { this.open = false; this.reset() },
-    reset() {
-      this.form = { id: undefined, code: undefined, name: undefined, categoryId: undefined, model: undefined, spec: undefined, purchaseDate: undefined, value: 0, location: undefined, status: 0 }
-      this.resetForm("form")
-    },
     handleQuery() { this.queryParams.pageNum = 1; this.getList() },
     resetQuery() { this.resetForm("queryForm"); this.handleQuery() },
     handleSelectionChange(selection) { this.ids = selection.map(item => item.id); this.single = selection.length != 1; this.multiple = !selection.length },
-    handleAdd() { this.reset(); this.open = true; this.title = this.$t('oa.asset.addAsset') },
+    handleAdd() { this.$router.push({ path: '/oa/assetDir/asset/form' }) },
     handleUpdate(row) {
-      this.reset()
       const id = row.id || this.ids
-      getAsset(id).then(response => { this.form = response.data; this.open = true; this.title = this.$t('oa.asset.editAsset') })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          const data = { ...this.form }
-          if (data.id != undefined) {
-            updateAsset(data).then(() => { this.$modal.msgSuccess(this.$t('common.editSuccess')); this.open = false; this.getList(); this.getStatistics() })
-          } else {
-            addAsset(data).then(() => { this.$modal.msgSuccess(this.$t('common.addSuccess')); this.open = false; this.getList(); this.getStatistics() })
-          }
-        }
-      })
+      this.$router.push({ path: '/oa/assetDir/asset/form', query: { id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids
@@ -248,9 +160,7 @@ export default {
       qrcodeAsset(row.code).then(response => { this.qrcodeData = response.data || {}; this.qrcodeOpen = true })
     },
     handleReceive(row) {
-      this.$modal.confirm(this.$t('oa.asset.confirm.receive', { name: row.name })).then(() => {
-        return receiveAsset(row.id, this.currentUserId, this.currentUserName)
-      }).then(() => { this.$modal.msgSuccess(this.$t('oa.asset.submitApprovalSuccess')); this.getList(); this.getStatistics() }).catch(() => {})
+      this.$router.push({ path: '/oa/asset/receive', query: { assetId: row.id } })
     },
     handleReturn(row) {
       this.$modal.confirm(this.$t('oa.asset.confirm.return', { name: row.name })).then(() => {
@@ -258,22 +168,13 @@ export default {
       }).then(() => { this.$modal.msgSuccess(this.$t('common.success')); this.getList(); this.getStatistics() }).catch(() => {})
     },
     handleTransfer(row) {
-      this.$prompt(this.$t('oa.asset.placeholder.transferUser'), this.$t('oa.asset.transfer'), { inputPlaceholder: this.$t('oa.asset.placeholder.transferUser') }).then(({ value }) => {
-        if (!value) { this.$modal.msgError(this.$t('oa.asset.required.transferUser')); return }
-        return transferAsset(row.id, this.currentUserId, this.currentUserName, parseInt(value) || 0, value)
-      }).then(() => { this.$modal.msgSuccess(this.$t('oa.asset.submitApprovalSuccess')); this.getList(); this.getStatistics() }).catch(() => {})
+      this.$router.push({ path: '/oa/asset/transfer', query: { assetId: row.id } })
     },
     handleRepair(row) {
-      this.$prompt(this.$t('oa.asset.placeholder.repairReason'), this.$t('oa.asset.repair'), { inputPlaceholder: this.$t('oa.asset.placeholder.repairReason') }).then(({ value }) => {
-        if (!value) { this.$modal.msgError(this.$t('oa.asset.required.repairReason')); return }
-        return repairAsset(row.id, value, 0, '')
-      }).then(() => { this.$modal.msgSuccess(this.$t('oa.asset.submitApprovalSuccess')); this.getList(); this.getStatistics() }).catch(() => {})
+      this.$router.push({ path: '/oa/asset/repair', query: { assetId: row.id } })
     },
     handleScrap(row) {
-      this.$prompt(this.$t('oa.asset.placeholder.scrapReason'), this.$t('oa.asset.scrap'), { inputPlaceholder: this.$t('oa.asset.placeholder.scrapReason') }).then(({ value }) => {
-        if (!value) { this.$modal.msgError(this.$t('oa.asset.required.scrapReason')); return }
-        return scrapAsset(row.id, value, '')
-      }).then(() => { this.$modal.msgSuccess(this.$t('oa.asset.submitApprovalSuccess')); this.getList(); this.getStatistics() }).catch(() => {})
+      this.$router.push({ path: '/oa/asset/scrap', query: { assetId: row.id } })
     }
   }
 }

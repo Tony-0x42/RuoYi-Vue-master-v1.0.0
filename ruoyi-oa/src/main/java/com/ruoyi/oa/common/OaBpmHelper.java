@@ -56,7 +56,7 @@ public class OaBpmHelper {
      * @param processKey 流程定义 Key
      * @param businessKey 业务标识
      * @param starter 发起人用户 ID
-     * @param approver 办理人，可以是 {@link Long} 或 {@code List<Long>}
+     * @param approver 办理人用户 ID 或用户 ID 列表
      * @return 流程实例
      */
     public BpmProcessInstance startApproval(String processKey, String businessKey, Long starter, Object approver) {

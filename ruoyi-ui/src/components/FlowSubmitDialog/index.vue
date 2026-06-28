@@ -1,44 +1,88 @@
 <template>
   <el-dialog
-    :title="title"
+    :title="dialogTitle"
     :visible.sync="dialogVisible"
-    width="700px"
+    width="600px"
     append-to-body
-    @closed="handleClosed"
+    :close-on-click-modal="false"
+    @close="handleClose"
   >
-    <el-form ref="form" :model="form" label-width="100px">
-      <el-form-item label="审批人" prop="approvalAssignee">
-        <user-multi-select v-model="form.approvalAssignee" title="选择审批人" />
+    <el-form
+      ref="form"
+      v-loading="loading"
+      :model="formModel"
+      :rules="rules"
+      label-width="100px"
+      @validate="onValidate"
+    >
+      <el-form-item label="下一节点">
+        <span>{{ nextNodeName || '-' }}</span>
+      </el-form-item>
+      <el-form-item label="候选人" prop="selectedCandidates">
+        <el-select
+          v-model="formModel.selectedCandidates"
+          multiple
+          placeholder="请选择候选人"
+          style="width: 100%"
+        >
+          <el-option
+            v-for="user in candidateList"
+            :key="user.userId"
+            :label="user.nickName || user.userName"
+            :value="user.userId"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="审批意见" prop="opinion">
-        <el-input v-model="form.opinion" type="textarea" :rows="3" placeholder="请输入审批意见" />
+        <el-input
+          v-model="formModel.opinion"
+          type="textarea"
+          :rows="3"
+          placeholder="请输入审批意见"
+        />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button type="primary" :loading="loading" @click="handleSubmit">确 定</el-button>
-      <el-button @click="handleCancel">取 消</el-button>
+      <el-button
+        v-if="taskId"
+        type="danger"
+        :loading="returnLoading"
+        :disabled="!formModel.opinion"
+        @click="handleReturn"
+      >退回上一环节</el-button>
+      <el-button
+        type="primary"
+        :loading="submitLoading"
+        :disabled="!submitEnabled"
+        @click="handleSubmit"
+      >提交</el-button>
+      <el-button @click="handleClose">取消</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
-import UserMultiSelect from '@/components/UserMultiSelect'
-import { listDefinition } from '@/api/bpm/definition'
-import { startProcess, submitTask } from '@/api/bpm/runtime'
+import {
+  previewStart,
+  previewNext,
+  getReturnTarget,
+  startProcess,
+  completeTask,
+  returnToPrevious
+} from '@/api/bpm/preview'
 
 export default {
   name: 'FlowSubmitDialog',
-  components: { UserMultiSelect },
   props: {
     visible: {
       type: Boolean,
       default: false
     },
-    title: {
-      type: String,
-      default: '提交审批'
-    },
     processKey: {
+      type: String,
+      default: ''
+    },
+    taskId: {
       type: String,
       default: ''
     },
@@ -46,9 +90,13 @@ export default {
       type: String,
       default: ''
     },
-    taskId: {
-      type: String,
-      default: ''
+    variables: {
+      type: Object,
+      default: () => ({})
+    },
+    formData: {
+      type: Object,
+      default: () => ({})
     },
     submitApi: {
       type: Function,
@@ -59,80 +107,170 @@ export default {
     return {
       dialogVisible: this.visible,
       loading: false,
-      form: {
-        approvalAssignee: '',
+      submitLoading: false,
+      returnLoading: false,
+      nextNodeName: '',
+      candidateList: [],
+      formModel: {
+        selectedCandidates: [],
         opinion: ''
+      },
+      fieldValid: {
+        opinion: false,
+        selectedCandidates: false
+      },
+      rules: {
+        opinion: [
+          { required: true, message: '请输入审批意见', trigger: 'blur' }
+        ],
+        selectedCandidates: [
+          { required: true, type: 'array', min: 1, message: '请至少选择一个候选人', trigger: 'change' }
+        ]
       }
+    }
+  },
+  computed: {
+    dialogTitle() {
+      return this.taskId ? '审批提交' : '流程发起'
+    },
+    userId() {
+      const getters = this.$store.getters
+      const stateUser = this.$store.state.user
+      return getters.userId ||
+        stateUser.userId ||
+        getters.id ||
+        stateUser.id ||
+        (stateUser.userInfo && stateUser.userInfo.userId)
+    },
+    submitEnabled() {
+      return this.fieldValid.opinion && this.fieldValid.selectedCandidates
+    },
+    selectedCandidates() {
+      return this.formModel.selectedCandidates.map(id => Number(id))
     }
   },
   watch: {
     visible(val) {
       this.dialogVisible = val
+      if (val) {
+        this.resetData()
+        this.loadPreview()
+      }
     },
     dialogVisible(val) {
       this.$emit('update:visible', val)
     }
   },
   methods: {
-    parseCandidates(value) {
-      if (!value) return []
-      return [...new Set(String(value).split(',').map(s => s.trim()).filter(Boolean))]
+    resetData() {
+      this.nextNodeName = ''
+      this.candidateList = []
+      this.formModel = {
+        selectedCandidates: [],
+        opinion: ''
+      }
+      this.fieldValid = {
+        opinion: false,
+        selectedCandidates: false
+      }
+      this.$nextTick(() => {
+        this.$refs.form && this.$refs.form.clearValidate()
+      })
     },
-    handleSubmit() {
+    onValidate(prop, valid) {
+      this.fieldValid[prop] = valid
+    },
+    loadPreview() {
       this.loading = true
-      const selectedCandidates = this.parseCandidates(this.form.approvalAssignee)
-      const payload = {
-        approvalAssignee: selectedCandidates,
-        opinion: this.form.opinion,
-        businessKey: this.businessKey,
-        processKey: this.processKey
-      }
-
-      let promise
-      if (this.taskId) {
-        promise = submitTask(this.taskId, {
-          opinion: payload.opinion,
-          variables: { approvalAssignee: selectedCandidates }
-        })
-      } else if (this.submitApi) {
-        promise = this.submitApi(payload)
-      } else {
-        promise = this.startProcessFallback(payload)
-      }
-
+      const params = { variables: this.variables }
+      const promise = this.taskId
+        ? previewNext({ taskId: this.taskId, operator: this.userId, ...params })
+        : previewStart({ processKey: this.processKey, operator: this.userId, ...params })
       promise.then(response => {
-        this.$emit('success', response)
-        this.dialogVisible = false
-      }).catch(() => {}).finally(() => {
+        const nodes = (response.data && response.data.nodes) || []
+        if (nodes.length > 0) {
+          const node = nodes[0]
+          this.nextNodeName = node.nodeName || ''
+          this.candidateList = node.candidates || []
+        }
+      }).catch(error => {
+        this.$message.error('流程预览失败')
+      }).finally(() => {
         this.loading = false
       })
     },
-    startProcessFallback(payload) {
-      if (!this.processKey) {
-        return Promise.reject(new Error('缺少流程标识'))
-      }
-      return listDefinition({
-        processKey: this.processKey,
-        status: 1,
-        pageNum: 1,
-        pageSize: 1
-      }).then(response => {
-        const rows = response.rows || []
-        if (!rows.length) {
-          throw new Error('未找到已发布的流程定义')
+    handleSubmit() {
+      this.$refs.form.validate(valid => {
+        if (!valid) {
+          return
         }
-        return startProcess(rows[0].id, {
-          businessKey: payload.businessKey,
-          variables: { approvalAssignee: payload.approvalAssignee }
+        this.submitLoading = true
+        const variables = {
+          ...this.variables,
+          approvalAssignee: this.selectedCandidates
+        }
+        let promise
+        if (this.submitApi) {
+          promise = this.submitApi({ approvalAssignee: this.selectedCandidates, variables, opinion: this.formModel.opinion })
+        } else if (this.taskId) {
+          promise = completeTask(this.taskId, {
+            operator: this.userId,
+            action: 'AGREE',
+            opinion: this.formModel.opinion,
+            formData: this.formData,
+            variables,
+            nextAssignees: this.selectedCandidates
+          })
+        } else {
+          promise = startProcess({
+            processDefinitionKey: this.processKey,
+            businessKey: this.businessKey,
+            starter: this.userId,
+            formData: this.formData,
+            variables
+          })
+        }
+        promise.then(response => {
+          this.$message.success('提交成功')
+          this.$emit('success', response.data)
+          this.handleClose()
+        }).catch(error => {
+          this.$message.error('提交失败')
+        }).finally(() => {
+          this.submitLoading = false
         })
       })
     },
-    handleCancel() {
-      this.dialogVisible = false
+    handleReturn() {
+      if (!this.taskId) {
+        return
+      }
+      if (!this.formModel.opinion) {
+        this.$message.warning('请先填写审批意见')
+        return
+      }
+      this.returnLoading = true
+      getReturnTarget(this.taskId).then(response => {
+        const target = response.data || {}
+        return returnToPrevious(this.taskId, {
+          operator: this.userId,
+          targetNodeId: target.targetNodeId,
+          returnAssignee: target.targetUserId,
+          opinion: this.formModel.opinion
+        })
+      }).then(response => {
+        this.$message.success('退回成功')
+        this.$emit('success', response.data)
+        this.handleClose()
+      }).catch(error => {
+        this.$message.error('退回失败')
+      }).finally(() => {
+        this.returnLoading = false
+      })
     },
-    handleClosed() {
-      this.form.approvalAssignee = ''
-      this.form.opinion = ''
+    handleClose() {
+      this.dialogVisible = false
+      this.$emit('close')
     }
   }
 }

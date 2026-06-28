@@ -160,70 +160,6 @@
       @pagination="getList"
     />
 
-    <el-dialog :title="title" :visible.sync="open" width="720px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px" :disabled="isDetail">
-        <el-row>
-          <el-col :span="24">
-            <el-form-item :label="$t('oa.meeting.form.title')" prop="title">
-              <el-input v-model="form.title" :placeholder="$t('oa.meeting.search.titlePlaceholder')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item :label="$t('oa.meeting.form.timeRange')" prop="timeRange">
-              <el-date-picker
-                v-model="form.timeRange"
-                type="datetimerange"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                :default-time="['09:00:00','18:00:00']"
-                range-separator="~"
-                :start-placeholder="$t('oa.meeting.form.timeRange')"
-                :end-placeholder="$t('oa.meeting.form.timeRange')"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.meeting.search.room')" prop="roomId">
-              <el-select v-model="form.roomId" :placeholder="$t('oa.meeting.form.roomIdRequired')" style="width: 100%">
-                <el-option
-                  v-for="item in roomOptions"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.meeting.form.attendees')">
-              <el-select v-model="form.attendeeIds" multiple collapse-tags :placeholder="$t('oa.meeting.form.attendees')" style="width: 100%">
-                <el-option
-                  v-for="user in userOptions"
-                  :key="user.userId"
-                  :label="user.userName"
-                  :value="user.userId"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item :label="$t('oa.meeting.form.content')" prop="content">
-              <el-input v-model="form.content" type="textarea" :rows="4" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item :label="$t('oa.meeting.form.remark')" prop="remark">
-              <el-input v-model="form.remark" type="textarea" :rows="2" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button v-if="!isDetail" type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
-
     <!-- 占用视图抽屉 -->
     <el-drawer :title="$t('oa.meeting.occupancy')" :visible.sync="occupancyOpen" direction="rtl" size="600px">
       <div style="padding: 0 20px">
@@ -267,8 +203,7 @@
 </template>
 
 <script>
-import { listMeeting, getMeeting, addMeeting, updateMeeting, delMeeting, cancelMeeting, listAvailableRoom, listOccupancy } from "@/api/oa/meeting"
-import { listUser } from "@/api/system/user"
+import { listMeeting, delMeeting, cancelMeeting, listAvailableRoom, listOccupancy } from "@/api/oa/meeting"
 
 export default {
   name: "OaMeeting",
@@ -282,10 +217,6 @@ export default {
       total: 0,
       meetingList: [],
       roomOptions: [],
-      userOptions: [],
-      title: "",
-      open: false,
-      isDetail: false,
       occupancyOpen: false,
       dateRange: [],
       occupancyQuery: {
@@ -299,25 +230,12 @@ export default {
         title: undefined,
         roomId: undefined,
         status: undefined
-      },
-      form: {},
-      rules: {
-        title: [
-          { required: true, message: this.$t('oa.meeting.form.titleRequired'), trigger: "blur" }
-        ],
-        timeRange: [
-          { required: true, message: this.$t('oa.meeting.form.timeRequired'), trigger: "change" }
-        ],
-        roomId: [
-          { required: true, message: this.$t('oa.meeting.form.roomIdRequired'), trigger: "change" }
-        ]
       }
     }
   },
   created() {
     this.getList()
     this.loadRooms()
-    this.loadUsers()
   },
   methods: {
     getList() {
@@ -337,11 +255,6 @@ export default {
         this.roomOptions = response.data || []
       })
     },
-    loadUsers() {
-      listUser({ pageSize: 1000 }).then(response => {
-        this.userOptions = response.rows || []
-      })
-    },
     loadOccupancy() {
       const params = {
         roomId: this.occupancyQuery.roomId,
@@ -351,23 +264,6 @@ export default {
       listOccupancy(params).then(response => {
         this.occupancyList = response.data || []
       })
-    },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        title: undefined,
-        timeRange: [],
-        roomId: undefined,
-        attendeeIds: [],
-        content: undefined,
-        remark: undefined
-      }
-      this.isDetail = false
-      this.resetForm("form")
     },
     handleQuery() {
       this.queryParams.pageNum = 1
@@ -384,57 +280,14 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.meeting.add')
+      this.$router.push({ path: '/oa/meetingDir/meeting/form' })
     },
     handleUpdate(row) {
-      this.reset()
-      const id = row.id || this.ids
-      getMeeting(id).then(response => {
-        const data = response.data
-        data.timeRange = [data.startTime, data.endTime]
-        data.attendeeIds = (data.attendees || []).map(a => a.userId)
-        this.form = data
-        this.open = true
-        this.title = this.$t('oa.meeting.edit')
-      })
+      const id = row ? row.id : this.ids[0]
+      this.$router.push({ path: '/oa/meetingDir/meeting/form', query: { id } })
     },
     handleView(row) {
-      this.reset()
-      getMeeting(row.id).then(response => {
-        const data = response.data
-        data.timeRange = [data.startTime, data.endTime]
-        data.attendeeIds = (data.attendees || []).map(a => a.userId)
-        this.form = data
-        this.open = true
-        this.isDetail = true
-        this.title = this.$t('oa.meeting.detail')
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          const data = { ...this.form }
-          data.startTime = data.timeRange[0]
-          data.endTime = data.timeRange[1]
-          delete data.timeRange
-          delete data.attendees
-          if (data.id != undefined) {
-            updateMeeting(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addMeeting(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+      this.$router.push({ path: '/oa/meetingDir/meeting/form', query: { mode: 'detail', id: row.id } })
     },
     handleOccupancy() {
       this.occupancyOpen = true

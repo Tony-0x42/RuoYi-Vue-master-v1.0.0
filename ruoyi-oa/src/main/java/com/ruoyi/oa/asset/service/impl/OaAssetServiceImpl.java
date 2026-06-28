@@ -116,30 +116,58 @@ public class OaAssetServiceImpl implements IOaAssetService
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int receive(Long id, Long userId, String userName)
+    public Long receive(Long id, Map<String, Object> params)
     {
-        OaAsset asset = assetMapper.selectById(id);
-        if (asset == null)
+        Object recordIdObj = params != null ? params.get("id") : null;
+        Long recordId = toLong(recordIdObj);
+        Object approver = params != null ? params.get("approvalAssignee") : null;
+
+        OaAssetReceive receive;
+        if (recordId != null)
         {
-            throw new ServiceException("资产不存在");
+            receive = receiveMapper.selectById(recordId);
+            if (receive == null)
+            {
+                throw new ServiceException("领用记录不存在");
+            }
+            if (receive.getProcessInstanceId() != null && !receive.getProcessInstanceId().isEmpty())
+            {
+                throw new ServiceException("领用申请已提交");
+            }
         }
-        if (!Integer.valueOf(0).equals(asset.getStatus()))
+        else
         {
-            throw new ServiceException("仅闲置资产可领用");
+            OaAsset asset = assetMapper.selectById(id);
+            if (asset == null)
+            {
+                throw new ServiceException("资产不存在");
+            }
+            if (!Integer.valueOf(0).equals(asset.getStatus()))
+            {
+                throw new ServiceException("仅闲置资产可领用");
+            }
+            Long userId = toLong(params != null ? params.get("userId") : null);
+            String userName = toStringVal(params != null ? params.get("userName") : null);
+            receive = new OaAssetReceive();
+            receive.setAssetId(id);
+            receive.setUserId(userId);
+            receive.setUserName(userName);
+            receive.setRemark(toStringVal(params != null ? params.get("remark") : null));
+            receive.setStatus(0);
+            receive.setCreateBy(SecurityUtils.getUsername());
+            receiveMapper.insert(receive);
         }
 
-        OaAssetReceive receive = new OaAssetReceive();
-        receive.setAssetId(id);
-        receive.setUserId(userId);
-        receive.setUserName(userName);
-        receive.setStatus(0);
-        receive.setCreateBy(SecurityUtils.getUsername());
-        receiveMapper.insert(receive);
-
-        BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_receive", "asset_receive:" + receive.getId(), userId);
-        receive.setProcessInstanceId(instance.getId());
-        receive.setUpdateBy(SecurityUtils.getUsername());
-        return receiveMapper.update(receive);
+        if (approver != null)
+        {
+            Long starter = receive.getUserId() != null ? receive.getUserId() : SecurityUtils.getUserId();
+            BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_receive", "asset_receive:" + receive.getId(), starter, approver);
+            receive.setProcessInstanceId(instance.getId());
+            receive.setStatus(0);
+            receive.setUpdateBy(SecurityUtils.getUsername());
+            receiveMapper.update(receive);
+        }
+        return receive.getId();
     }
 
     @Override
@@ -193,61 +221,113 @@ public class OaAssetServiceImpl implements IOaAssetService
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int transfer(Long id, Long fromUserId, String fromUserName, Long toUserId, String toUserName)
+    public Long transfer(Long id, Map<String, Object> params)
     {
-        OaAsset asset = assetMapper.selectById(id);
-        if (asset == null)
+        Object recordIdObj = params != null ? params.get("id") : null;
+        Long recordId = toLong(recordIdObj);
+        Object approver = params != null ? params.get("approvalAssignee") : null;
+
+        OaAssetTransfer transfer;
+        if (recordId != null)
         {
-            throw new ServiceException("资产不存在");
+            transfer = transferMapper.selectById(recordId);
+            if (transfer == null)
+            {
+                throw new ServiceException("调拨记录不存在");
+            }
+            if (transfer.getProcessInstanceId() != null && !transfer.getProcessInstanceId().isEmpty())
+            {
+                throw new ServiceException("调拨申请已提交");
+            }
         }
-        if (!Integer.valueOf(1).equals(asset.getStatus()))
+        else
         {
-            throw new ServiceException("仅在用资产可调拨");
+            OaAsset asset = assetMapper.selectById(id);
+            if (asset == null)
+            {
+                throw new ServiceException("资产不存在");
+            }
+            if (!Integer.valueOf(1).equals(asset.getStatus()))
+            {
+                throw new ServiceException("仅在用资产可调拨");
+            }
+            transfer = new OaAssetTransfer();
+            transfer.setAssetId(id);
+            transfer.setFromUserId(toLong(params != null ? params.get("fromUserId") : null));
+            transfer.setFromUserName(toStringVal(params != null ? params.get("fromUserName") : null));
+            transfer.setToUserId(toLong(params != null ? params.get("toUserId") : null));
+            transfer.setToUserName(toStringVal(params != null ? params.get("toUserName") : null));
+            transfer.setRemark(toStringVal(params != null ? params.get("remark") : null));
+            transfer.setStatus(0);
+            transfer.setCreateBy(SecurityUtils.getUsername());
+            transferMapper.insert(transfer);
         }
 
-        OaAssetTransfer transfer = new OaAssetTransfer();
-        transfer.setAssetId(id);
-        transfer.setFromUserId(fromUserId);
-        transfer.setFromUserName(fromUserName);
-        transfer.setToUserId(toUserId);
-        transfer.setToUserName(toUserName);
-        transfer.setStatus(0);
-        transfer.setCreateBy(SecurityUtils.getUsername());
-        transferMapper.insert(transfer);
-
-        BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_transfer", "asset_transfer:" + transfer.getId(), fromUserId);
-        transfer.setProcessInstanceId(instance.getId());
-        transfer.setUpdateBy(SecurityUtils.getUsername());
-        return transferMapper.update(transfer);
+        if (approver != null)
+        {
+            Long starter = transfer.getFromUserId() != null ? transfer.getFromUserId() : SecurityUtils.getUserId();
+            BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_transfer", "asset_transfer:" + transfer.getId(), starter, approver);
+            transfer.setProcessInstanceId(instance.getId());
+            transfer.setStatus(0);
+            transfer.setUpdateBy(SecurityUtils.getUsername());
+            transferMapper.update(transfer);
+        }
+        return transfer.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int repair(Long id, String reason, java.math.BigDecimal cost, String vendor)
+    public Long repair(Long id, Map<String, Object> params)
     {
-        OaAsset asset = assetMapper.selectById(id);
-        if (asset == null)
+        Object recordIdObj = params != null ? params.get("id") : null;
+        Long recordId = toLong(recordIdObj);
+        Object approver = params != null ? params.get("approvalAssignee") : null;
+
+        OaAssetRepair repair;
+        if (recordId != null)
         {
-            throw new ServiceException("资产不存在");
+            repair = repairMapper.selectById(recordId);
+            if (repair == null)
+            {
+                throw new ServiceException("维修记录不存在");
+            }
+            if (repair.getProcessInstanceId() != null && !repair.getProcessInstanceId().isEmpty())
+            {
+                throw new ServiceException("维修申请已提交");
+            }
         }
-        if (Integer.valueOf(3).equals(asset.getStatus()))
+        else
         {
-            throw new ServiceException("已报废资产不可维修");
+            OaAsset asset = assetMapper.selectById(id);
+            if (asset == null)
+            {
+                throw new ServiceException("资产不存在");
+            }
+            if (Integer.valueOf(3).equals(asset.getStatus()))
+            {
+                throw new ServiceException("已报废资产不可维修");
+            }
+            repair = new OaAssetRepair();
+            repair.setAssetId(id);
+            repair.setReason(toStringVal(params != null ? params.get("reason") : null));
+            repair.setCost(toBigDecimal(params != null ? params.get("cost") : null));
+            repair.setVendor(toStringVal(params != null ? params.get("vendor") : null));
+            repair.setRemark(toStringVal(params != null ? params.get("remark") : null));
+            repair.setStatus(0);
+            repair.setCreateBy(SecurityUtils.getUsername());
+            repairMapper.insert(repair);
         }
 
-        OaAssetRepair repair = new OaAssetRepair();
-        repair.setAssetId(id);
-        repair.setReason(reason);
-        repair.setCost(cost);
-        repair.setVendor(vendor);
-        repair.setStatus(0);
-        repair.setCreateBy(SecurityUtils.getUsername());
-        repairMapper.insert(repair);
-
-        BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_repair", "asset_repair:" + repair.getId(), SecurityUtils.getUserId());
-        repair.setProcessInstanceId(instance.getId());
-        repair.setUpdateBy(SecurityUtils.getUsername());
-        return repairMapper.update(repair);
+        if (approver != null)
+        {
+            Long starter = SecurityUtils.getUserId();
+            BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_repair", "asset_repair:" + repair.getId(), starter, approver);
+            repair.setProcessInstanceId(instance.getId());
+            repair.setStatus(0);
+            repair.setUpdateBy(SecurityUtils.getUsername());
+            repairMapper.update(repair);
+        }
+        return repair.getId();
     }
 
     @Override
@@ -276,30 +356,87 @@ public class OaAssetServiceImpl implements IOaAssetService
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int scrap(Long id, String reason, String disposalMethod)
+    public Long scrap(Long id, Map<String, Object> params)
     {
-        OaAsset asset = assetMapper.selectById(id);
-        if (asset == null)
+        Object recordIdObj = params != null ? params.get("id") : null;
+        Long recordId = toLong(recordIdObj);
+        Object approver = params != null ? params.get("approvalAssignee") : null;
+
+        OaAssetScrap scrap;
+        if (recordId != null)
         {
-            throw new ServiceException("资产不存在");
+            scrap = scrapMapper.selectById(recordId);
+            if (scrap == null)
+            {
+                throw new ServiceException("报废记录不存在");
+            }
+            if (scrap.getProcessInstanceId() != null && !scrap.getProcessInstanceId().isEmpty())
+            {
+                throw new ServiceException("报废申请已提交");
+            }
         }
-        if (Integer.valueOf(3).equals(asset.getStatus()))
+        else
         {
-            throw new ServiceException("资产已报废");
+            OaAsset asset = assetMapper.selectById(id);
+            if (asset == null)
+            {
+                throw new ServiceException("资产不存在");
+            }
+            if (Integer.valueOf(3).equals(asset.getStatus()))
+            {
+                throw new ServiceException("资产已报废");
+            }
+            scrap = new OaAssetScrap();
+            scrap.setAssetId(id);
+            scrap.setReason(toStringVal(params != null ? params.get("reason") : null));
+            scrap.setDisposalMethod(toStringVal(params != null ? params.get("disposalMethod") : null));
+            scrap.setRemark(toStringVal(params != null ? params.get("remark") : null));
+            scrap.setStatus(0);
+            scrap.setCreateBy(SecurityUtils.getUsername());
+            scrapMapper.insert(scrap);
         }
 
-        OaAssetScrap scrap = new OaAssetScrap();
-        scrap.setAssetId(id);
-        scrap.setReason(reason);
-        scrap.setDisposalMethod(disposalMethod);
-        scrap.setStatus(0);
-        scrap.setCreateBy(SecurityUtils.getUsername());
-        scrapMapper.insert(scrap);
+        if (approver != null)
+        {
+            Long starter = SecurityUtils.getUserId();
+            BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_scrap", "asset_scrap:" + scrap.getId(), starter, approver);
+            scrap.setProcessInstanceId(instance.getId());
+            scrap.setStatus(0);
+            scrap.setUpdateBy(SecurityUtils.getUsername());
+            scrapMapper.update(scrap);
+        }
+        return scrap.getId();
+    }
 
-        BpmProcessInstance instance = bpmHelper.startApproval("oa_asset_scrap", "asset_scrap:" + scrap.getId(), SecurityUtils.getUserId());
-        scrap.setProcessInstanceId(instance.getId());
-        scrap.setUpdateBy(SecurityUtils.getUsername());
-        return scrapMapper.update(scrap);
+    private Long toLong(Object obj)
+    {
+        if (obj == null)
+        {
+            return null;
+        }
+        if (obj instanceof Number)
+        {
+            return ((Number) obj).longValue();
+        }
+        return Long.valueOf(obj.toString());
+    }
+
+    private String toStringVal(Object obj)
+    {
+        return obj == null ? null : obj.toString();
+    }
+
+    private java.math.BigDecimal toBigDecimal(Object obj)
+    {
+        if (obj == null)
+        {
+            return null;
+        }
+        if (obj instanceof java.math.BigDecimal)
+        {
+            return (java.math.BigDecimal) obj;
+        }
+        return new java.math.BigDecimal(obj.toString());
     }
 
     @Override

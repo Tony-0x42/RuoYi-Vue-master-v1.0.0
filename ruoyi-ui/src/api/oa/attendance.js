@@ -260,10 +260,11 @@ export function delLeave(ids) {
 }
 
 // 提交请假申请
-export function submitLeave(id) {
+export function submitLeave(id, data) {
   return request({
     url: '/api/v1/oa/attendance/leaves/' + id + '/submit',
-    method: 'post'
+    method: 'post',
+    data: data
   })
 }
 
@@ -311,10 +312,11 @@ export function delOvertime(ids) {
 }
 
 // 提交加班申请
-export function submitOvertime(id) {
+export function submitOvertime(id, data) {
   return request({
     url: '/api/v1/oa/attendance/overtimes/' + id + '/submit',
-    method: 'post'
+    method: 'post',
+    data: data
   })
 }
 
@@ -362,10 +364,11 @@ export function delTrip(ids) {
 }
 
 // 提交出差申请
-export function submitTrip(id) {
+export function submitTrip(id, data) {
   return request({
     url: '/api/v1/oa/attendance/trips/' + id + '/submit',
-    method: 'post'
+    method: 'post',
+    data: data
   })
 }
 
@@ -413,10 +416,11 @@ export function delMakeup(ids) {
 }
 
 // 提交补卡申请
-export function submitMakeup(id) {
+export function submitMakeup(id, data) {
   return request({
     url: '/api/v1/oa/attendance/makeups/' + id + '/submit',
-    method: 'post'
+    method: 'post',
+    data: data
   })
 }
 

@@ -81,7 +81,7 @@ public class OaAttendanceOvertimeServiceImpl implements IOaAttendanceOvertimeSer
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int submit(Long id)
+    public int submit(Long id, Object approver)
     {
         OaAttendanceOvertime existing = overtimeMapper.selectById(id);
         if (existing == null)
@@ -92,7 +92,7 @@ public class OaAttendanceOvertimeServiceImpl implements IOaAttendanceOvertimeSer
         {
             throw new ServiceException("只有草稿状态可提交");
         }
-        BpmProcessInstance instance = bpmHelper.startApproval("oa_attendance_overtime", "attendance_overtime:" + id, existing.getUserId());
+        BpmProcessInstance instance = bpmHelper.startApproval("oa_attendance_overtime", "attendance_overtime:" + id, existing.getUserId(), approver);
         existing.setStatus("approving");
         existing.setProcessInstanceId(instance.getId());
         existing.setUpdateBy(SecurityUtils.getUsername());

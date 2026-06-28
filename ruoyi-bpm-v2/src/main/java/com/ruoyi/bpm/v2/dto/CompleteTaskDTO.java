@@ -1,5 +1,6 @@
 package com.ruoyi.bpm.v2.dto;
 
+import java.util.List;
 import java.util.Map;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,9 @@ public class CompleteTaskDTO {
     private Map<String, Object> formData;
 
     private Map<String, Object> variables;
+
+    /** AGREE 时优先作为下一节点审批人变量 */
+    private List<Long> nextAssignees;
 
     public Long getOperator() {
         return operator;
@@ -59,5 +63,13 @@ public class CompleteTaskDTO {
 
     public void setVariables(Map<String, Object> variables) {
         this.variables = variables;
+    }
+
+    public List<Long> getNextAssignees() {
+        return nextAssignees;
+    }
+
+    public void setNextAssignees(List<Long> nextAssignees) {
+        this.nextAssignees = nextAssignees;
     }
 }

@@ -26,6 +26,12 @@ public interface IBpmTaskService {
                      Map<String, Object> formData, Map<String, Object> variables);
 
     /**
+     * 完成任务（支持指定下一节点审批人）
+     */
+    BpmTask complete(String taskId, Long operator, String action, String opinion,
+                     Map<String, Object> formData, Map<String, Object> variables, List<Long> nextAssignees);
+
+    /**
      * 转交任务
      */
     BpmTask transfer(String taskId, Long operator, Long assignee, String opinion);
@@ -34,4 +40,10 @@ public interface IBpmTaskService {
      * 退回任务
      */
     BpmTask returnTask(String taskId, Long operator, String targetNodeId, String opinion);
+
+    /**
+     * 退回到上一办理人
+     * @param returnAssignee 强制指定的退回办理人，覆盖目标节点的 assigneeType 解析结果
+     */
+    BpmTask returnToPrevious(String taskId, Long operator, String targetNodeId, Long returnAssignee, String opinion);
 }

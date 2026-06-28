@@ -52,5 +52,5 @@ public interface IOaExpenseLoanService
     /**
      * 提交借款单并启动审批流程
      */
-    int submit(Long id);
+    int submit(Long id, Object approvalAssignee);
 }

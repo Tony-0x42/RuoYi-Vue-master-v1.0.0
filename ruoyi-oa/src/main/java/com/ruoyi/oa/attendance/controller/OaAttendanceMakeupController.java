@@ -1,6 +1,7 @@
 package com.ruoyi.oa.attendance.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -92,8 +93,9 @@ public class OaAttendanceMakeupController extends BaseController
     @PreAuthorize("@ss.hasPermi('oa:attendanceMakeup:edit')")
     @Log(title = "补卡申请提交", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/submit")
-    public AjaxResult submit(@PathVariable Long id)
+    public AjaxResult submit(@PathVariable Long id, @RequestBody Map<String, Object> body)
     {
-        return toAjax(makeupService.submit(id));
+        Object approvalAssignee = body != null ? body.get("approvalAssignee") : null;
+        return toAjax(makeupService.submit(id, approvalAssignee));
     }
 }

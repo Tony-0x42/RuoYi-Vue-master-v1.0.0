@@ -41,5 +41,5 @@ public interface IOaAttendanceTripService
     /**
      * 提交出差申请并启动审批流程
      */
-    int submit(Long id);
+    int submit(Long id, Object approverId);
 }

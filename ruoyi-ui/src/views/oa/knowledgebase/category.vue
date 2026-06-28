@@ -100,32 +100,11 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item :label="$t('oa.knowledgebase.categoryName')" prop="name">
-          <el-input v-model="form.name" :placeholder="$t('oa.knowledgebase.categoryName')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.knowledgebase.categoryCode')" prop="code">
-          <el-input v-model="form.code" :placeholder="$t('oa.knowledgebase.categoryCode')" />
-        </el-form-item>
-        <el-form-item :label="$t('common.status')" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio :label="1">{{ $t('oa.knowledgebase.enable') }}</el-radio>
-            <el-radio :label="0">{{ $t('oa.knowledgebase.disable') }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listCategory, getCategory, addCategory, updateCategory, delCategory } from "@/api/oa/knowledgebase"
+import { listCategory, delCategory } from "@/api/oa/knowledgebase"
 
 export default {
   name: "OaKnowledgebaseCategory",
@@ -138,22 +117,11 @@ export default {
       showSearch: true,
       total: 0,
       categoryList: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         name: undefined,
         status: undefined
-      },
-      form: {},
-      rules: {
-        name: [
-          { required: true, message: this.$t('oa.knowledgebase.required.title'), trigger: "blur" }
-        ],
-        code: [
-          { required: true, message: this.$t('oa.knowledgebase.required.categoryCode'), trigger: "blur" }
-        ]
       }
     }
   },
@@ -169,21 +137,6 @@ export default {
         this.loading = false
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        name: undefined,
-        code: undefined,
-        status: 1,
-        sort: 0,
-        parentId: 0
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -198,37 +151,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.knowledgebase.addCategory')
+      this.$router.push({ path: '/oa/knowledge/knowledgebaseCategory/form' })
     },
     handleUpdate(row) {
-      this.reset()
       const id = row.id || this.ids
-      getCategory(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('oa.knowledgebase.editCategory')
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.id != undefined) {
-            updateCategory(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addCategory(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+      this.$router.push({ path: '/oa/knowledge/knowledgebaseCategory/form', query: { id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

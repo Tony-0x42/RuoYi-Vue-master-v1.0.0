@@ -2,7 +2,12 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="80px">
       <el-form-item :label="$t('oa.attendance.userId')" prop="userName">
-        <el-input v-model="queryParams.userName" :placeholder="$t('oa.attendance.placeholder.userId')" clearable @keyup.enter.native="handleQuery" />
+        <el-input
+          v-model="queryParams.userName"
+          :placeholder="$t('oa.attendance.placeholder.userId')"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
       </el-form-item>
       <el-form-item :label="$t('common.status')" prop="status">
         <el-select v-model="queryParams.status" :placeholder="$t('common.status')" clearable style="width:160px">
@@ -54,42 +59,31 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="queryParams.pageNum"
+      :limit.sync="queryParams.pageSize"
+      @pagination="getList"
+    />
 
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item :label="$t('oa.attendance.userId')" prop="userId">
-          <el-select v-model="form.userId" :placeholder="$t('oa.attendance.placeholder.userId')" filterable style="width:100%">
-            <el-option v-for="user in userOptions" :key="user.userId" :label="user.nickName || user.userName" :value="user.userId" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.startTime')" prop="startTime">
-          <el-date-picker v-model="form.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" :placeholder="$t('oa.attendance.placeholder.startTime')" style="width:100%" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.endTime')" prop="endTime">
-          <el-date-picker v-model="form.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" :placeholder="$t('oa.attendance.placeholder.endTime')" style="width:100%" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.hours')" prop="hours">
-          <el-input-number v-model="form.hours" :min="0" :precision="2" style="width:100%" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.reason')" prop="reason">
-          <el-input v-model="form.reason" type="textarea" :placeholder="$t('oa.attendance.placeholder.reason')" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
+    <flow-submit-dialog
+      :visible.sync="submitOpen"
+      process-key="oa_attendance_overtime"
+      :business-key="currentRow ? 'attendance_overtime:' + currentRow.id : ''"
+      :submit-api="submitApi"
+      @success="handleSubmitSuccess"
+    />
   </div>
 </template>
 
 <script>
-import { listOvertime, getOvertime, addOvertime, updateOvertime, delOvertime, submitOvertime } from "@/api/oa/attendance"
-import { listUser } from "@/api/system/user"
+import { listOvertime, delOvertime, submitOvertime } from "@/api/oa/attendance"
+import FlowSubmitDialog from "@/components/FlowSubmitDialog"
 
 export default {
   name: "OaAttendanceOvertime",
+  components: { FlowSubmitDialog },
   data() {
     return {
       loading: true,
@@ -99,21 +93,13 @@ export default {
       showSearch: true,
       total: 0,
       overtimeList: [],
-      userOptions: [],
-      title: "",
-      open: false,
+      submitOpen: false,
+      currentRow: null,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         userName: undefined,
         status: undefined
-      },
-      form: {},
-      rules: {
-        userId: [{ required: true, message: this.$t('oa.attendance.required.userId'), trigger: "change" }],
-        startTime: [{ required: true, message: this.$t('oa.attendance.required.startTime'), trigger: "change" }],
-        endTime: [{ required: true, message: this.$t('oa.attendance.required.endTime'), trigger: "change" }],
-        reason: [{ required: true, message: this.$t('oa.attendance.required.reason'), trigger: "blur" }]
       }
     }
   },
@@ -129,7 +115,6 @@ export default {
   },
   created() {
     this.getList()
-    this.loadUsers()
   },
   methods: {
     getList() {
@@ -139,27 +124,6 @@ export default {
         this.total = response.total
         this.loading = false
       })
-    },
-    loadUsers() {
-      listUser({ pageSize: 1000 }).then(response => {
-        this.userOptions = response.rows || []
-      })
-    },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        userId: undefined,
-        startTime: undefined,
-        endTime: undefined,
-        hours: 0,
-        reason: undefined,
-        status: 'draft'
-      }
-      this.resetForm("form")
     },
     handleQuery() {
       this.queryParams.pageNum = 1
@@ -175,46 +139,22 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.attendance.addOvertime')
+      this.$router.push({ path: '/oa/hr/overtime/form' })
     },
     handleUpdate(row) {
-      this.reset()
       const id = row.id || this.ids
-      getOvertime(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('oa.attendance.editOvertime')
-      })
+      this.$router.push({ path: '/oa/hr/overtime/form', query: { id } })
     },
     handleSubmit(row) {
-      this.$modal.confirm(this.$t('oa.attendance.confirm.submitOvertime', { id: row.id })).then(function() {
-        return submitOvertime(row.id)
-      }).then(() => {
-        this.getList()
-        this.$modal.msgSuccess(this.$t('oa.attendance.submitApproval'))
-      }).catch(() => {})
+      this.currentRow = row
+      this.submitOpen = true
     },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          const data = { ...this.form }
-          if (data.id != undefined) {
-            updateOvertime(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addOvertime(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+    submitApi(data) {
+      return submitOvertime(this.currentRow.id, data)
+    },
+    handleSubmitSuccess() {
+      this.getList()
+      this.$modal.msgSuccess(this.$t('oa.attendance.submitApproval'))
     },
     handleDelete(row) {
       const ids = row.id || this.ids

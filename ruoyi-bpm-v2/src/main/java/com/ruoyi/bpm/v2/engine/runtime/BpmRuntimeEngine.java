@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -17,7 +19,6 @@ import com.alibaba.fastjson2.JSON;
 import com.ruoyi.bpm.v2.domain.BpmDefinitionVersion;
 import com.ruoyi.bpm.v2.domain.BpmProcessDefinition;
 import com.ruoyi.bpm.v2.domain.BpmProcessInstance;
-import com.ruoyi.bpm.v2.domain.BpmDefinitionVersion;
 import com.ruoyi.bpm.v2.domain.BpmTask;
 import com.ruoyi.bpm.v2.domain.BpmTaskHistory;
 import com.ruoyi.bpm.v2.engine.model.BpmEdge;
@@ -66,7 +67,32 @@ public class BpmRuntimeEngine {
     @Autowired
     private SysUserMapper sysUserMapper;
 
+    private static final Logger log = LoggerFactory.getLogger(BpmRuntimeEngine.class);
+
     private final SpelExpressionParser spelParser = new SpelExpressionParser();
+
+    /**
+     * 预览从指定节点出发的下一环节
+     */
+    public List<BpmNode> previewNextNodes(String processKey, String fromNodeId, Map<String, Object> vars) {
+        BpmProcessDefinition definition = definitionMapper.selectByKeyAndTenant(processKey, getCurrentTenantId());
+        if (definition == null) {
+            throw new ServiceException("流程定义不存在");
+        }
+        BpmProcessModel model = modelParser.parse(definition.getExtJson());
+        BpmNode node = findNodeById(model, fromNodeId);
+        if (node == null) {
+            throw new ServiceException("节点不存在");
+        }
+        return getNextNodes(model, node, vars);
+    }
+
+    /**
+     * 预览节点的候选人
+     */
+    public List<Long> previewAssignees(BpmNode node, Long starter, Map<String, Object> vars) {
+        return getAssignees(node, starter, vars);
+    }
 
     /**
      * 启动流程实例
@@ -184,6 +210,15 @@ public class BpmRuntimeEngine {
      */
     @Transactional(rollbackFor = Exception.class)
     public BpmTask returnTask(String taskId, Long operator, String targetNodeId, String opinion) {
+        return returnTask(taskId, operator, targetNodeId, opinion, null);
+    }
+
+    /**
+     * 退回任务（支持传入流程变量，可强制指定退回办理人）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public BpmTask returnTask(String taskId, Long operator, String targetNodeId, String opinion,
+                              Map<String, Object> variables) {
         BpmTask task = taskMapper.selectById(taskId);
         if (task == null) {
             throw new ServiceException("任务不存在");
@@ -204,7 +239,22 @@ public class BpmRuntimeEngine {
         if (targetNode == null) {
             throw new ServiceException("目标节点不存在");
         }
-        enterNode(instance, model, targetNode, parseVariables(instance.getVariables()));
+        Map<String, Object> mergedVars = parseVariables(instance.getVariables());
+        if (variables != null) {
+            mergedVars.putAll(variables);
+        }
+        enterNode(instance, model, targetNode, mergedVars);
+
+        // 若显式指定退回办理人，则覆盖目标节点自身分配结果
+        Long returnAssignee = extractSingleReturnAssignee(variables == null ? null : variables.get("returnAssignee"));
+        if (returnAssignee != null) {
+            List<BpmTask> activeTasks = taskMapper.selectPendingByNode(instance.getId(), targetNodeId);
+            for (BpmTask activeTask : activeTasks) {
+                activeTask.setAssignee(returnAssignee);
+                activeTask.setCandidates(null);
+                taskMapper.update(activeTask);
+            }
+        }
         return task;
     }
 
@@ -501,7 +551,9 @@ public class BpmRuntimeEngine {
                         }
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                log.warn("节点表达式解析失败: nodeId={}, expression={}", node.getId(), expression, e);
+                throw new ServiceException("节点表达式解析失败");
             }
         }
         return result.stream().distinct().collect(Collectors.toList());
@@ -582,11 +634,25 @@ public class BpmRuntimeEngine {
                 .orElse(null);
     }
 
-    private Map<String, Object> parseVariables(String variablesJson) {
+    public Map<String, Object> parseVariables(String variablesJson) {
         if (StringUtils.isEmpty(variablesJson)) {
             return new HashMap<>();
         }
         return JSON.parseObject(variablesJson, Map.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Long extractSingleReturnAssignee(Object value) {
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        if (value instanceof List) {
+            List<?> list = (List<?>) value;
+            if (list.size() == 1 && list.get(0) instanceof Number) {
+                return ((Number) list.get(0)).longValue();
+            }
+        }
+        return null;
     }
 
     private void saveHistory(String taskId, String instanceId, String nodeId, Long operator, String action,

@@ -41,5 +41,5 @@ public interface IOaAttendanceOvertimeService
     /**
      * 提交加班申请并启动审批流程
      */
-    int submit(Long id);
+    int submit(Long id, Object approver);
 }

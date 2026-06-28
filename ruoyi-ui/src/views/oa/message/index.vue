@@ -131,45 +131,6 @@
       @pagination="getList"
     />
 
-    <!-- 发送消息 -->
-    <el-dialog :title="$t('oa.message.sendMessage')" :visible.sync="sendOpen" width="700px" append-to-body>
-      <el-form ref="sendForm" :model="sendForm" :rules="sendRules" label-width="100px">
-        <el-form-item :label="$t('oa.message.type')" prop="type">
-          <el-select v-model="sendForm.type" :placeholder="$t('oa.message.placeholder.type')" style="width:100%">
-            <el-option :label="$t('oa.message.todo')" value="todo" />
-            <el-option :label="$t('oa.message.result')" value="result" />
-            <el-option :label="$t('oa.message.notice')" value="notice" />
-            <el-option :label="$t('oa.message.system')" value="system" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('oa.message.title')" prop="title">
-          <el-input v-model="sendForm.title" :placeholder="$t('oa.message.placeholder.title')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.message.content')" prop="content">
-          <el-input v-model="sendForm.content" type="textarea" :rows="4" :placeholder="$t('oa.message.placeholder.content')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.message.priority')" prop="priority">
-          <el-select v-model="sendForm.priority" :placeholder="$t('oa.message.placeholder.priority')" style="width:100%">
-            <el-option :label="$t('oa.message.low')" value="low" />
-            <el-option :label="$t('oa.message.normal')" value="normal" />
-            <el-option :label="$t('oa.message.high')" value="high" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('oa.message.channel')" prop="channel">
-          <el-select v-model="sendForm.channel" :placeholder="$t('oa.message.placeholder.channel')" style="width:100%">
-            <el-option :label="$t('oa.message.site')" value="site" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('oa.message.recipient')" prop="recipientUserIds">
-          <UserMultiSelect v-model="sendForm.recipientUserIds" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitSend">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancelSend">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
-
     <!-- 查看消息 -->
     <el-dialog :title="$t('oa.message.viewMessage')" :visible.sync="viewOpen" width="600px" append-to-body>
       <el-descriptions :column="1" border>
@@ -189,12 +150,10 @@
 </template>
 
 <script>
-import { listMessage, sendMessage, readMessage, delMessage } from "@/api/oa/message"
-import UserMultiSelect from "@/components/UserMultiSelect"
+import { listMessage, readMessage, delMessage } from "@/api/oa/message"
 
 export default {
   name: "OaMessage",
-  components: { UserMultiSelect },
   data() {
     return {
       loading: true,
@@ -205,9 +164,7 @@ export default {
       showSearch: true,
       total: 0,
       messageList: [],
-      sendOpen: false,
       viewOpen: false,
-      sendForm: {},
       viewForm: {},
       queryParams: {
         pageNum: 1,
@@ -215,14 +172,6 @@ export default {
         title: undefined,
         type: undefined,
         recipientStatus: undefined
-      },
-      sendRules: {
-        title: [
-          { required: true, message: this.$t('oa.message.required.title'), trigger: "blur" }
-        ],
-        content: [
-          { required: true, message: this.$t('oa.message.required.content'), trigger: "blur" }
-        ]
       }
     }
   },
@@ -237,21 +186,6 @@ export default {
         this.total = response.total
         this.loading = false
       })
-    },
-    cancelSend() {
-      this.sendOpen = false
-      this.resetSend()
-    },
-    resetSend() {
-      this.sendForm = {
-        type: "system",
-        title: undefined,
-        content: undefined,
-        priority: "normal",
-        channel: "site",
-        recipientUserIds: ""
-      }
-      this.resetForm("sendForm")
     },
     handleQuery() {
       this.queryParams.pageNum = 1
@@ -268,24 +202,7 @@ export default {
       this.multiple = !selection.length
     },
     handleSend() {
-      this.resetSend()
-      this.sendOpen = true
-    },
-    submitSend() {
-      this.$refs["sendForm"].validate(valid => {
-        if (valid) {
-          const data = { ...this.sendForm }
-          data.recipientUserIds = String(data.recipientUserIds || "")
-            .split(",")
-            .map(s => Number(s.trim()))
-            .filter(id => !isNaN(id) && id > 0)
-          sendMessage(data).then(() => {
-            this.$modal.msgSuccess(this.$t('oa.message.sendSuccess'))
-            this.sendOpen = false
-            this.getList()
-          })
-        }
-      })
+      this.$router.push({ path: '/oa/message/form', query: { mode: 'add' } })
     },
     handleView(row) {
       this.viewForm = row
