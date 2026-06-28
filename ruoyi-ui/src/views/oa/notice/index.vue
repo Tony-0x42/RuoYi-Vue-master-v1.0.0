@@ -143,86 +143,14 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.notice.title')" prop="title">
-              <el-input v-model="form.title" :placeholder="$t('oa.notice.placeholder.title')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.notice.category')" prop="categoryId">
-              <el-select v-model="form.categoryId" :placeholder="$t('oa.notice.placeholder.category')" style="width:100%">
-                <el-option
-                  v-for="item in categoryList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.notice.scopeType')" prop="scopeType">
-              <el-select v-model="form.scopeType" :placeholder="$t('oa.notice.placeholder.scopeType')" style="width:100%">
-                <el-option :label="$t('oa.notice.scopeAll')" value="all" />
-                <el-option :label="$t('oa.notice.scopeDept')" value="dept" />
-                <el-option :label="$t('oa.notice.scopeRole')" value="role" />
-                <el-option :label="$t('oa.notice.scopeUser')" value="user" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.notice.expireTime')" prop="expireTime">
-              <el-date-picker
-                v-model="form.expireTime"
-                type="datetime"
-                :placeholder="$t('oa.notice.placeholder.expireTime')"
-                style="width:100%"
-                value-format="yyyy-MM-dd HH:mm:ss"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item :label="$t('common.status')" prop="status">
-              <el-radio-group v-model="form.status">
-                <el-radio :label="0">{{ $t('oa.notice.statusDraft') }}</el-radio>
-                <el-radio :label="1">{{ $t('oa.notice.statusPublished') }}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item>
-              <el-checkbox v-model="form.top">{{ $t('oa.notice.top') }}</el-checkbox>
-              <el-checkbox v-model="form.needConfirm">{{ $t('oa.notice.needConfirm') }}</el-checkbox>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item :label="$t('oa.notice.content')" prop="content">
-              <editor v-model="form.content" :min-height="192" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
-
-    <notice-detail ref="detailRef" :category-list="categoryList" />
   </div>
 </template>
 
 <script>
-import { listNotice, getNotice, addNotice, updateNotice, delNotice, offlineNotice, listCategory } from "@/api/oa/notice"
-import NoticeDetail from "./detail"
+import { listNotice, delNotice, offlineNotice, listCategory } from "@/api/oa/notice"
 
 export default {
   name: "OaNotice",
-  components: { NoticeDetail },
   data() {
     return {
       loading: true,
@@ -233,23 +161,12 @@ export default {
       total: 0,
       noticeList: [],
       categoryList: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         title: undefined,
         categoryId: undefined,
         status: undefined
-      },
-      form: {},
-      rules: {
-        title: [
-          { required: true, message: this.$t('oa.notice.required.title'), trigger: "blur" }
-        ],
-        categoryId: [
-          { required: true, message: this.$t('oa.notice.required.category'), trigger: "change" }
-        ]
       }
     }
   },
@@ -271,25 +188,6 @@ export default {
         this.loading = false
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        title: undefined,
-        categoryId: undefined,
-        content: undefined,
-        scopeType: "all",
-        scopeIds: undefined,
-        needConfirm: false,
-        top: false,
-        status: 0,
-        expireTime: undefined
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -304,45 +202,14 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.notice.addNotice')
+      this.$router.push('/oa/notice/form?mode=add')
     },
     handleUpdate(row) {
-      this.reset()
-      const id = row.id || this.ids
-      getNotice(id).then(response => {
-        this.form = response.data
-        this.form.needConfirm = this.form.needConfirm === 1
-        this.form.top = this.form.top === 1
-        this.open = true
-        this.title = this.$t('oa.notice.editNotice')
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          const data = { ...this.form }
-          data.needConfirm = data.needConfirm ? 1 : 0
-          data.top = data.top ? 1 : 0
-          if (data.id != undefined) {
-            updateNotice(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addNotice(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+      const id = row ? row.id : this.ids[0]
+      this.$router.push('/oa/notice/form?mode=edit&id=' + id)
     },
     handleView(row) {
-      this.$refs.detailRef.open(row.id)
+      this.$router.push('/oa/notice/form?mode=detail&id=' + row.id)
     },
     handleOffline(row) {
       this.$modal.confirm(this.$t('oa.notice.confirm.offline', { title: row.title })).then(function() {

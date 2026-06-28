@@ -87,51 +87,11 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item :label="$t('oa.attendance.group')" prop="name">
-          <el-input v-model="form.name" :placeholder="$t('oa.attendance.placeholder.name')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.memberType')" prop="memberType">
-          <el-select v-model="form.memberType" :placeholder="$t('oa.attendance.placeholder.memberType')" style="width:100%">
-            <el-option v-for="item in memberTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.memberIds')" prop="memberIds">
-          <el-input v-model="form.memberIds" :placeholder="$t('oa.attendance.placeholder.memberIds')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.shiftId')" prop="shiftId">
-          <el-select v-model="form.shiftId" :placeholder="$t('oa.attendance.placeholder.shiftId')" style="width:100%">
-            <el-option v-for="item in shiftOptions" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.checkInType')" prop="checkInType">
-          <el-select v-model="form.checkInType" :placeholder="$t('oa.attendance.placeholder.checkInType')" style="width:100%">
-            <el-option v-for="item in checkInTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.workDays')" prop="workDays">
-          <el-select v-model="form.workDays" :placeholder="$t('oa.attendance.placeholder.workDays')" style="width:100%">
-            <el-option label="周一到周五" value="1,2,3,4,5" />
-            <el-option label="周一到周六" value="1,2,3,4,5,6" />
-            <el-option label="每天" value="1,2,3,4,5,6,7" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('common.remark')">
-          <el-input v-model="form.remark" type="textarea" :rows="2" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listGroup, getGroup, addGroup, updateGroup, delGroup, listShift } from "@/api/oa/attendance"
+import { listGroup, delGroup, listShift } from "@/api/oa/attendance"
 
 export default {
   name: "OaAttendanceGroup",
@@ -145,18 +105,11 @@ export default {
       total: 0,
       groupList: [],
       shiftOptions: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         name: undefined,
         memberType: undefined
-      },
-      form: {},
-      rules: {
-        name: [{ required: true, message: this.$t('oa.attendance.required.name'), trigger: "blur" }],
-        shiftId: [{ required: true, message: this.$t('oa.attendance.required.shiftId'), trigger: "change" }]
       }
     }
   },
@@ -196,23 +149,6 @@ export default {
         this.shiftOptions = response.rows || []
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        name: undefined,
-        memberType: "user",
-        memberIds: undefined,
-        shiftId: undefined,
-        checkInType: "gps",
-        workDays: "1,2,3,4,5",
-        remark: undefined
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -227,37 +163,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.attendance.addGroup')
+      this.$router.push('/oa/attendance/group/form?mode=add')
     },
     handleUpdate(row) {
-      this.reset()
-      const id = row.id || this.ids
-      getGroup(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('oa.attendance.editGroup')
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.id != undefined) {
-            updateGroup(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addGroup(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+      const id = row ? row.id : this.ids[0]
+      this.$router.push('/oa/attendance/group/form?mode=edit&id=' + id)
     },
     handleDelete(row) {
       const ids = row.id || this.ids

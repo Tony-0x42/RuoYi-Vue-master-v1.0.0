@@ -2,16 +2,15 @@ import Layout from '@/layout'
 
 export default [
   {
-    path: '/oa/task/detail',
+    path: '/oa/task/form',
     component: Layout,
     hidden: true,
-    permissions: ['oa:task:list'],
     children: [
       {
-        path: ':id',
-        component: () => import('@/views/oa/task/index'),
-        name: 'OaTaskDetail',
-        meta: { title: 'oa.task.detail', activeMenu: '/oa/task' }
+        path: '',
+        component: () => import('@/views/oa/task/taskForm'),
+        name: 'OaTaskForm',
+        meta: { title: '任务', activeMenu: '/oa/task' }
       }
     ]
   }

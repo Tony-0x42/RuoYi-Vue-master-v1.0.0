@@ -99,50 +99,11 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item :label="$t('oa.attendance.userId')" prop="userId">
-          <el-select v-model="form.userId" :placeholder="$t('oa.attendance.placeholder.userId')" filterable style="width:100%">
-            <el-option v-for="user in userOptions" :key="user.userId" :label="user.nickName || user.userName" :value="user.userId" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.checkInTime')" prop="checkInTime">
-          <el-date-picker
-            v-model="form.checkInTime"
-            type="datetime"
-            value-format="yyyy-MM-dd HH:mm:ss"
-            :placeholder="$t('oa.attendance.checkInTime')"
-            style="width:100%"
-          />
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.checkInType')" prop="type">
-          <el-select v-model="form.type" :placeholder="$t('oa.attendance.placeholder.checkInType')" style="width:100%">
-            <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.location')" prop="location">
-          <el-input v-model="form.location" :placeholder="$t('oa.attendance.placeholder.location')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.attendance.status')" prop="status">
-          <el-select v-model="form.status" :placeholder="$t('oa.attendance.placeholder.status')" style="width:100%">
-            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('common.remark')">
-          <el-input v-model="form.remark" type="textarea" :rows="2" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listRecord, getRecord, addRecord, updateRecord, delRecord } from "@/api/oa/attendance"
+import { listRecord, delRecord } from "@/api/oa/attendance"
 import { listUser } from "@/api/system/user"
 
 export default {
@@ -158,18 +119,11 @@ export default {
       recordList: [],
       userOptions: [],
       dateRange: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         userId: undefined,
         status: undefined
-      },
-      form: {},
-      rules: {
-        userId: [{ required: true, message: this.$t('oa.attendance.required.userId'), trigger: "change" }],
-        checkInTime: [{ required: true, message: this.$t('oa.attendance.checkInTime'), trigger: "change" }]
       }
     }
   },
@@ -213,22 +167,6 @@ export default {
         this.userOptions = response.rows || []
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        userId: undefined,
-        checkInTime: undefined,
-        type: "gps",
-        location: undefined,
-        status: "normal",
-        remark: undefined
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -244,37 +182,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.attendance.addRecord')
+      this.$router.push('/oa/attendance/record/form?mode=add')
     },
     handleUpdate(row) {
-      this.reset()
-      const id = row.id || this.ids
-      getRecord(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('oa.attendance.editRecord')
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.id != undefined) {
-            updateRecord(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addRecord(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+      const id = row ? row.id : this.ids[0]
+      this.$router.push('/oa/attendance/record/form?mode=edit&id=' + id)
     },
     handleDelete(row) {
       const ids = row.id || this.ids

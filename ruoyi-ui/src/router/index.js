@@ -10,12 +10,31 @@ import oaAssetReceiveRoutes from './oa/assetReceive'
 import oaAssetTransferRoutes from './oa/assetTransfer'
 import oaAssetRepairRoutes from './oa/assetRepair'
 import oaAssetScrapRoutes from './oa/assetScrap'
+import oaAssetCategoryRoutes from './oa/assetCategory'
+import oaAssetInventoryRoutes from './oa/assetInventory'
 import oaExpenseRoutes from './oa/expense'
 import oaExpenseLoanRoutes from './oa/expenseLoan'
+import oaExpenseBudgetRoutes from './oa/expenseBudget'
+import oaExpenseInvoiceRoutes from './oa/expenseInvoice'
+import oaExpenseStandardRoutes from './oa/expenseStandard'
+import oaExpenseCategoryRoutes from './oa/expenseCategory'
 import oaLeaveRoutes from './oa/leave'
 import oaOvertimeRoutes from './oa/overtime'
 import oaTripRoutes from './oa/trip'
 import oaMakeupRoutes from './oa/makeup'
+import oaAttendanceGroupRoutes from './oa/group'
+import oaAttendanceRecordRoutes from './oa/record'
+import oaTaskRoutes from './oa/task'
+import oaMessageRoutes from './oa/message'
+import oaMessageTemplateRoutes from './oa/messageTemplate'
+import oaMeetingRoutes from './oa/meeting'
+import oaMeetingRoomRoutes from './oa/meetingRoom'
+import oaArticleRoutes from './oa/article'
+import oaKbCategoryRoutes from './oa/kbCategory'
+import oaNoticeRoutes from './oa/notice'
+import oaNoticeCategoryRoutes from './oa/noticeCategory'
+import oaCalendarEventRoutes from './oa/event'
+import oaAddressbookContactRoutes from './oa/contact'
 
 /**
  * Note: 路由配置项
@@ -226,12 +245,31 @@ export const dynamicRoutes = [
   ...oaAssetTransferRoutes,
   ...oaAssetRepairRoutes,
   ...oaAssetScrapRoutes,
+  ...oaAssetCategoryRoutes,
+  ...oaAssetInventoryRoutes,
   ...oaExpenseRoutes,
   ...oaExpenseLoanRoutes,
+  ...oaExpenseBudgetRoutes,
+  ...oaExpenseInvoiceRoutes,
+  ...oaExpenseStandardRoutes,
+  ...oaExpenseCategoryRoutes,
   ...oaLeaveRoutes,
   ...oaOvertimeRoutes,
   ...oaTripRoutes,
-  ...oaMakeupRoutes
+  ...oaMakeupRoutes,
+  ...oaAttendanceGroupRoutes,
+  ...oaAttendanceRecordRoutes,
+  ...oaTaskRoutes,
+  ...oaMessageRoutes,
+  ...oaMessageTemplateRoutes,
+  ...oaMeetingRoutes,
+  ...oaMeetingRoomRoutes,
+  ...oaArticleRoutes,
+  ...oaKbCategoryRoutes,
+  ...oaNoticeRoutes,
+  ...oaNoticeCategoryRoutes,
+  ...oaCalendarEventRoutes,
+  ...oaAddressbookContactRoutes
 ]
 
 // 防止连续点击多次路由报错

@@ -53,35 +53,11 @@
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
-
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item :label="$t('oa.asset.categoryName')" prop="name">
-          <el-input v-model="form.name" :placeholder="$t('oa.asset.categoryName')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.asset.categoryCode')" prop="code">
-          <el-input v-model="form.code" :placeholder="$t('oa.asset.categoryCode')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.asset.depreciationYears')" prop="depreciationYears">
-          <el-input-number v-model="form.depreciationYears" :min="0" :max="100" controls-position="right" />
-        </el-form-item>
-        <el-form-item :label="$t('common.status')" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio :label="1">{{ $t('oa.asset.enable') }}</el-radio>
-            <el-radio :label="0">{{ $t('oa.asset.disable') }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listCategory, getCategory, addCategory, updateCategory, delCategory } from "@/api/oa/asset"
+import { listCategory, delCategory } from "@/api/oa/asset"
 
 export default {
   name: "OaAssetCategory",
@@ -94,14 +70,7 @@ export default {
       showSearch: true,
       total: 0,
       categoryList: [],
-      title: "",
-      open: false,
-      queryParams: { pageNum: 1, pageSize: 10, name: undefined, status: undefined },
-      form: {},
-      rules: {
-        name: [{ required: true, message: this.$t('oa.asset.required.categoryName'), trigger: "blur" }],
-        code: [{ required: true, message: this.$t('oa.asset.required.categoryCode'), trigger: "blur" }]
-      }
+      queryParams: { pageNum: 1, pageSize: 10, name: undefined, status: undefined }
     }
   },
   created() {
@@ -115,14 +84,6 @@ export default {
         this.total = response.total
         this.loading = false
       })
-    },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = { id: undefined, name: undefined, code: undefined, depreciationYears: 5, status: 1, sort: 0, parentId: 0 }
-      this.resetForm("form")
     },
     handleQuery() {
       this.queryParams.pageNum = 1
@@ -138,29 +99,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.asset.addCategory')
+      this.$router.push({ path: '/oa/assetDir/assetCategory/form', query: { mode: 'add' } })
     },
     handleUpdate(row) {
-      this.reset()
       const id = row.id || this.ids
-      getCategory(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('oa.asset.editCategory')
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.id != undefined) {
-            updateCategory(this.form).then(() => { this.$modal.msgSuccess(this.$t('common.editSuccess')); this.open = false; this.getList() })
-          } else {
-            addCategory(this.form).then(() => { this.$modal.msgSuccess(this.$t('common.addSuccess')); this.open = false; this.getList() })
-          }
-        }
-      })
+      this.$router.push({ path: '/oa/assetDir/assetCategory/form', query: { mode: 'edit', id: id } })
     },
     handleDelete(row) {
       const ids = row.id || this.ids

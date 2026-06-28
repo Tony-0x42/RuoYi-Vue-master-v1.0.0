@@ -1,54 +1,50 @@
 <template>
   <div class="app-container">
-    <h3 class="page-title">{{ pageTitle }}</h3>
+    <div v-if="computedTitle" class="form-title">{{ computedTitle }}</div>
     <slot name="form" />
-    <oa-form-actions :mode="mode" @submit="handleSubmit" @save="handleSave" @close="handleClose" />
+    <slot v-if="!$slots.form" />
+    <oa-form-actions :mode="mode" @save="$emit('save')" @submit="$emit('submit')" @close="$emit('close')" />
   </div>
 </template>
 
 <script>
-import OaFormActions from "./OaFormActions"
+import OaFormActions from './OaFormActions'
 
 export default {
-  name: "OaFormPage",
-  components: {
-    OaFormActions
-  },
+  name: 'OaFormPage',
+  components: { OaFormActions },
   props: {
     title: {
       type: String,
-      default: undefined
+      default: ''
+    },
+    mode: {
+      type: String,
+      default: 'add'
     }
   },
   computed: {
-    mode() {
-      const m = this.$route.query.mode
-      return ["add", "edit", "detail"].includes(m) ? m : "add"
-    },
-    formId() {
-      return this.$route.query.id
-    },
-    pageTitle() {
-      const base = this.title || (this.$route.meta && this.$route.meta.title) || ""
-      const prefixMap = {
-        add: "新增",
-        edit: "编辑",
-        detail: "查看"
+    computedTitle() {
+      if (this.title) {
+        return this.title
       }
-      const prefix = prefixMap[this.mode] || ""
-      return prefix + base
-    }
-  },
-  methods: {
-    handleSubmit() {
-      this.$emit("submit")
-    },
-    handleSave() {
-      this.$emit("save")
-    },
-    handleClose() {
-      this.$router.back()
+      const metaTitle = this.$route && this.$route.meta && this.$route.meta.title
+      if (!metaTitle) {
+        return ''
+      }
+      const prefix = this.mode === 'add' ? '新增' : this.mode === 'edit' ? '编辑' : this.mode === 'detail' ? '查看' : ''
+      return prefix + metaTitle
     }
   }
 }
 </script>
+
+<style scoped>
+.form-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+</style>

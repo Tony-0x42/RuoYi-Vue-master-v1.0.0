@@ -122,31 +122,12 @@
       </el-col>
     </el-row>
 
-    <!-- 添加常用联系人对话框 -->
-    <el-dialog :title="$t('addressBook.addContact')" :visible.sync="contactOpen" width="400px" append-to-body>
-      <el-form ref="contactForm" :model="contactForm" label-width="80px">
-        <el-form-item :label="$t('addressBook.contactGroups')">
-          <el-select v-model="contactForm.groupId" clearable :placeholder="$t('addressBook.all')">
-            <el-option
-              v-for="group in contactGroups"
-              :key="group.groupId"
-              :label="group.groupName"
-              :value="group.groupId"
-            />
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitContact">{{ $t('common.confirm') }}</el-button>
-        <el-button @click="contactOpen = false">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import './i18n'
-import { getDeptTree, getDeptUsers, searchUsers, getUserDetail, addContact, listContactGroups } from '@/api/oa/addressbook'
+import { getDeptTree, getDeptUsers, searchUsers, getUserDetail } from '@/api/oa/addressbook'
 
 export default {
   name: 'OaAddressBook',
@@ -177,16 +158,7 @@ export default {
       // 当前选中人员
       selectedUser: null,
       // 同部门同事
-      subordinates: [],
-      // 联系人分组
-      contactGroups: [],
-      // 添加联系人弹窗
-      contactOpen: false,
-      // 联系人表单
-      contactForm: {
-        contactUserId: undefined,
-        groupId: undefined
-      }
+      subordinates: []
     }
   },
   watch: {
@@ -197,7 +169,6 @@ export default {
   created() {
     this.getDeptTree()
     this.getList()
-    this.getContactGroups()
   },
   methods: {
     /** 查询部门树 */
@@ -270,30 +241,13 @@ export default {
         this.subordinates = response.subordinates || []
       })
     },
-    /** 获取联系人分组 */
-    getContactGroups() {
-      listContactGroups().then(response => {
-        this.contactGroups = response.data || []
-      })
-    },
     /** 添加常用联系人 */
     handleAddContact() {
       if (!this.selectedUser) {
         this.$modal.msgWarning(this.$t('addressBook.noData'))
         return
       }
-      this.contactForm = {
-        contactUserId: this.selectedUser.userId,
-        groupId: undefined
-      }
-      this.contactOpen = true
-    },
-    /** 提交联系人 */
-    submitContact() {
-      addContact(this.contactForm).then(() => {
-        this.$modal.msgSuccess(this.$t('common.success'))
-        this.contactOpen = false
-      })
+      this.$router.push('/oa/addressbook/form?mode=add&contactUserId=' + this.selectedUser.userId)
     }
   }
 }

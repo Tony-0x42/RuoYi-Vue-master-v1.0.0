@@ -2,16 +2,15 @@ import Layout from '@/layout'
 
 export default [
   {
-    path: '/oa/notice/detail',
+    path: '/oa/notice/form',
     component: Layout,
     hidden: true,
-    permissions: ['oa:notice:list'],
     children: [
       {
-        path: ':id',
-        component: () => import('@/views/oa/notice/detail'),
-        name: 'OaNoticeDetail',
-        meta: { title: 'oa.notice.detail', activeMenu: '/oa/notice' }
+        path: '',
+        component: () => import('@/views/oa/notice/noticeForm'),
+        name: 'OaNoticeForm',
+        meta: { title: '公告', activeMenu: '/oa/notice' }
       }
     ]
   }

@@ -111,44 +111,11 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item :label="$t('oa.meeting.room.code')" prop="code">
-          <el-input v-model="form.code" :placeholder="$t('oa.meeting.room.codePlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.meeting.room.name')" prop="name">
-          <el-input v-model="form.name" :placeholder="$t('oa.meeting.room.namePlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.meeting.room.location')" prop="location">
-          <el-input v-model="form.location" :placeholder="$t('oa.meeting.room.locationPlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.meeting.room.capacity')" prop="capacity">
-          <el-input-number v-model="form.capacity" :min="1" controls-position="right" style="width: 100%" />
-        </el-form-item>
-        <el-form-item :label="$t('oa.meeting.room.devices')" prop="devices">
-          <el-input v-model="form.devices" :placeholder="$t('oa.meeting.room.devicesPlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="$t('common.status')" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio :label="1">{{ $t('oa.meeting.room.enable') }}</el-radio>
-            <el-radio :label="0">{{ $t('oa.meeting.room.disable') }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item :label="$t('oa.meeting.room.picUrl')" prop="picUrl">
-          <el-input v-model="form.picUrl" placeholder="https://" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listRoom, getRoom, addRoom, updateRoom, delRoom } from "@/api/oa/meeting"
+import { listRoom, delRoom } from "@/api/oa/meeting"
 
 export default {
   name: "OaMeetingRoom",
@@ -161,26 +128,12 @@ export default {
       showSearch: true,
       total: 0,
       roomList: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         code: undefined,
         name: undefined,
         status: undefined
-      },
-      form: {},
-      rules: {
-        code: [
-          { required: true, message: this.$t('oa.meeting.required.code'), trigger: "blur" }
-        ],
-        name: [
-          { required: true, message: this.$t('oa.meeting.required.name'), trigger: "blur" }
-        ],
-        capacity: [
-          { required: true, message: this.$t('oa.meeting.required.capacity'), trigger: "blur" }
-        ]
       }
     }
   },
@@ -196,23 +149,6 @@ export default {
         this.loading = false
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        code: undefined,
-        name: undefined,
-        location: undefined,
-        capacity: 10,
-        devices: undefined,
-        status: 1,
-        picUrl: undefined
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -227,37 +163,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('common.add') + this.$t('oa.meeting.roomTitle')
+      this.$router.push('/oa/meetingRoom/form?mode=add')
     },
     handleUpdate(row) {
-      this.reset()
-      const id = row.id || this.ids
-      getRoom(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('common.edit') + this.$t('oa.meeting.roomTitle')
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.id != undefined) {
-            updateRoom(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addRoom(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+      const id = row ? row.id : this.ids[0]
+      this.$router.push('/oa/meetingRoom/form?mode=edit&id=' + id)
     },
     handleDelete(row) {
       const ids = row.id || this.ids

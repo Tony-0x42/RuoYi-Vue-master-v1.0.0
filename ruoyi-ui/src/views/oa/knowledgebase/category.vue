@@ -125,7 +125,7 @@
 </template>
 
 <script>
-import { listCategory, getCategory, addCategory, updateCategory, delCategory } from "@/api/oa/knowledgebase"
+import { listCategory, delCategory } from "@/api/oa/knowledgebase"
 
 export default {
   name: "OaKnowledgebaseCategory",
@@ -138,22 +138,11 @@ export default {
       showSearch: true,
       total: 0,
       categoryList: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         name: undefined,
         status: undefined
-      },
-      form: {},
-      rules: {
-        name: [
-          { required: true, message: this.$t('oa.knowledgebase.required.title'), trigger: "blur" }
-        ],
-        code: [
-          { required: true, message: this.$t('oa.knowledgebase.required.categoryCode'), trigger: "blur" }
-        ]
       }
     }
   },
@@ -169,21 +158,6 @@ export default {
         this.loading = false
       })
     },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        name: undefined,
-        code: undefined,
-        status: 1,
-        sort: 0,
-        parentId: 0
-      }
-      this.resetForm("form")
-    },
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
@@ -198,37 +172,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.knowledgebase.addCategory')
+      this.$router.push('/oa/knowledgebaseCategory/form?mode=add')
     },
     handleUpdate(row) {
-      this.reset()
-      const id = row.id || this.ids
-      getCategory(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = this.$t('oa.knowledgebase.editCategory')
-      })
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.id != undefined) {
-            updateCategory(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addCategory(this.form).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+      const id = row ? row.id : this.ids[0]
+      this.$router.push('/oa/knowledgebaseCategory/form?mode=edit&id=' + id)
     },
     handleDelete(row) {
       const ids = row.id || this.ids
