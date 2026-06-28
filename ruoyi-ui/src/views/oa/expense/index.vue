@@ -128,111 +128,12 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.userName')" prop="userName">
-              <el-input v-model="form.userName" :placeholder="$t('oa.expense.placeholder.userName')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('oa.expense.category')" prop="categoryId">
-              <el-select v-model="form.categoryId" :placeholder="$t('oa.expense.placeholder.category')" style="width:100%">
-                <el-option
-                  v-for="item in categoryList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item :label="$t('oa.expense.reason')" prop="reason">
-              <el-input v-model="form.reason" type="textarea" :placeholder="$t('oa.expense.placeholder.reason')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item :label="$t('oa.expense.loan')" prop="loanId">
-              <el-select v-model="form.loanId" :placeholder="$t('oa.expense.placeholder.loan')" clearable style="width:50%">
-                <el-option
-                  v-for="item in availableLoanList"
-                  :key="item.id"
-                  :label="item.reason + ' (' + item.amount + ')'"
-                  :value="item.id"
-                />
-              </el-select>
-              <el-input-number v-model="form.offsetAmount" :min="0" :precision="2" style="margin-left:10px" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-divider content-position="left">{{ $t('oa.expense.items') }}</el-divider>
-        <el-table :data="form.items" border>
-          <el-table-column :label="$t('oa.expense.category')" align="center" width="180">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.categoryId" size="mini" style="width:100%">
-                <el-option
-                  v-for="item in categoryList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column :label="$t('oa.expense.amount')" align="center" width="140">
-            <template slot-scope="scope">
-              <el-input-number v-model="scope.row.amount" :min="0" :precision="2" size="mini" style="width:100%" />
-            </template>
-          </el-table-column>
-          <el-table-column :label="$t('oa.expense.invoice')" align="center" width="140">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.invoiceId" size="mini" clearable style="width:100%">
-                <el-option
-                  v-for="item in invoiceList"
-                  :key="item.id"
-                  :label="item.invoiceNo"
-                  :value="item.id"
-                />
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column :label="$t('oa.expense.expenseDate')" align="center" width="150">
-            <template slot-scope="scope">
-              <el-date-picker v-model="scope.row.expenseDate" type="date" size="mini" value-format="yyyy-MM-dd" style="width:100%" />
-            </template>
-          </el-table-column>
-          <el-table-column :label="$t('oa.expense.description')" align="center">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.description" size="mini" />
-            </template>
-          </el-table-column>
-          <el-table-column :label="$t('common.operation')" align="center" width="80">
-            <template slot-scope="scope">
-              <el-button size="mini" type="text" icon="el-icon-delete" @click="removeItem(scope.$index)">{{ $t('common.delete') }}</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-row style="margin-top:10px">
-          <el-col :span="24" style="text-align:center">
-            <el-button type="primary" size="mini" icon="el-icon-plus" @click="addItem">{{ $t('oa.expense.addItem') }}</el-button>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">{{ $t('common.submit') }}</el-button>
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listReport, getReport, addReport, updateReport, delReport, submitReport } from "@/api/oa/expense"
-import { listCategory, listInvoice, listAvailableLoan } from "@/api/oa/expense"
+import { listReport, delReport, submitReport } from "@/api/oa/expense"
+import { listCategory } from "@/api/oa/expense"
 
 export default {
   name: "OaExpenseReport",
@@ -246,50 +147,23 @@ export default {
       total: 0,
       reportList: [],
       categoryList: [],
-      invoiceList: [],
-      availableLoanList: [],
-      title: "",
-      open: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         userName: undefined,
         categoryId: undefined,
         status: undefined
-      },
-      form: {
-        items: []
-      },
-      rules: {
-        userName: [
-          { required: true, message: this.$t('oa.expense.required.userName'), trigger: "blur" }
-        ],
-        categoryId: [
-          { required: true, message: this.$t('oa.expense.required.category'), trigger: "change" }
-        ]
       }
     }
   },
   created() {
     this.getCategoryList()
-    this.getInvoiceList()
-    this.getAvailableLoanList()
     this.getList()
   },
   methods: {
     getCategoryList() {
       listCategory({ pageNum: 1, pageSize: 1000, status: 1 }).then(response => {
         this.categoryList = response.rows
-      })
-    },
-    getInvoiceList() {
-      listInvoice({ pageNum: 1, pageSize: 1000, status: 0 }).then(response => {
-        this.invoiceList = response.rows
-      })
-    },
-    getAvailableLoanList() {
-      listAvailableLoan().then(response => {
-        this.availableLoanList = response.rows
       })
     },
     getList() {
@@ -299,25 +173,6 @@ export default {
         this.total = response.total
         this.loading = false
       })
-    },
-    cancel() {
-      this.open = false
-      this.reset()
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        userName: undefined,
-        userId: undefined,
-        deptId: undefined,
-        categoryId: undefined,
-        reason: undefined,
-        loanId: undefined,
-        offsetAmount: 0,
-        status: 0,
-        items: []
-      }
-      this.resetForm("form")
     },
     handleQuery() {
       this.queryParams.pageNum = 1
@@ -333,53 +188,11 @@ export default {
       this.multiple = !selection.length
     },
     handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = this.$t('oa.expense.addReport')
+      this.$router.push('/oa/expense/form?mode=add')
     },
     handleUpdate(row) {
-      this.reset()
-      const id = row.id || this.ids
-      getReport(id).then(response => {
-        this.form = response.data
-        if (!this.form.items) {
-          this.form.items = []
-        }
-        this.open = true
-        this.title = this.$t('oa.expense.editReport')
-      })
-    },
-    addItem() {
-      this.form.items.push({
-        categoryId: undefined,
-        amount: 0,
-        invoiceId: undefined,
-        description: undefined,
-        expenseDate: undefined
-      })
-    },
-    removeItem(index) {
-      this.form.items.splice(index, 1)
-    },
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          const data = { ...this.form }
-          if (data.id != undefined) {
-            updateReport(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.editSuccess'))
-              this.open = false
-              this.getList()
-            })
-          } else {
-            addReport(data).then(() => {
-              this.$modal.msgSuccess(this.$t('common.addSuccess'))
-              this.open = false
-              this.getList()
-            })
-          }
-        }
-      })
+      const id = row ? row.id : this.ids[0]
+      this.$router.push('/oa/expense/form?mode=edit&id=' + id)
     },
     handleSubmit(row) {
       this.$modal.confirm(this.$t('oa.expense.confirm.submit', { id: row.id })).then(function() {

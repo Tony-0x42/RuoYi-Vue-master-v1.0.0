@@ -6,6 +6,7 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/layout'
 import oaAssetRoutes from './oa/asset'
+import oaExpenseRoutes from './oa/expense'
 
 /**
  * Note: 路由配置项
@@ -211,7 +212,8 @@ export const dynamicRoutes = [
       }
     ]
   },
-  ...oaAssetRoutes
+  ...oaAssetRoutes,
+  ...oaExpenseRoutes
 ]
 
 // 防止连续点击多次路由报错
