@@ -122,14 +122,25 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <flow-submit-dialog
+      :visible.sync="flowDialogVisible"
+      title="审批办理"
+      :task-id="flowDialogTaskId"
+      :process-key="flowDialogProcessKey"
+      :business-key="flowDialogBusinessKey"
+      @success="handleFlowSuccess"
+    />
   </div>
 </template>
 
 <script>
 import { getHome, listTodos, listMessages, listApps, toggleFavorite, getDashboard } from "@/api/oa/portal"
+import FlowSubmitDialog from "@/components/FlowSubmitDialog"
 
 export default {
   name: "OaPortal",
+  components: { FlowSubmitDialog },
   data() {
     return {
       todoLoading: false,
@@ -153,7 +164,11 @@ export default {
         { time: "14:00", title: this.$t('oa.portal.scheduleReview') }
       ],
       dashboardRange: "7",
-      dashboardData: {}
+      dashboardData: {},
+      flowDialogVisible: false,
+      flowDialogTaskId: undefined,
+      flowDialogProcessKey: undefined,
+      flowDialogBusinessKey: undefined
     }
   },
   created() {
@@ -212,7 +227,19 @@ export default {
       })
     },
     handleTodo(row) {
-      this.$router.push({ path: '/bpm/task/todo' })
+      this.flowDialogTaskId = row.taskId
+      this.flowDialogProcessKey = this.parseProcessKey(row.businessKey)
+      this.flowDialogBusinessKey = row.businessKey
+      this.flowDialogVisible = true
+    },
+    parseProcessKey(businessKey) {
+      if (!businessKey) return ''
+      const prefix = businessKey.split(':')[0]
+      return prefix ? 'oa_' + prefix : ''
+    },
+    handleFlowSuccess() {
+      this.$modal.msgSuccess('操作成功')
+      this.loadTodos()
     },
     handleMoreTodo() {
       this.$modal.msgInfo(this.$t('oa.portal.moreTodo'))
